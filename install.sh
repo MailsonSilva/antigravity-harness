@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Antigravity Developer Harness - Instalador Universal (Linux / macOS / WSL / Git Bash)
-# Instala o ecossistema completo de agentes, TDD, Stitch MCP, Graft e ai-memory.
+# 100% Autocontido: Instala ferramentas (ai-memory, graft), regras, skills e workflows
 # ==============================================================================
 
 set -e
@@ -9,6 +9,7 @@ set -e
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
+GRAY='\033[0;37m'
 NC='\033[0m' # No Color
 
 echo -e "${CYAN}=====================================================${NC}"
@@ -21,7 +22,40 @@ cd "$TARGET_DIR"
 
 echo -e "${YELLOW}📁 Criando estrutura de pastas no diretório: $(pwd)${NC}"
 
-# 1. Criação das pastas fundamentais
+# ------------------------------------------------------------------------------
+# 1. Verificação e Instalação de Ferramentas Auxiliares (MCPs & CLI Tools)
+# ------------------------------------------------------------------------------
+echo -e "\n${YELLOW}🔍 Verificando ferramentas auxiliares...${NC}"
+
+# 1.1 Checagem do Node / npm e ai-memory
+if command -v npm &> /dev/null; then
+    if ! command -v ai-memory &> /dev/null; then
+        echo -e "${CYAN}📦 Instalando ai-memory globalmente via npm...${NC}"
+        npm install -g ai-memory || echo -e "${YELLOW}⚠️ Falha ao instalar ai-memory globalmente. Execute 'npm i -g ai-memory' com permissões adequadas se necessário.${NC}"
+    else
+        echo -e "${GREEN}✔ ai-memory já instalado no sistema.${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠️ Node.js / npm não detectado. O servidor ai-memory precisará do Node instalado para rodar.${NC}"
+fi
+
+# 1.2 Checagem do Graft (AST Graph Navigator)
+if ! command -v graft &> /dev/null; then
+    if command -v cargo &> /dev/null; then
+        echo -e "${CYAN}📦 Compilando e instalando Graft via Cargo...${NC}"
+        cargo install graft-cli || echo -e "${YELLOW}⚠️️ Falha ao compilar graft via cargo.${NC}"
+    else
+        echo -e "${YELLOW}ℹ️️ Cargo não detectado. O harness usará fallback para análise estática nativa caso o binário do Graft não esteja no PATH.${NC}"
+    fi
+else
+    echo -e "${GREEN}✔ Graft já instalado no sistema.${NC}"
+fi
+
+# ------------------------------------------------------------------------------
+# 2. Criação das pastas fundamentais
+# ------------------------------------------------------------------------------
+echo -e "\n${YELLOW}📁 Criando diretórios do projeto...${NC}"
+
 mkdir -p .agents/rules
 mkdir -p .agents/skills/spec-discovery
 mkdir -p .agents/skills/mobile-ux-stitch
@@ -36,11 +70,15 @@ mkdir -p apps/mobile
 mkdir -p apps/web
 mkdir -p apps/landing
 
+# Criação de .gitkeep para garantir que as pastas de referências subam para o Git
+touch _references/screens/.gitkeep
+touch _references/brand/.gitkeep
+
 echo -e "${GREEN}✔ Diretórios criados com sucesso.${NC}"
-echo -e "${YELLOW}📄 Gerando arquivos de configuração, regras e skills...${NC}"
+echo -e "${YELLOW}📄 Gerando arquivos de configuração, regras, skills e workflows...${NC}"
 
 # ------------------------------------------------------------------------------
-# 2. _specs/prd-template.md (Agnóstico e Dinâmico)
+# 3. _specs/prd-template.md (Agnóstico e Dinâmico)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > _specs/prd-template.md
 ---
@@ -140,7 +178,7 @@ technology_choices:
 EOF
 
 # ------------------------------------------------------------------------------
-# 3. .agents/harness.yaml (Modelos Dinâmicos Gemini 3.8 & Subagentes)
+# 4. .agents/harness.yaml (Modelos Dinâmicos Gemini 3.8 & Subagentes)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/harness.yaml
 version: "1.0"
@@ -268,7 +306,7 @@ workflows:
 EOF
 
 # ------------------------------------------------------------------------------
-# 4. .agents/mcp.json (Configuração dos MCP Servers)
+# 5. .agents/mcp.json (Configuração dos MCP Servers)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/mcp.json
 {
@@ -308,7 +346,7 @@ cat << 'EOF' > .agents/mcp.json
 EOF
 
 # ------------------------------------------------------------------------------
-# 5. .agents/rules/ (Regras de Engenharia)
+# 6. .agents/rules/ (Regras de Engenharia)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/rules/global.md
 # Diretrizes Globais do Harness de Engenharia
@@ -500,7 +538,7 @@ Inspirado nas diretrizes de alta performance de Addy Osmani:
 EOF
 
 # ------------------------------------------------------------------------------
-# 6. .agents/skills/ (As 4 Skills Fundamentais)
+# 7. .agents/skills/ (As 4 Skills Fundamentais)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/skills/spec-discovery/SKILL.md
 ---
@@ -597,7 +635,7 @@ Esta skill dita o comportamento dos subagentes `tdd_tester`, `mobile_builder` e 
 EOF
 
 # ------------------------------------------------------------------------------
-# 7. .agents/workflows/dev-cycle.yaml (Workflow Completo com TDD e Git)
+# 8. .agents/workflows/dev-cycle.yaml (Workflow Completo com TDD e Git)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/workflows/dev-cycle.yaml
 version: "1.0"
@@ -727,7 +765,7 @@ steps:
 EOF
 
 # ------------------------------------------------------------------------------
-# 8. .gitignore recomendado
+# 9. .gitignore recomendado
 # ------------------------------------------------------------------------------
 if [ ! -f .gitignore ]; then
 cat << 'EOF' > .gitignore
