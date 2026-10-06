@@ -75,3 +75,16 @@ Quando o projeto utilizar persistência local em SQLite:
 - O código deve compilar sem nenhum aviso de linter (`flutter analyze` deve retornar código de saída `0`).
 - Use o formatador padrão do Dart (`dart format .`) antes de qualquer submissão de código.
 - Nomes de classes em `UpperCamelCase`, nomes de variáveis e métodos em `lowerCamelCase`, e nomes de arquivos em `snake_case`.
+
+---
+
+## 6. Versionamento, Flavors e Assinatura de Release
+1. **Versionamento Único**:
+   - A versão do app vive no `pubspec.yaml` (`version: x.y.z+build`). Todo release incrementa o build number; toda entrega visível incrementa `x.y.z` seguindo semver.
+2. **Flavors Obrigatórios (`dev` / `stg` / `prod`)**:
+   - Nenhum build de produção pode apontar para backend de desenvolvimento. Use `--flavor` com entrypoints e bundle IDs/applicationIds distintos por ambiente.
+3. **Assinatura**:
+   - Android: App Bundle (`.aab`) assinado com upload key versionada fora do repo (nunca commitar keystore ou `key.properties`).
+   - iOS: distribuição via certificado + provisioning profile gerenciados por `fastlane match`; segredos apenas em variáveis de ambiente do CI.
+4. **Gate de Release**:
+   - Nenhum build sobe para loja sem `flutter test` + `dart analyze` verdes na mesma revisão.

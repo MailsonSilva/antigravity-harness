@@ -16,8 +16,8 @@ inputs:
     default: ""
   target:
     type: string
-    description: "Alvo da execução: mobile | web | landing (se omitido, lê targets de _specs/prd.md)"
-    default: "mobile"
+    description: "Plataforma de destino do build: android | ios | both"
+    default: "both"
   skip_design:
     type: boolean
     description: "Pular inspeção visual para tarefas puramente de lógica ou backend"
@@ -77,18 +77,11 @@ steps:
     thinking_budget: 0
     description: "Escreve o código estritamente necessário para satisfazer os testes e a spec."
 
-  - id: web_performance_audit
-    name: "5. Auditoria de Performance e Padrões Web"
-    skill: web-performance
-    condition: "${inputs.target == 'web' || inputs.target == 'landing'}"
-    thinking_budget: 1000
-    description: "Verifica renderizações, hidratação, bundle size e Core Web Vitals no Next.js."
-
   - id: automated_validation_loop
     name: "6. Validação Contínua (Linter, Tipos e Testes)"
     skill: code-quality-tests
     thinking_budget: 1000
-    description: "Executa a suíte de testes e o type-check até garantir estabilidade completa."
+    description: "Executa flutter test e dart analyze até garantir estabilidade completa."
 
   - id: git_semantic_commit
     name: "7. Versionamento Semântico no Git"

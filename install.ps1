@@ -65,7 +65,6 @@ $dirs = @(
     ".agents\rules",
     ".agents\skills\spec-discovery",
     ".agents\skills\mobile-ux",
-    ".agents\skills\web-performance",
     ".agents\skills\clean-architecture",
     ".agents\skills\code-quality-tests",
     ".agents\skills\antigravity-skill-orchestrator",
@@ -75,9 +74,7 @@ $dirs = @(
     "_specs\tasks",
     "_references\screens",
     "_references\brand",
-    "apps\mobile",
-    "apps\web",
-    "apps\landing"
+    "apps\mobile"
 )
 
 foreach ($d in $dirs) {
@@ -103,11 +100,10 @@ version: "0.1.0"
 date: "2026-10-01"
 status: "draft" # draft | approved | in_progress | completed
 
-# Alvos da aplicação (ativados na fase de descoberta)
-targets:
-  mobile: true        # apps/mobile
-  web: false          # apps/web
-  landing_page: true  # apps/landing
+# Plataformas do aplicativo (ativadas na fase de descoberta)
+platforms:
+  android: true
+  ios: true
 
 # Definição tecnológica aberta decidida na descoberta
 technology_choices:
@@ -117,10 +113,9 @@ technology_choices:
   primary_database: "to_be_decided" # ex: sqlite, postgres, mysql, supabase, firebase, local_json, nenhum
   backend_strategy: "to_be_decided" # ex: direct_db, custom_api, edge_functions, baas, offline_only
 
-  # Frameworks decididos por alvo
+  # Framework do app
   mobile_framework: "flutter" # ou react_native_expo, nativo, etc.
-  web_framework: "nextjs"     # ou react_vite, astro, etc.
-  styling_approach: "tokens"  # tailwind, design_tokens, material3
+  styling_approach: "tokens"  # design_tokens, material3
 ---
 
 # PRD: {{project_name}}
@@ -144,22 +139,12 @@ technology_choices:
 
 ---
 
-## 3. Escopo dos Alvos (Targets)
+## 3. Escopo do Aplicativo Mobile (`apps/mobile`)
 
-### 3.1. Aplicativo Mobile (`apps/mobile`)
-> *Status: [Ativo / Inativo]*
-- **Papel no Produto**: 
+- **Papel no Produto**:
 - **Capacidades Críticas**: [Offline-first, notificações, acesso à câmera, biometria, etc.]
-
-### 3.2. Painel Web / Dashboard (`apps/web`)
-> *Status: [Ativo / Inativo]*
-- **Papel no Produto**: 
-- **Capacidades Críticas**: [Relatórios, dashboards gerenciais, operações em massa, desktop-friendly]
-
-### 3.3. Landing Page / Site Institucional (`apps/landing`)
-> *Status: [Ativo / Inativo]*
-- **Papel no Produto**: 
-- **Capacidades Críticas**: [Alta conversão, SEO semântico, carregamento instantâneo, captura de leads]
+- **Plataformas**: [Android e/ou iOS, versão mínima do SO por plataforma]
+- **Matriz de Devices**: [modelos e tamanhos de tela prioritários para teste]
 
 ---
 
@@ -177,7 +162,7 @@ technology_choices:
 
 ### Épico 1: [Nome do Fluxo Principal]
 - **Como** [perfil de usuário],
-- **Quero** [realizar uma ação no app/web],
+- **Quero** [realizar uma ação no app],
 - **Para** [atingir determinado benefício].
 
 **Critérios de Aceitação Obrigatórios**:
@@ -224,19 +209,8 @@ workspaces:
       - ".agents/"
   mobile:
     path: "apps/mobile/"
-    active_when: "targets.mobile == true"
     test_command: "cd apps/mobile && flutter test"
     lint_command: "cd apps/mobile && dart analyze"
-  web:
-    path: "apps/web/"
-    active_when: "targets.web == true"
-    test_command: "cd apps/web && npm test"
-    lint_command: "cd apps/web && npm run lint"
-  landing:
-    path: "apps/landing/"
-    active_when: "targets.landing_page == true"
-    test_command: "cd apps/landing && npm test"
-    lint_command: "cd apps/landing && npm run lint"
 
 tools:
   ai_memory:
@@ -283,7 +257,6 @@ subagents:
   mobile_builder:
     model: "${MODEL_CODING}"
     role: "Escreve código Flutter estritamente tipado, modular e aderente à Clean Architecture para passar nos testes."
-    active_when: "targets.mobile == true"
     rules:
       - ".agents/rules/global.md"
       - ".agents/rules/mobile.md"
@@ -292,21 +265,9 @@ subagents:
       - ".agents/skills/clean-architecture/SKILL.md"
     tools: ["file_read", "file_write", "graft", "ai_memory"]
 
-  web_builder:
-    model: "${MODEL_CODING}"
-    role: "Escreve componentes Next.js/React com Server Components e boas práticas de Core Web Vitals (Addy Osmani)."
-    active_when: "targets.web == true || targets.landing_page == true"
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/web.md"
-    skills:
-      - ".agents/skills/web-performance/SKILL.md"
-      - ".agent/skills/nextjs-app-router-patterns/SKILL.md"
-    tools: ["file_read", "file_write", "graft", "ai_memory"]
-
   qa_validator:
     model: "${MODEL_CODING}"
-    role: "Executa testes e linters do target ativo, orquestrando até 3 ciclos de autorreparo automático caso algo quebre."
+    role: "Executa testes e linters do app mobile, orquestrando até 3 ciclos de autorreparo automático caso algo quebre."
     rules:
       - ".agents/rules/global.md"
     skills:
@@ -367,7 +328,7 @@ workflows:
 '@ | Set-Content -Path ".agents\mcp.json" -Encoding UTF8
 
 # ------------------------------------------------------------------------------
-# 6. .agents/rules/ (global.md, mobile.md, web.md)
+# 6. .agents/rules/ (global.md, mobile.md)
 # ------------------------------------------------------------------------------
 @'
 # Diretrizes Globais do Harness de Engenharia
@@ -496,68 +457,6 @@ Toda tela que consulta, carrega ou submete informações DEVE implementar explic
    - Testes unitários de repositórios e DAOs locais devem rodar em memória (ex.: `sqflite_common_ffi`), garantindo feedback em milissegundos sem depender de emulador físico.
 '@ | Set-Content -Path ".agents\rules\mobile.md" -Encoding UTF8
 
-@'
-# Diretrizes Técnicas para Desenvolvimento Web e Landing Pages (Next.js / React)
-
-Este guia estabelece os padrões de arquitetura, ergonomia de componentes, performance de renderização (Core Web Vitals) e boas práticas de conversão para aplicações em `apps/web/` e `apps/landing/`.
-
----
-
-## 1. Arquitetura de Software e Estrutura de Diretórios
-Adotamos o padrão modular com Next.js (App Router) e TypeScript estrito:
-
-```text
-apps/[web|landing]/
-├── app/                   # Rotas, Layouts e Server Actions (App Router)
-│   ├── (auth)/            # Rotas autenticadas agrupadas
-│   ├── api/               # Route Handlers para webhooks/integrações
-│   ├── layout.tsx         # Layout raiz com fontes e metadados globais
-│   └── page.tsx           # Ponto de entrada da aplicação/landing
-├── components/            # Componentes visuais reutilizáveis
-│   ├── ui/                # Componentes atômicos e primitivos (Design System / Tailwind)
-│   └── shared/            # Componentes compostos entre páginas
-├── lib/                   # Utilitários, clientes de dados e conexões
-└── types/                 # Interfaces e tipos globais TypeScript
-```
-
----
-
-## 2. Paradigma Server-First (RSC) e Gestão de Estado
-1. **Server Components por Padrão**:
-   - Todo componente deve ser renderizado no servidor por padrão (`React Server Component`).
-   - A diretiva `'use client'` deve ser restrita exclusivamente às folhas da árvore de componentes que exigem interatividade imediata (event listeners, hooks como `useState`/`useEffect` ou APIs de navegador).
-2. **Data Fetching Direto no Servidor**:
-   - Evite carregar dados primários através de `useEffect` no cliente. Busque os dados diretamente em Server Components assíncronos (`async/await`) para eliminar cascatas (*waterfalls*).
-3. **Mutações Seguras via Server Actions**:
-   - Formulários e ações de escrita devem priorizar **Server Actions** tipadas com validação de schema (ex.: Zod).
-
----
-
-## 3. Performance Web e Core Web Vitals (Padrões de Engenharia)
-Inspirado nas diretrizes de alta performance de Addy Osmani:
-1. **Otimização de Carregamento de Recursos**:
-   - Imagens devem obrigatoriamente utilizar o componente `next/image` com dimensões explícitas (`width` e `height`) ou propriedade `fill`, prevenindo CLS (Cumulative Layout Shift).
-   - A imagem principal da primeira dobra (*Hero Image*) deve conter a propriedade `priority` para otimizar o LCP (Largest Contentful Paint).
-2. **Fontes Locais e Zero Layout Shift**:
-   - Carregue fontes via `next/font` com estratégia de swap automático.
-3. **Eliminação de Código Não Utilizado**:
-   - Importe ícones e módulos de forma granular (ex.: `lucide-react` com imports individuais).
-
----
-
-## 4. Landing Pages de Alta Conversão e SEO (`apps/landing`)
-1. **Metadados e Open Graph Dinâmicos**:
-   - Todo layout ou página pública deve declarar o objeto `metadata` completo: `title`, `description`, `openGraph` (com imagem de preview de 1200x630px) e `robots`.
-2. **Semântica HTML e Acessibilidade (a11y)**:
-   - Respeite rigorosamente a hierarquia de títulos: apenas um único `<h1>` por página, seguido de `<h2>` e `<h3>`.
-   - Contraste de cores conforme as diretrizes WCAG AA.
-3. **Seções Obrigatórias de Conversão**:
-   - **Above the Fold**: Proposta de valor clara, subtítulo de reforço e CTA principal.
-   - **Prova Social / Demonstração**: Demonstração visual do valor gerado ou depoimentos.
-   - **Tabela de Preços / Planos**: Comparativo direto e transparente.
-   - **FAQ com Acordeão**: Quebra das principais objeções antes da compra.
-'@ | Set-Content -Path ".agents\rules\web.md" -Encoding UTF8
-
 # ------------------------------------------------------------------------------
 # 7. .agents/skills/ (As 4 Skills Fundamentais)
 # ------------------------------------------------------------------------------
@@ -574,7 +473,7 @@ Esta skill orienta o agente `product_architect` na formalização de escopo e es
 ## 1. Processo de Entrevista de Produto
 O agente deve formular perguntas curtas e diretas ao desenvolvedor, cobrindo:
 1. **Dor Central**: Qual gargalo o usuário enfrenta sem esse software?
-2. **Alvos do Projeto (Targets)**: O projeto terá App Mobile, Painel Web e/ou Landing Page?
+2. **Plataformas do App**: O projeto atende Android, iOS ou ambos? Quais versões mínimas?
 3. **Decisão de Persistência**: A solução precisa de banco 100% local (ex: SQLite), sincronização em nuvem ou API externa?
 4. **Métrica de Sucesso (North Star Metric)**: O que valida comercialmente o produto no curto prazo?
 
@@ -608,27 +507,6 @@ Quando existirem capturas ou imagens em `_references/screens/`:
   - `ErrorState`: Mensagem clara em pt-BR e botão de retentativa.
   - `SuccessState`: Renderização fluida e performática dos dados.
 '@ | Set-Content -Path ".agents\skills\mobile-ux\SKILL.md" -Encoding UTF8
-
-@'
----
-name: web-performance
-description: Padrões de alta performance web, otimização de Core Web Vitals, SSR/RSC e SEO técnico inspirados nas diretrizes de Addy Osmani.
----
-
-# Skill: Web Performance & SEO Optimization
-
-Esta skill estabelece os padrões técnicos aplicáveis às aplicações em `apps/web/` e `apps/landing/`.
-
-## 1. Core Web Vitals
-- **LCP (< 2.5s)**: Imagens hero da primeira dobra com a propriedade `priority`.
-- **CLS (< 0.1)**: Mídia com dimensões explícitas (`width` e `height`) e fontes com swap automático.
-- **INP (< 200ms)**: Tarefas longas divididas para evitar travamento da thread principal.
-
-## 2. Padrão Server-First (React Server Components)
-- Mantenha a maior parte dos componentes como Server Components puros.
-- Restrinja `'use client'` às folhas da árvore com interatividade imediata.
-- Mutações centralizadas em Server Actions com validação Zod.
-'@ | Set-Content -Path ".agents\skills\web-performance\SKILL.md" -Encoding UTF8
 
 @'
 ---
@@ -676,8 +554,8 @@ inputs:
     default: ""
   target:
     type: string
-    description: "Alvo da execução: mobile | web | landing (se omitido, lê targets de _specs/prd.md)"
-    required: false
+    description: "Plataforma de destino do build: android | ios | both"
+    default: "both"
   skip_design:
     type: boolean
     description: "Pular inspeção visual caso a tarefa seja puramente backend/lógica de negócio"
@@ -705,12 +583,12 @@ steps:
             if [ -z "${!v}" ]; then echo "ERRO: $v não definida. Defina antes de executar (ex: $env:$v='<seu-modelo>') e rode novamente."; exit 1; fi;
           done
       - description: "Consultar grafo estático via Graft para mapear arquivos impactados"
-        command: "graft scan --path apps/${inputs.target || 'mobile'}"
+        command: "graft scan --path apps/mobile"
       - description: "Inicializar ticket de execução no ai-memory"
         command: >
           ai-memory ticket create
           --title "Dev Cycle: ${inputs.feature_spec}"
-          --tags "target:${inputs.target},tdd,in_progress"
+          --tags "platform:${inputs.target},tdd,in_progress"
 
   - id: step_design_tokens
     name: "2. Verificação de Tokens e Referências Visuais"
@@ -736,22 +614,11 @@ steps:
       - description: "Escrever testes unitários e de interface cobrindo os cenários"
         tool: "file_write"
       - description: "Executar testes e certificar que falham (Red)"
-        command: >
-          if [ "${inputs.target}" = "web" ] || [ "${inputs.target}" = "landing" ]; then
-            cd apps/${inputs.target} && npm test || true
-          else
-            cd apps/mobile && flutter test || true
-          fi
+        command: "cd apps/mobile && flutter test || true"
 
   - id: step_tdd_green
     name: "4. TDD Fase Verde (GREEN) - Implementação de Código de Produção"
-    agent_selector:
-      when:
-        - condition: "${inputs.target == 'mobile'}"
-          agent: "mobile_builder"
-        - condition: "${inputs.target == 'web' || inputs.target == 'landing'}"
-          agent: "web_builder"
-        - default: "mobile_builder"
+    agent: "mobile_builder"
     actions:
       - description: "Escrever código de produção estritamente necessário para satisfazer os testes"
         tool: "file_write"
@@ -764,20 +631,10 @@ steps:
       until: "test_result.exit_code == 0 && lint_result.exit_code == 0"
       on_iteration:
         - name: "Executar Linter e Checagem de Tipos"
-          command: >
-            if [ "${inputs.target}" = "web" ] || [ "${inputs.target}" = "landing" ]; then
-              cd apps/${inputs.target} && npm run lint
-            else
-              cd apps/mobile && dart analyze
-            fi
+          command: "cd apps/mobile && dart analyze"
           catch_output: "lint_result"
         - name: "Executar Suíte de Testes"
-          command: >
-            if [ "${inputs.target}" = "web" ] || [ "${inputs.target}" = "landing" ]; then
-              cd apps/${inputs.target} && npm test
-            else
-              cd apps/mobile && flutter test
-            fi
+          command: "cd apps/mobile && flutter test"
           catch_output: "test_result"
 
   - id: step_refactor
@@ -785,22 +642,17 @@ steps:
     agent: "qa_validator"
     actions:
       - description: "Aplicar formatador de código oficial"
-        command: >
-          if [ "${inputs.target}" = "web" ] || [ "${inputs.target}" = "landing" ]; then
-            cd apps/${inputs.target} && npm run format || true
-          else
-            cd apps/mobile && dart format .
-          fi
+        command: "cd apps/mobile && dart format ."
 
   - id: step_git_commit
     name: "7. Versionamento Atômico e Fechamento no Git"
     agent: "git_committer"
     actions:
       - description: "Adicionar arquivos alterados à staging area"
-        command: "git add apps/${inputs.target} _specs/"
+        command: "git add apps/mobile _specs/"
       - description: "Executar commit semântico atômico"
         command: >
-          git commit -m "feat(${inputs.target}): implement ${inputs.feature_spec} with TDD coverage"
+          git commit -m "feat(mobile): implement ${inputs.feature_spec} with TDD coverage"
           -m "- Verified against criteria in ${inputs.feature_spec}"
           -m "- Clean Architecture and full test suite passed"
 '@ | Set-Content -Path ".agents\workflows\dev-cycle.yaml" -Encoding UTF8

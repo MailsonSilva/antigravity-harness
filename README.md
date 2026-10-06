@@ -1,18 +1,17 @@
-# 🚀 Antigravity Developer Harness Base
+# 🚀 Antigravity Mobile Harness (Flutter)
 
-Harness unificado e modular para desenvolvimento autónomo de software com suporte multi-alvo (**Mobile**, **Web** e **Landing Pages**). 
+Harness modular para desenvolvimento autónomo de **aplicativos mobile em Flutter** (Android + iOS).
 
 Projetado para orquestrar subagentes especializados através de ciclos estritos de **TDD (Red-Green-Refactor)**, prototipagem visual orientada por referências (**Google Stitch MCP**), navegação precisa por AST (**Graft**) e persistência contextual entre agentes (**ai-memory**).
 
 ---
 
-## 🎯 Arquitetura de Alvos (Multi-Target)
+## 🎯 Arquitetura Mobile-First (Flutter)
 
-O harness centraliza as regras de negócio e a identidade de produto, ativando módulos sob procura definidos em `_specs/prd-template.md`:
+O harness centraliza as regras de negócio e a identidade de produto, com o app definido em `_specs/prd-template.md`:
 
-* **`apps/mobile`**: Aplicações móveis em Flutter com Clean Architecture, tratamento dos 4 estados de ecrã (*loading, empty, error, success*) e suporte a bases de dados locais/remotas (SQLite, Supabase, etc.).
-* **`apps/web`**: Painéis e aplicações Next.js/React com foco em React Server Components e tipagem estrita.
-* **`apps/landing`**: Páginas de alta conversão otimizadas para Core Web Vitals, SEO semântico e acessibilidade.
+* **`apps/mobile`**: Aplicações móveis em Flutter com Clean Architecture, tratamento dos 4 estados de ecrã (*loading, empty, error, success*), flavors `dev/stg/prod` e suporte a bases de dados locais/remotas (SQLite/Drift, Supabase, etc.).
+* **Plataformas**: Android e iOS a partir da mesma base de código, com builds assinados via Fastlane e publicação na Play Store e App Store.
 
 ---
 
@@ -30,20 +29,15 @@ antigravity-harness-base/
 │   ├── mcp.json                     # Configuração dos servidores MCP (Stitch, Graft, ai-memory)
 │   ├── rules/                       # Diretrizes e restrições técnicas
 │   │   ├── global.md                # TDD, Conventional Commits e pt-BR
-│   │   ├── mobile.md                # Normas de arquitetura Flutter e padrões de UI
-│   │   └── web.md                   # Normas para Next.js, RSC e Core Web Vitals
+│   │   │   └── mobile.md                # Normas de arquitetura Flutter e padrões de UI
 │   ├── skills/                      # Competências modulares padronizadas
 │   │   ├── antigravity-skill-orchestrator/ # SKILL.md (Triagem cognitiva e roteamento)
 │   │   ├── clean-architecture/      # SKILL.md (Fase Red-Green e testes isolados)
-│   │   ├── code-quality-tests/      # SKILL.md (QA web, lint e type-check)
+│   │   ├── code-quality-tests/      # SKILL.md (QA mobile, testes e análise)
 │   │   ├── mobile-ux/               # SKILL.md (Ergonomia móvel e ligação Stitch)
-│   │   ├── spec-discovery/          # SKILL.md (Entrevista e definição de PRD)
-│   │   └── web-performance/         # SKILL.md (Boas práticas e otimização web)
+│   │   └── spec-discovery/          # SKILL.md (Entrevista e definição de PRD)
 │   └── workflows/
 │       └── dev-cycle.yaml           # Ciclo fechado: Spec ➔ Red ➔ Green ➔ QA ➔ Git
-├── .agent/
-│   └── skills/
-│       └── nextjs-app-router-patterns/ # Padrões App Router, RSC e Server Actions
 ├── install.ps1                      # Script de instalação para Windows
 └── install.sh                       # Script de instalação para ambientes Unix/WSL
 
@@ -67,7 +61,7 @@ O harness **não fixa nenhum modelo**. Você escolhe qual modelo cada subagente 
 ```powershell
 # Windows (PowerShell) — vale para a sessão atual
 $env:MODEL_REASONING = "seu-modelo-forte"    # PRD, arquitetura (product_architect)
-$env:MODEL_CODING = "seu-modelo-rapido"      # TDD e builders (tdd_tester, mobile/web_builder, qa)
+$env:MODEL_CODING = "seu-modelo-rapido"      # TDD e builders (tdd_tester, mobile_builder, qa)
 $env:MODEL_DESIGN = "seu-modelo-com-visao"   # Protótipos visuais (ui_ux_designer)
 $env:MODEL_OPS = "seu-modelo-leve"           # Commits e comandos (git_committer)
 ```
@@ -99,7 +93,7 @@ Design Visual (ui_ux_designer): Inspeciona _references/screens/, interage com o 
 
 Fase Vermelha (tdd_tester): Cria a bateria de testes unitários ou de widgets que inicialmente falham.
 
-Fase Verde (mobile_builder / web_builder): Implementa o código mínimo necessário com auxílio do Graft para satisfazer os testes.
+Fase Verde (mobile_builder): Implementa o código mínimo necessário com auxílio do Graft para satisfazer os testes.
 
 Auditoria e Autorreparo (qa-validator): Executa validações estáticas e testes; em caso de falha, aciona o ciclo de correção automática (limite de 3 tentativas).
 

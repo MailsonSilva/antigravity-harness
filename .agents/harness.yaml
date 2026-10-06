@@ -1,6 +1,6 @@
 version: "1.0"
-name: "unified-developer-harness"
-description: "Harness unificado multi-alvo com alocação dinâmica de modelos de IA, TDD, Stitch MCP, Graft e ai-memory."
+name: "mobile-developer-harness"
+description: "Harness mobile-first (Flutter) com TDD, Stitch MCP, Graft e ai-memory."
 
 # -------------------------------------------------------------
 # 1. Seleção de Modelos por Tarefa (sem nenhum modelo fixado)
@@ -32,7 +32,7 @@ settings:
   language: "pt-BR"
   enforce_tdd: true
   max_repair_cycles: 3
-  active_profile: "dynamic" # Lê targets diretamente de _specs/prd.md
+  active_profile: "mobile" # Harness mobile-only: sem alternância de targets
 
 # -------------------------------------------------------------
 # 3. Workspaces e Comandos de Validação por Target
@@ -45,19 +45,8 @@ workspaces:
       - ".agents/"
   mobile:
     path: "apps/mobile/"
-    active_when: "targets.mobile == true"
     test_command: "cd apps/mobile && flutter test"
     lint_command: "cd apps/mobile && dart analyze"
-  web:
-    path: "apps/web/"
-    active_when: "targets.web == true"
-    test_command: "cd apps/web && npm test"
-    lint_command: "cd apps/web && npm run lint"
-  landing:
-    path: "apps/landing/"
-    active_when: "targets.landing_page == true"
-    test_command: "cd apps/landing && npm test"
-    lint_command: "cd apps/landing && npm run lint"
 
 # -------------------------------------------------------------
 # 4. Ferramentas Externas e MCPs Conectados
@@ -114,7 +103,6 @@ subagents:
   mobile_builder:
     model: "${MODEL_CODING}"
     role: "Escreve código Flutter estritamente tipado, modular e aderente à Clean Architecture para passar nos testes."
-    active_when: "targets.mobile == true"
     rules:
       - ".agents/rules/global.md"
       - ".agents/rules/mobile.md"
@@ -123,30 +111,17 @@ subagents:
       - ".agents/skills/clean-architecture/SKILL.md"
     tools: ["file_read", "file_write", "graft", "ai_memory"]
 
-  # Agente 5: Desenvolvedor Web e Landing Pages (Fase Verde - GREEN)
-  web_builder:
-    model: "${MODEL_CODING}"
-    role: "Escreve componentes Next.js/React com Server Components e boas práticas de Core Web Vitals (Addy Osmani)."
-    active_when: "targets.web == true || targets.landing_page == true"
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/web.md"
-    skills:
-      - ".agents/skills/web-performance/SKILL.md"
-      - ".agent/skills/nextjs-app-router-patterns/SKILL.md"
-    tools: ["file_read", "file_write", "graft", "ai_memory"]
-
-  # Agente 6: Auditor de Qualidade e Autorreparo (Fase REFACTOR)
+  # Agente 5: Auditor de Qualidade e Autorreparo (Fase REFACTOR)
   qa_validator:
     model: "${MODEL_CODING}"
-    role: "Executa testes e linters do target ativo, orquestrando até 3 ciclos de autorreparo automático caso algo quebre."
+    role: "Executa testes e linters do app mobile, orquestrando até 3 ciclos de autorreparo automático caso algo quebre."
     rules:
       - ".agents/rules/global.md"
     skills:
       - ".agents/skills/code-quality-tests/SKILL.md"
     tools: ["bash", "file_read", "file_write", "ai_memory"]
 
-  # Agente 7: Versionador Semântico
+  # Agente 6: Versionador Semântico
   git_committer:
     model: "${MODEL_OPS}"
     role: "Inspeciona o diff staged, extrai o contexto do ticket no ai-memory e cria o commit semântico atômico."

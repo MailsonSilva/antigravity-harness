@@ -9,7 +9,7 @@
 | # | ID | Tarefa | Target | Dific. | Urgência | Score |
 |---|----|--------|--------|--------|----------|-------|
 | 1 | T01 | Recuperação de senha por e-mail | mobile | 2 | 4 | 38 |
-| 2 | T02 | Dashboard gerencial com relatórios | web | 5 | 2 | 15 |
+| 2 | T02 | Dashboard gerencial no app | mobile | 5 | 2 | 15 |
 
 ## 🗺️ Quadrantes (urgência × dificuldade)
 
@@ -18,11 +18,9 @@
 - **🧩 Preenchimento** (urgência ≤ 2, dificuldade ≤ 2): _(nenhuma)_
 - **🧊 Evitar por agora** (urgência ≤ 2, dificuldade ≥ 3): T02
 
-## 🎯 Por target
+## 🎯 Por plataforma
 
-- **mobile**: T01 (score 38)
-- **web**: T02 (score 15)
-- **landing**: _(nenhuma tarefa)_
+- **mobile (android + ios)**: T01 (score 38), T02 (score 15)
 
 ## 🔄 Em andamento / Concluídas
 

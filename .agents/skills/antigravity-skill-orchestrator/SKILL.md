@@ -10,16 +10,16 @@ Você atua como o avaliador prévio de execução no harness. Seu papel é imped
 ## Regras de Triagem
 
 1. **Alterações Elementares (Low Complexity):**
-   - Correções simples de sintaxe, ajustes pontuais de CSS/Tailwind, renomeação de variáveis ou adição de tipagens triviais.
+   - Correções simples de sintaxe, ajustes pontuais de tema/widgets, renomeação de variáveis ou adição de tipagens triviais.
    - **Ação:** NÃO ative skills adicionais. Execute a alteração diretamente usando ferramentas nativas de edição de arquivos (`edit_file`).
 
 2. **Planejamento de Funcionalidade ou Refatoração Estrutural:**
-   - Criação de novos módulos, Server Actions, rotas no App Router ou integração de fluxos de negócio.
+   - Criação de novas features, telas, fluxos de navegação ou integração de fontes de dados.
    - **Ação:** Invoque a skill `spec-discovery` e/ou `clean-architecture`.
 
-3. **Performance e Carregamento Web (Next.js / Frontend):**
-   - Problemas com Core Web Vitals, re-renderizações excessivas, bundle size elevado ou hidratação.
-   - **Ação:** Ative exclusivamente a skill `web-performance`.
+3. **Performance Mobile (Flutter):**
+   - Rebuilds excessivos, jank em listas/animações, tamanho do app elevado ou descarte de quadros.
+   - **Ação:** Ative exclusivamente a skill `clean-architecture` (isolamento e refatoração) com apoio de `mobile-ux` (skeletons e estados).
 
 4. **Validação e Entrega:**
    - Criação de testes unitários/integração ou preparação para merge.
@@ -27,4 +27,4 @@ Você atua como o avaliador prévio de execução no harness. Seu papel é imped
 
 ## Protocolo de Decisão
 - Nunca ative mais de duas skills simultaneamente no mesmo turno.
-- Garanta que as regras contidas em `.agents/rules/global.md` e `.agents/rules/web.md` sejam o teto máximo de conformidade.
+- Garanta que as regras contidas em `.agents/rules/global.md` e `.agents/rules/mobile.md` sejam o teto máximo de conformidade.
