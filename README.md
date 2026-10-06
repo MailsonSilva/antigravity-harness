@@ -69,6 +69,23 @@ curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-bas
 ```
 > Ajuste `MailsonSilva/antigravity-harness-base` para o seu `USUARIO/REPO` se fizer fork.
 
+## 🔄 Atualizando um projeto existente
+
+Se o harness já está instalado e você quer as skills/regras novas **sem perder** seu código, PRD, tarefas e referências:
+
+```powershell
+# Windows (PowerShell) — rode na raiz do projeto
+irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/update.ps1 | iex
+```
+
+```bash
+# Linux / macOS / WSL — rode na raiz do projeto
+curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/update.sh | bash
+```
+
+- **Atualiza**: `.agents/`, `_specs/prd-template.md`, `_specs/tasks/_template.md`, instaladores (com backup automático em `.agents.bak-<data>`).
+- **Preserva**: `apps/`, `_specs/prd.md`, `_specs/features/`, suas tarefas e board, `_references/`, `README.md`, `.git/`.
+
 ## 🤖 Seleção de Modelos por Tarefa
 
 O harness **não fixa nenhum modelo**. Você escolhe qual modelo cada subagente usa na hora de executar, via variáveis de ambiente — sem editar arquivos:
