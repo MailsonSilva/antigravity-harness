@@ -17,7 +17,7 @@ void main() {
           .thenThrow(InvalidEmail());
 
       await expectLater(
-        repo.requestReset('not-an-email'),
+        () => repo.requestReset('not-an-email'),
         throwsA(isA<InvalidEmail>()),
       );
     });
@@ -28,7 +28,7 @@ void main() {
           .thenThrow(NetworkFailure());
 
       await expectLater(
-        repo.requestReset('user@mail.com'),
+        () => repo.requestReset('user@mail.com'),
         throwsA(isA<NetworkFailure>()),
       );
     });
@@ -50,7 +50,7 @@ void main() {
           .thenThrow(ExpiredToken());
 
       await expectLater(
-        repo.confirmReset('expired-token', 'Senha123'),
+        () => repo.confirmReset('expired-token', 'Senha123'),
         throwsA(isA<ExpiredToken>()),
       );
     });
@@ -61,7 +61,7 @@ void main() {
           .thenThrow(WeakPassword());
 
       await expectLater(
-        repo.confirmReset('valid-token', '123'),
+        () => repo.confirmReset('valid-token', '123'),
         throwsA(isA<WeakPassword>()),
       );
     });
