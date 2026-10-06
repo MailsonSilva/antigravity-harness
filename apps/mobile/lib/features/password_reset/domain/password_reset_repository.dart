@@ -1,5 +1,5 @@
-/// Contrato do repositório de recuperação de senha (camada Domain, Dart puro).
-/// Implementado pela camada Data; consumido via Riverpod, nunca pelo widget.
+// Contrato do repositório de recuperação de senha (camada Domain, Dart puro).
+// Implementado pela camada Data; consumido via Riverpod, nunca pelo widget.
 
 abstract class PasswordResetRepository {
   /// Solicita o link de redefinição. Lança [InvalidEmail] ou [NetworkFailure].

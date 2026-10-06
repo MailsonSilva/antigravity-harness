@@ -1,5 +1,5 @@
-/// Exceções do fluxo de recuperação de senha (camada Data).
-/// Lançadas pelo [PasswordResetRepository] e mapeadas para ErrorState na UI.
+// Exceções do fluxo de recuperação de senha (camada Data).
+// Lançadas pelo repositório e mapeadas para ErrorState na UI.
 
 /// E-mail com formato inválido (validação local antes do envio).
 class InvalidEmail implements Exception {

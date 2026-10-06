@@ -4,7 +4,7 @@ title: "Recuperação de senha por e-mail"
 target: "mobile"
 difficulty: 2
 urgency: 4
-status: "todo"
+status: "done"
 spec: "_specs/features/recuperacao-senha.md"
 ---
 

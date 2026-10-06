@@ -14,7 +14,7 @@ void main() {
     test('e-mail com formato inválido lança InvalidEmail', () async {
       final repo = _MockRepo();
       when(() => repo.requestReset('not-an-email'))
-          .thenThrow(InvalidEmail());
+.thenThrow(const InvalidEmail());
 
       await expectLater(
         () => repo.requestReset('not-an-email'),
@@ -25,7 +25,7 @@ void main() {
     test('falha de rede lança NetworkFailure', () async {
       final repo = _MockRepo();
       when(() => repo.requestReset('user@mail.com'))
-          .thenThrow(NetworkFailure());
+          .thenThrow(const NetworkFailure());
 
       await expectLater(
         () => repo.requestReset('user@mail.com'),
@@ -47,7 +47,7 @@ void main() {
     test('token expirado ou usado lança ExpiredToken', () async {
       final repo = _MockRepo();
       when(() => repo.confirmReset('expired-token', 'Senha123'))
-          .thenThrow(ExpiredToken());
+          .thenThrow(const ExpiredToken());
 
       await expectLater(
         () => repo.confirmReset('expired-token', 'Senha123'),
@@ -58,7 +58,7 @@ void main() {
     test('senha fraca lança WeakPassword', () async {
       final repo = _MockRepo();
       when(() => repo.confirmReset('valid-token', '123'))
-          .thenThrow(WeakPassword());
+          .thenThrow(const WeakPassword());
 
       await expectLater(
         () => repo.confirmReset('valid-token', '123'),
@@ -97,7 +97,7 @@ void main() {
 
     test('e-mail inválido emite AsyncError (ErrorState)', () async {
       final repo = _MockRepo();
-      when(() => repo.requestReset(any())).thenThrow(InvalidEmail());
+      when(() => repo.requestReset(any())).thenThrow(const InvalidEmail());
       final container = ProviderContainer(
         overrides: [passwordResetRepositoryProvider.overrideWithValue(repo)],
       );
