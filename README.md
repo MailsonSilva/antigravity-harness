@@ -34,8 +34,14 @@ antigravity-harness-base/
 │   │   ├── antigravity-skill-orchestrator/ # SKILL.md (Triagem cognitiva e roteamento)
 │   │   ├── clean-architecture/      # SKILL.md (Fase Red-Green e testes isolados)
 │   │   ├── code-quality-tests/      # SKILL.md (QA mobile, testes e análise)
+│   │   ├── flutter-release/         # SKILL.md (Pipeline test→version→build→ship)
+│   │   ├── flutter-state-riverpod/  # SKILL.md (Estado padrão com Riverpod)
+│   │   ├── local-first-data/        # SKILL.md (Drift/SQLite, sync offline)
+│   │   ├── mobile-cicd/             # SKILL.md (Fastlane + GitHub Actions)
 │   │   ├── mobile-ux/               # SKILL.md (Ergonomia móvel e ligação Stitch)
-│   │   └── spec-discovery/          # SKILL.md (Entrevista e definição de PRD)
+│   │   ├── spec-discovery/          # SKILL.md (Entrevista e definição de PRD)
+│   │   └── store-publishing/        # SKILL.md (Play Store + App Store)
+│   │   └── supabase-flutter/        # SKILL.md (Auth, DB, Storage, Realtime)
 │   └── workflows/
 │       └── dev-cycle.yaml           # Ciclo fechado: Spec ➔ Red ➔ Green ➔ QA ➔ Git
 ├── install.ps1                      # Script de instalação para Windows
