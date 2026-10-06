@@ -58,9 +58,11 @@ echo -e "\n${YELLOW}📁 Criando diretórios do projeto...${NC}"
 
 mkdir -p .agents/rules
 mkdir -p .agents/skills/spec-discovery
-mkdir -p .agents/skills/mobile-ux-stitch
-mkdir -p .agents/skills/web-performance-seo
-mkdir -p .agents/skills/clean-architecture-tdd
+mkdir -p .agents/skills/mobile-ux
+mkdir -p .agents/skills/web-performance
+mkdir -p .agents/skills/clean-architecture
+mkdir -p .agents/skills/code-quality-tests
+mkdir -p .agents/skills/antigravity-skill-orchestrator
 mkdir -p .agents/workflows
 mkdir -p .agents/memory
 mkdir -p _specs/features
@@ -185,11 +187,13 @@ version: "1.0"
 name: "unified-developer-harness"
 description: "Harness unificado multi-alvo com alocação dinâmica de modelos de IA, TDD, Stitch MCP, Graft e ai-memory."
 
+# Nenhum modelo é fixado: escolha via variáveis de ambiente por tarefa.
+# Ex: export MODEL_REASONING="seu-modelo-forte" MODEL_CODING="seu-modelo-rapido"
 models:
-  reasoning: "${MODEL_REASONING:-gemini-3.8-pro}"
-  coding: "${MODEL_CODING:-gemini-3.8-flash}"
-  multimodal_design: "${MODEL_DESIGN:-gemini-3.8-flash}"
-  fast_ops: "${MODEL_OPS:-gemini-3.8-flash}"
+  reasoning: "${MODEL_REASONING}"
+  coding: "${MODEL_CODING}"
+  multimodal_design: "${MODEL_DESIGN}"
+  fast_ops: "${MODEL_OPS}"
 
 settings:
   prd_path: "_specs/prd.md"
@@ -236,7 +240,7 @@ tools:
 
 subagents:
   product_architect:
-    model: "${models.reasoning}"
+    model: "${MODEL_REASONING}"
     role: "Entrevista o desenvolvedor, define requisitos de negócio e gera o PRD agnóstico em _specs/ com diagramas Archify."
     rules:
       - ".agents/rules/global.md"
@@ -245,55 +249,58 @@ subagents:
     tools: ["file_read", "file_write", "ai_memory"]
 
   ui_ux_designer:
-    model: "${models.multimodal_design}"
+    model: "${MODEL_DESIGN}"
     role: "Inspeciona capturas em _references/screens/ usando Google Stitch MCP e gera os tokens de design em _specs/design-tokens.json."
     rules:
       - ".agents/rules/global.md"
     skills:
-      - ".agents/skills/mobile-ux-stitch/SKILL.md"
+      - ".agents/skills/mobile-ux/SKILL.md"
     tools: ["google_stitch_mcp", "file_read", "file_write", "ai_memory"]
 
   tdd_tester:
-    model: "${models.coding}"
+    model: "${MODEL_CODING}"
     role: "Lê a spec da feature e cria testes unitários/widgets/componentes que obrigatoriamente falham antes do código."
     rules:
       - ".agents/rules/global.md"
     skills:
-      - ".agents/skills/clean-architecture-tdd/SKILL.md"
+      - ".agents/skills/clean-architecture/SKILL.md"
     tools: ["file_read", "file_write", "bash", "graft", "ai_memory"]
 
   mobile_builder:
-    model: "${models.coding}"
+    model: "${MODEL_CODING}"
     role: "Escreve código Flutter estritamente tipado, modular e aderente à Clean Architecture para passar nos testes."
     active_when: "targets.mobile == true"
     rules:
       - ".agents/rules/global.md"
       - ".agents/rules/mobile.md"
     skills:
-      - ".agents/skills/mobile-ux-stitch/SKILL.md"
-      - ".agents/skills/clean-architecture-tdd/SKILL.md"
+      - ".agents/skills/mobile-ux/SKILL.md"
+      - ".agents/skills/clean-architecture/SKILL.md"
     tools: ["file_read", "file_write", "graft", "ai_memory"]
 
   web_builder:
-    model: "${models.coding}"
+    model: "${MODEL_CODING}"
     role: "Escreve componentes Next.js/React com Server Components e boas práticas de Core Web Vitals (Addy Osmani)."
     active_when: "targets.web == true || targets.landing_page == true"
     rules:
       - ".agents/rules/global.md"
       - ".agents/rules/web.md"
     skills:
-      - ".agents/skills/web-performance-seo/SKILL.md"
+      - ".agents/skills/web-performance/SKILL.md"
+      - ".agent/skills/nextjs-app-router-patterns/SKILL.md"
     tools: ["file_read", "file_write", "graft", "ai_memory"]
 
   qa_validator:
-    model: "${models.coding}"
+    model: "${MODEL_CODING}"
     role: "Executa testes e linters do target ativo, orquestrando até 3 ciclos de autorreparo automático caso algo quebre."
     rules:
       - ".agents/rules/global.md"
+    skills:
+      - ".agents/skills/code-quality-tests/SKILL.md"
     tools: ["bash", "file_read", "file_write", "ai_memory"]
 
   git_committer:
-    model: "${models.fast_ops}"
+    model: "${MODEL_OPS}"
     role: "Inspeciona o diff staged, extrai o contexto do ticket no ai-memory e cria o commit semântico atômico."
     rules:
       - ".agents/rules/global.md"
@@ -563,9 +570,9 @@ O agente deve formular perguntas curtas e diretas ao desenvolvedor, cobrindo:
 - Registre o ticket inicial no `ai-memory` marcando os targets ativos.
 EOF
 
-cat << 'EOF' > .agents/skills/mobile-ux-stitch/SKILL.md
+cat << 'EOF' > .agents/skills/mobile-ux/SKILL.md
 ---
-name: mobile-ux-stitch
+name: mobile-ux
 description: Diretrizes de UX/UI mobile, extração de Design DNA com Google Stitch MCP a partir de prints e geração de tokens visuais.
 ---
 
@@ -588,9 +595,9 @@ Quando existirem capturas ou imagens em `_references/screens/`:
   - `SuccessState`: Renderização fluida e performática dos dados.
 EOF
 
-cat << 'EOF' > .agents/skills/web-performance-seo/SKILL.md
+cat << 'EOF' > .agents/skills/web-performance/SKILL.md
 ---
-name: web-performance-seo
+name: web-performance
 description: Padrões de alta performance web, otimização de Core Web Vitals, SSR/RSC e SEO técnico inspirados nas diretrizes de Addy Osmani.
 ---
 
@@ -609,9 +616,9 @@ Esta skill estabelece os padrões técnicos aplicáveis às aplicações em `app
 - Mutações centralizadas em Server Actions com validação Zod.
 EOF
 
-cat << 'EOF' > .agents/skills/clean-architecture-tdd/SKILL.md
+cat << 'EOF' > .agents/skills/clean-architecture/SKILL.md
 ---
-name: clean-architecture-tdd
+name: clean-architecture
 description: Práticas de Test-Driven Development (Red-Green-Refactor), desacoplamento de domínio e criação de suítes de teste de alta velocidade.
 ---
 
@@ -663,6 +670,11 @@ steps:
     actions:
       - description: "Validar se a spec existe e possui critérios de aceitação objetivos"
         command: "test -f ${inputs.feature_spec}"
+      - description: "Fail-fast: aborta se algum MODEL_* (REASONING/CODING/DESIGN/OPS) estiver vazio"
+        command: >
+          for v in MODEL_REASONING MODEL_CODING MODEL_DESIGN MODEL_OPS; do
+            if [ -z "${!v}" ]; then echo "ERRO: $v não definida. Defina antes de executar (ex: export $v='<seu-modelo>') e rode novamente."; exit 1; fi;
+          done
       - description: "Consultar grafo estático via Graft para mapear arquivos impactados"
         command: "graft scan --path apps/${inputs.target || 'mobile'}"
       - description: "Inicializar ticket de execução no ai-memory"
@@ -798,5 +810,5 @@ echo ""
 echo -e "Próximos passos recomendados:"
 echo -e " 1. Adicione prints/telas de inspiração em:  ${CYAN}_references/screens/${NC}"
 echo -e " 2. Inicie a descoberta do produto:          ${CYAN}Copie _specs/prd-template.md para _specs/prd.md${NC}"
-echo -e " 3. Ajuste os modelos (se desejar):          ${CYAN}export MODEL_REASONING='gemini-3.8-pro'${NC}"
+echo -e " 3. Escolha os modelos por tarefa:          ${CYAN}export MODEL_REASONING='seu-modelo-forte' MODEL_CODING='seu-modelo-rapido'${NC}"
 echo ""

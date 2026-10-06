@@ -1,5 +1,5 @@
 ---
-name: web-performance-seo
+name: web-performance
 description: Padrões de alta performance web, otimização de Core Web Vitals, SSR/RSC e SEO técnico inspirados nas diretrizes de engenharia de Addy Osmani.
 ---
 

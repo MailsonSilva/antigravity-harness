@@ -1,0 +1,17 @@
+# Ambientes e Dependências
+.env
+.env*.local
+node_modules/
+.dart_tool/
+.packages
+build/
+
+# Antigravity & Memória Local
+.agents/memory/*.db
+.agents/memory/*.db-journal
+
+# IDEs e OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

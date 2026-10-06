@@ -10,8 +10,8 @@ inputs:
     required: true
   target:
     type: string
-    description: "Alvo da execução: web | mobile | api"
-    default: "web"
+    description: "Alvo da execução: mobile | web | landing (se omitido, lê targets de _specs/prd.md)"
+    default: "mobile"
   skip_design:
     type: boolean
     description: "Pular inspeção visual para tarefas puramente de lógica ou backend"
@@ -19,6 +19,17 @@ inputs:
 
 # 2. Pipeline Sequencial Unificado
 steps:
+  - id: validate_models
+    name: "Pré-condição: Modelos Selecionados (fail-fast)"
+    fail_fast: true
+    description: "Aborta o pipeline com mensagem clara se qualquer variável de modelo estiver vazia. Defina por tarefa antes de executar — PowerShell: $env:MODEL_REASONING='<seu-modelo>'; Bash: export MODEL_REASONING='<seu-modelo>'. Variáveis exigidas: MODEL_REASONING, MODEL_CODING, MODEL_DESIGN, MODEL_OPS."
+    actions:
+      - description: "Aborta (exit 1) listando qual variável está vazia"
+        command: >
+          for v in MODEL_REASONING MODEL_CODING MODEL_DESIGN MODEL_OPS; do
+            if [ -z "${!v}" ]; then echo "ERRO: $v não definida. Defina antes de executar (ex: export $v='<seu-modelo>') e rode novamente."; exit 1; fi;
+          done
+
   - id: triage
     name: "0. Triagem Cognitiva e Alocação de Contexto"
     skill: antigravity-skill-orchestrator
@@ -51,7 +62,7 @@ steps:
   - id: web_performance_audit
     name: "5. Auditoria de Performance e Padrões Web"
     skill: web-performance
-    condition: "${inputs.target == 'web'}"
+    condition: "${inputs.target == 'web' || inputs.target == 'landing'}"
     thinking_budget: 1000
     description: "Verifica renderizações, hidratação, bundle size e Core Web Vitals no Next.js."
 

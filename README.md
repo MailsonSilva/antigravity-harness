@@ -33,24 +33,52 @@ antigravity-harness-base/
 │   │   ├── mobile.md                # Normas de arquitetura Flutter e padrões de UI
 │   │   └── web.md                   # Normas para Next.js, RSC e Core Web Vitals
 │   ├── skills/                      # Competências modulares padronizadas
+│   │   ├── antigravity-skill-orchestrator/ # SKILL.md (Triagem cognitiva e roteamento)
 │   │   ├── clean-architecture/      # SKILL.md (Fase Red-Green e testes isolados)
+│   │   ├── code-quality-tests/      # SKILL.md (QA web, lint e type-check)
 │   │   ├── mobile-ux/               # SKILL.md (Ergonomia móvel e ligação Stitch)
 │   │   ├── spec-discovery/          # SKILL.md (Entrevista e definição de PRD)
 │   │   └── web-performance/         # SKILL.md (Boas práticas e otimização web)
 │   └── workflows/
 │       └── dev-cycle.yaml           # Ciclo fechado: Spec ➔ Red ➔ Green ➔ QA ➔ Git
-├── instalador_powershell_windows.ps1 # Script de instalação para Windows
-└── instalador_shell_linux_macos_wsl.sh # Script de instalação para ambientes Unix/WSL
+├── .agent/
+│   └── skills/
+│       └── nextjs-app-router-patterns/ # Padrões App Router, RSC e Server Actions
+├── install.ps1                      # Script de instalação para Windows
+└── install.sh                       # Script de instalação para ambientes Unix/WSL
 
 ⚡ Instalação Rápida em Qualquer Computador
 Para configurar um novo projeto a partir de uma pasta limpa, execute o comando correspondente ao seu sistema operativo no terminal:
 
 Windows (PowerShell)
-PowerShell
-irm [https://raw.githubusercontent.com/SEU_USUARIO/antigravity-harness-base/main/instalador_powershell_windows.ps1](https://raw.githubusercontent.com/SEU_USUARIO/antigravity-harness-base/main/instalador_powershell_windows.ps1) | iex
+```powershell
+irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/install.ps1 | iex
+```
 Linux / macOS / WSL
-Bash
-curl -sSL [https://raw.githubusercontent.com/SEU_USUARIO/antigravity-harness-base/main/instalador_shell_linux_macos_wsl.sh](https://raw.githubusercontent.com/SEU_USUARIO/antigravity-harness-base/main/instalador_shell_linux_macos_wsl.sh) | bash
+```bash
+curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/install.sh | bash
+```
+> Ajuste `MailsonSilva/antigravity-harness-base` para o seu `USUARIO/REPO` se fizer fork.
+
+## 🤖 Seleção de Modelos por Tarefa
+
+O harness **não fixa nenhum modelo**. Você escolhe qual modelo cada subagente usa na hora de executar, via variáveis de ambiente — sem editar arquivos:
+
+```powershell
+# Windows (PowerShell) — vale para a sessão atual
+$env:MODEL_REASONING = "seu-modelo-forte"    # PRD, arquitetura (product_architect)
+$env:MODEL_CODING = "seu-modelo-rapido"      # TDD e builders (tdd_tester, mobile/web_builder, qa)
+$env:MODEL_DESIGN = "seu-modelo-com-visao"   # Protótipos visuais (ui_ux_designer)
+$env:MODEL_OPS = "seu-modelo-leve"           # Commits e comandos (git_committer)
+```
+
+```bash
+# Linux / macOS / WSL
+export MODEL_REASONING="seu-modelo-forte" MODEL_CODING="seu-modelo-rapido" \
+       MODEL_DESIGN="seu-modelo-com-visao" MODEL_OPS="seu-modelo-leve"
+```
+
+Troque os valores a cada tarefa conforme custo/qualidade desejados; o `harness.yaml` apenas lê essas variáveis.
 
 🔄 Fluxo de Desenvolvimento (Pipeline dev-cycle)
 O desenvolvimento opera através de transições estruturadas entre subagentes especializados:

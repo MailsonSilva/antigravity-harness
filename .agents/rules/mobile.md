@@ -48,7 +48,7 @@ Toda tela que consulta, carrega ou submete informações DEVE implementar explic
 ## 3. Diretrizes de UI, Widgets e Performance
 1. **Construtores `const`**: Sempre declare construtores `const` em Widgets sem estado mutável para evitar reconstruções desnecessárias na árvore de renderização.
 2. **Tamanho Mínimo de Alvo de Toque (Touch Target)**:
-   - Todo botão, ícone interativo ou elemento clicável deve ter uma área de toque de no mínimo **$48 \times 48\text{ dp}$**, prevenindo toques acidentais ou frustração de uso.
+    - Todo botão, ícone interativo ou elemento clicável deve ter uma área de toque de no mínimo **48x48 dp**, prevenindo toques acidentais ou frustração de uso.
 3. **Alinhamento com Tokens Visuais**:
    - Cores, raios de borda, espaçamentos e fontes devem ser consumidos centralmente a partir de `core/theme/` (gerado a partir de `_specs/design-tokens.json`).
    - É proibido usar cores "mágicas" (`Color(0xFF123456)`) diretamente no corpo dos widgets.
