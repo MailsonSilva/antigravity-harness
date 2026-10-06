@@ -72,6 +72,7 @@ $dirs = @(
     ".agents\workflows",
     ".agents\memory",
     "_specs\features",
+    "_specs\tasks",
     "_references\screens",
     "_references\brand",
     "apps\mobile",
@@ -663,10 +664,16 @@ name: "dev-cycle"
 description: "Pipeline completo orientado a Spec com TDD (Red-Green-Refactor), loop autônomo de autorreparo e Git committer semântico."
 
 inputs:
+  task_id:
+    type: string
+    description: "ID da tarefa em _specs/tasks/ (ex: T01). Se informado, a spec é derivada da tarefa e feature_spec torna-se opcional"
+    required: false
+    default: ""
   feature_spec:
     type: string
-    description: "Caminho relativo da especificação da funcionalidade (ex: _specs/features/auth-login.md)"
-    required: true
+    description: "Caminho relativo da especificação da funcionalidade (ex: _specs/features/auth-login.md). Opcional quando task_id é informado"
+    required: false
+    default: ""
   target:
     type: string
     description: "Alvo da execução: mobile | web | landing (se omitido, lê targets de _specs/prd.md)"
@@ -677,6 +684,15 @@ inputs:
     default: false
 
 steps:
+  - id: step_select_task
+    name: "0. Seleção da Tarefa (ranking por dificuldade x urgência)"
+    actions:
+      - description: "Aborta se nem task_id nem feature_spec foram informados"
+        command: >
+          if [ -z "${inputs.task_id}" ] && [ -z "${inputs.feature_spec}" ]; then echo "ERRO: informe task_id (ex: T01, veja o ranking em _specs/task-board.md) ou feature_spec."; exit 1; fi
+      - description: "Com task_id: valida existência em _specs/tasks/ com status todo e deriva a spec da tarefa"
+        command: >
+          if [ -n "${inputs.task_id}" ]; then f=$(grep -rl "^id: \"${inputs.task_id}\"$" _specs/tasks/ | head -n 1); if [ -z "$f" ]; then echo "ERRO: tarefa ${inputs.task_id} não encontrada em _specs/tasks/."; exit 1; fi; st=$(grep "^status:" "$f" | head -n 1); case "$st" in *todo*) ;; *) echo "ERRO: tarefa ${inputs.task_id} não está com status todo ($st)."; exit 1;; esac; fi
   - id: step_ingest_context
     name: "1. Ingestão de Contexto e Análise de Símbolos"
     agent: "product_architect"

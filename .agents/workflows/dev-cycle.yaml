@@ -4,10 +4,16 @@ description: "Pipeline orientado a Spec com TDD (Red-Green-Refactor), validaçã
 
 # 1. Parâmetros de Entrada
 inputs:
+  task_id:
+    type: string
+    description: "ID da tarefa em _specs/tasks/ (ex: T01). Se informado, a spec é derivada da tarefa e feature_spec torna-se opcional"
+    required: false
+    default: ""
   feature_spec:
     type: string
-    description: "Caminho da especificação da funcionalidade (ex: _specs/prd-template.md ou _specs/features/nova-tela.md)"
-    required: true
+    description: "Caminho da especificação da funcionalidade (ex: _specs/prd-template.md ou _specs/features/nova-tela.md). Opcional quando task_id é informado"
+    required: false
+    default: ""
   target:
     type: string
     description: "Alvo da execução: mobile | web | landing (se omitido, lê targets de _specs/prd.md)"
@@ -30,6 +36,18 @@ steps:
             if [ -z "${!v}" ]; then echo "ERRO: $v não definida. Defina antes de executar (ex: export $v='<seu-modelo>') e rode novamente."; exit 1; fi;
           done
 
+  - id: select_task
+    name: "Seleção da Tarefa (ranking por dificuldade × urgência)"
+    fail_fast: true
+    description: "Sem task_id: lê _specs/task-board.md, apresenta o ranking (score = urgência×10 − dificuldade) e pausa pedindo sua escolha (informe o ID ou confirme o top 1). Com task_id: valida que existe em _specs/tasks/ com status todo, deriva a spec do campo spec da tarefa e marca a tarefa como doing."
+    actions:
+      - description: "Aborta se nem task_id nem feature_spec foram informados"
+        command: >
+          if [ -z "${inputs.task_id}" ] && [ -z "${inputs.feature_spec}" ]; then echo "ERRO: informe task_id (ex: T01, veja o ranking em _specs/task-board.md) ou feature_spec."; exit 1; fi
+      - description: "Com task_id: valida existência, status todo e deriva a spec da tarefa"
+        command: >
+          if [ -n "${inputs.task_id}" ]; then f=$(grep -rl "^id: \"${inputs.task_id}\"$" _specs/tasks/ | head -n 1); if [ -z "$f" ]; then echo "ERRO: tarefa ${inputs.task_id} não encontrada em _specs/tasks/."; exit 1; fi; st=$(grep "^status:" "$f" | head -n 1); case "$st" in *todo*) ;; *) echo "ERRO: tarefa ${inputs.task_id} não está com status todo ($st)."; exit 1;; esac; fi
+
   - id: triage
     name: "0. Triagem Cognitiva e Alocação de Contexto"
     skill: antigravity-skill-orchestrator
@@ -40,7 +58,7 @@ steps:
     name: "1. Leitura e Análise da Especificação"
     skill: spec-discovery
     thinking_budget: 4000
-    description: "Lê ${inputs.feature_spec} e mapeia critérios de aceitação e contratos de interface."
+    description: "Lê ${inputs.feature_spec} (ou a spec derivada do campo spec da tarefa quando task_id foi informado) e mapeia critérios de aceitação e contratos de interface."
 
   - id: architecture_review
     name: "2. Arquitetura e Estrutura Limpa"
@@ -75,4 +93,8 @@ steps:
   - id: git_semantic_commit
     name: "7. Versionamento Semântico no Git"
     thinking_budget: 0
-    description: "Gera o commit convencional padronizado refletindo a spec implementada."
+    description: "Gera o commit convencional padronizado refletindo a spec implementada. Se task_id foi informado: marca a tarefa como done em _specs/tasks/ e regenera _specs/task-board.md (ranking, quadrantes e seção por target)."
+    actions:
+      - description: "Com task_id: marca status done na tarefa (todo/doing -> done)"
+        command: >
+          if [ -n "${inputs.task_id}" ]; then f=$(grep -rl "^id: \"${inputs.task_id}\"$" _specs/tasks/ | head -n 1); if [ -n "$f" ]; then sed -i 's/^status: .*/status: "done"/' "$f" && echo "Tarefa ${inputs.task_id} marcada como done em $f."; fi; fi

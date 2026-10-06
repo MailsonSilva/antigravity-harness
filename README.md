@@ -80,6 +80,12 @@ export MODEL_REASONING="seu-modelo-forte" MODEL_CODING="seu-modelo-rapido" \
 
 Troque os valores a cada tarefa conforme custo/qualidade desejados; o `harness.yaml` apenas lê essas variáveis.
 
+## 📋 Tarefas e priorização (dificuldade × urgência)
+
+1. **Crie uma tarefa** copiando `_specs/tasks/_template.md` para `_specs/tasks/<ID>-<slug>.md` e preenchendo `difficulty` (1–5), `urgency` (1–4), `target` e `status`.
+2. **Visualize o quadro** em `_specs/task-board.md`: ranking por `score = urgência×10 − dificuldade` (quick wins primeiro), quadrantes e visão por target.
+3. **Execute escolhendo a ordem**: rode o `dev-cycle` sem `task_id` para ver o ranking e escolher, ou com `task_id` (ex: `T01`) para ir direto — a spec é derivada da tarefa e o status vira `done` ao final.
+
 🔄 Fluxo de Desenvolvimento (Pipeline dev-cycle)
 O desenvolvimento opera através de transições estruturadas entre subagentes especializados:
 
