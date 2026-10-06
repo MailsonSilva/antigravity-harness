@@ -87,6 +87,8 @@ subagents:
       - ".agents/rules/global.md"
     skills:
       - ".agents/skills/mobile-ux/SKILL.md"
+      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
+      - ".agents/skills/flutter-setup-localization/SKILL.md"
     tools: ["google_stitch_mcp", "file_read", "file_write", "ai_memory"]
 
   # Agente 3: TDD Tester (Fase Vermelha - RED)
@@ -131,6 +133,7 @@ subagents:
     skills:
       - ".agents/skills/code-quality-tests/SKILL.md"
       - ".agents/skills/dart-collect-coverage/SKILL.md"
+      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
     tools: ["bash", "file_read", "file_write", "ai_memory"]
 
   # Agente 6: Versionador Semântico
