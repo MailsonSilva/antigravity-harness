@@ -116,6 +116,22 @@ Registo Semântico (git_committer): Valida as alterações pendentes no Git e cr
 
 Release (release_manager, opcional via `release: true`): Executa gates, versionamento, builds por plataforma (android/ios) e entrega nas lojas com rollout controlado.
 
+🤖 Agentes × Skills (7 agentes, 20 skills)
+
+Cada subagente carrega só as skills do seu papel (ver `subagents:` em `.agents/harness.yaml`):
+
+| Agente | Skills |
+|---|---|
+| `product_architect` | `spec-discovery` |
+| `ui_ux_designer` | `mobile-ux`, `flutter-build-responsive-layout`, `flutter-setup-localization` |
+| `tdd_tester` | `clean-architecture`, `flutter-add-widget-test`, `flutter-add-integration-test` |
+| `mobile_builder` | `mobile-ux`, `clean-architecture`, `flutter-apply-architecture-best-practices`, `flutter-state-riverpod`, `flutter-setup-declarative-routing`, `flutter-setup-localization`, `flutter-build-responsive-layout`, `flutter-use-http-package`, `dart-use-pattern-matching`, `supabase-flutter`, `local-first-data` |
+| `qa_validator` | `code-quality-tests`, `dart-collect-coverage`, `dart-use-pattern-matching` |
+| `git_committer` | (nenhuma — usa `ai-memory` + diff) |
+| `release_manager` | `flutter-release`, `mobile-cicd`, `store-publishing` |
+
+O `antigravity-skill-orchestrator` sabe qual chamar para cada tipo de tarefa — ver **Tabela de Roteamento** em `.agents/skills/antigravity-skill-orchestrator/SKILL.md` (máx. 2 skills por turno).
+
 🛠️ Ferramentas e Protocolos Integrados
 Google Stitch MCP: Prototipagem e extração de padrões visuais a partir de imagens.
 
