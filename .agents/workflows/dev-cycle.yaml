@@ -22,6 +22,10 @@ inputs:
     type: boolean
     description: "Pular inspeção visual para tarefas puramente de lógica ou backend"
     default: false
+  release:
+    type: boolean
+    description: "Executar a etapa de release ao final (gates, versionamento, build e entrega). Exige tag v* para produção"
+    default: false
 
 # 2. Pipeline Sequencial Unificado
 steps:
@@ -91,3 +95,14 @@ steps:
       - description: "Com task_id: marca status done na tarefa (todo/doing -> done)"
         command: >
           if [ -n "${inputs.task_id}" ]; then f=$(grep -rl "^id: \"${inputs.task_id}\"$" _specs/tasks/ | head -n 1); if [ -n "$f" ]; then sed -i 's/^status: .*/status: "done"/' "$f" && echo "Tarefa ${inputs.task_id} marcada como done em $f."; fi; fi
+
+  - id: release
+    name: "8. Release (gates, versionamento, build, entrega)"
+    agent: "release_manager"
+    condition: "${inputs.release == true}"
+    thinking_budget: 2000
+    description: "Roda só com release: true. Segue flutter-release (gates via flutter test/dart analyze, bump no pubspec, tag v*, builds por platform com flavor prod) e entrega via mobile-cicd/store-publishing (beta interno ou produção com staged rollout)."
+    skills:
+      - flutter-release
+      - mobile-cicd
+      - store-publishing

@@ -268,6 +268,18 @@ subagents:
       - ".agents/rules/global.md"
     tools: ["git", "ai_memory", "bash"]
 
+  release_manager:
+    model: "${MODEL_CODING}"
+    role: "Executa o pipeline de release Flutter (gates, versionamento, build, entrega) e publica nas lojas com rollout controlado."
+    rules:
+      - ".agents/rules/global.md"
+      - ".agents/rules/mobile.md"
+    skills:
+      - ".agents/skills/flutter-release/SKILL.md"
+      - ".agents/skills/mobile-cicd/SKILL.md"
+      - ".agents/skills/store-publishing/SKILL.md"
+    tools: ["bash", "file_read", "file_write", "ai_memory"]
+
 workflows:
   dev_cycle:
     file: ".agents/workflows/dev-cycle.yaml"
@@ -547,6 +559,10 @@ inputs:
     type: boolean
     description: "Pular inspeção visual caso a tarefa seja puramente backend/lógica de negócio"
     default: false
+  release:
+    type: boolean
+    description: "Executar a etapa de release ao final (gates, versionamento, build e entrega)"
+    default: false
 
 steps:
   - id: step_select_task
@@ -642,6 +658,15 @@ steps:
           git commit -m "feat(mobile): implement ${inputs.feature_spec} with TDD coverage"
           -m "- Verified against criteria in ${inputs.feature_spec}"
           -m "- Clean Architecture and full test suite passed"
+
+  - id: step_release
+    name: "8. Release (gates, versionamento, build, entrega)"
+    agent: "release_manager"
+    condition: "${inputs.release == true}"
+    actions:
+      - description: "Seguir flutter-release com mobile-cicd/store-publishing conforme platform"
+        tool: "file_read"
+        path: "_specs/prd.md"
 EOF
 
 # ------------------------------------------------------------------------------

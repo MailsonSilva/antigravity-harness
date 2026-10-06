@@ -132,6 +132,19 @@ subagents:
       - ".agents/rules/global.md"
     tools: ["git", "ai_memory", "bash"]
 
+  # Agente 7: Gerente de Release (Play Store + App Store)
+  release_manager:
+    model: "${MODEL_CODING}"
+    role: "Executa o pipeline de release Flutter (gates, versionamento, build, entrega) e publica nas lojas com rollout controlado."
+    rules:
+      - ".agents/rules/global.md"
+      - ".agents/rules/mobile.md"
+    skills:
+      - ".agents/skills/flutter-release/SKILL.md"
+      - ".agents/skills/mobile-cicd/SKILL.md"
+      - ".agents/skills/store-publishing/SKILL.md"
+    tools: ["bash", "file_read", "file_write", "ai_memory"]
+
 # -------------------------------------------------------------
 # 6. Workflows
 # -------------------------------------------------------------

@@ -105,6 +105,8 @@ Auditoria e Autorreparo (qa-validator): Executa validações estáticas e testes
 
 Registo Semântico (git_committer): Valida as alterações pendentes no Git e cria commits atómicos no formato Conventional Commits baseando-se no contexto registado pelo ai-memory.
 
+Release (release_manager, opcional via `release: true`): Executa gates, versionamento, builds por plataforma (android/ios) e entrega nas lojas com rollout controlado.
+
 🛠️ Ferramentas e Protocolos Integrados
 Google Stitch MCP: Prototipagem e extração de padrões visuais a partir de imagens.
 
