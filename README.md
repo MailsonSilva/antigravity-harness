@@ -34,6 +34,7 @@ antigravity-harness-base/
 │   │   ├── antigravity-skill-orchestrator/ # SKILL.md (Triagem cognitiva e roteamento)
 │   │   ├── clean-architecture/      # SKILL.md (Fase Red-Green e testes isolados)
 │   │   ├── code-quality-tests/      # SKILL.md (QA mobile, testes e análise)
+│   │   ├── flutter-apply-architecture-best-practices/ # SKILL.md (Camadas UI/Lógica/Dados, oficial Flutter)
 │   │   ├── flutter-release/         # SKILL.md (Pipeline test→version→build→ship)
 │   │   ├── flutter-state-riverpod/  # SKILL.md (Estado padrão com Riverpod)
 │   │   ├── local-first-data/        # SKILL.md (Drift/SQLite, sync offline)

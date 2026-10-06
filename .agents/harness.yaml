@@ -109,6 +109,7 @@ subagents:
     skills:
       - ".agents/skills/mobile-ux/SKILL.md"
       - ".agents/skills/clean-architecture/SKILL.md"
+      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
       - ".agents/skills/flutter-state-riverpod/SKILL.md"
       - ".agents/skills/supabase-flutter/SKILL.md"
       - ".agents/skills/local-first-data/SKILL.md"
