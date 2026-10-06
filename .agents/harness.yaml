@@ -114,7 +114,10 @@ subagents:
       - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
       - ".agents/skills/flutter-state-riverpod/SKILL.md"
       - ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
+      - ".agents/skills/flutter-setup-localization/SKILL.md"
+      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
       - ".agents/skills/flutter-use-http-package/SKILL.md"
+      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
       - ".agents/skills/supabase-flutter/SKILL.md"
       - ".agents/skills/local-first-data/SKILL.md"
     tools: ["file_read", "file_write", "graft", "ai_memory"]
@@ -127,6 +130,7 @@ subagents:
       - ".agents/rules/global.md"
     skills:
       - ".agents/skills/code-quality-tests/SKILL.md"
+      - ".agents/skills/dart-collect-coverage/SKILL.md"
     tools: ["bash", "file_read", "file_write", "ai_memory"]
 
   # Agente 6: Versionador Semântico
