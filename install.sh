@@ -578,8 +578,9 @@ steps:
     name: "1. Ingestão de Contexto e Análise de Símbolos"
     agent: "product_architect"
     actions:
-      - description: "Validar se a spec existe e possui critérios de aceitação objetivos"
-        command: "test -f ${inputs.feature_spec}"
+      - description: "Resolver spec (da tarefa quando feature_spec vazio) e validar existência"
+        command: >
+          SPEC="${inputs.feature_spec}"; if [ -z "$SPEC" ]; then SPEC=$(grep -h "^spec:" $(grep -rl "^id: \"${inputs.task_id}\"$" _specs/tasks/ | head -n 1) | head -n 1 | sed 's/^spec: "\(.*\)"$/\1/'); fi; if [ -z "$SPEC" ]; then echo "ERRO: nenhuma spec resolvida (informe feature_spec ou task_id com campo spec)."; exit 1; fi; test -f "$SPEC" || { echo "ERRO: spec não encontrada: $SPEC. Rode spec-discovery para criá-la antes do dev-cycle."; exit 1; }
       - description: "Fail-fast: aborta se algum MODEL_* (REASONING/CODING/DESIGN/OPS) estiver vazio"
         command: >
           for v in MODEL_REASONING MODEL_CODING MODEL_DESIGN MODEL_OPS; do
