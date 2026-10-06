@@ -97,6 +97,8 @@ subagents:
       - ".agents/rules/global.md"
     skills:
       - ".agents/skills/clean-architecture/SKILL.md"
+      - ".agents/skills/flutter-add-widget-test/SKILL.md"
+      - ".agents/skills/flutter-add-integration-test/SKILL.md"
     tools: ["file_read", "file_write", "bash", "graft", "ai_memory"]
 
   # Agente 4: Desenvolvedor Mobile (Fase Verde - GREEN)
@@ -111,6 +113,8 @@ subagents:
       - ".agents/skills/clean-architecture/SKILL.md"
       - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
       - ".agents/skills/flutter-state-riverpod/SKILL.md"
+      - ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
+      - ".agents/skills/flutter-use-http-package/SKILL.md"
       - ".agents/skills/supabase-flutter/SKILL.md"
       - ".agents/skills/local-first-data/SKILL.md"
     tools: ["file_read", "file_write", "graft", "ai_memory"]
