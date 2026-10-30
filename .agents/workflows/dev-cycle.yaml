@@ -30,14 +30,14 @@ inputs:
 # 2. Pipeline Sequencial Unificado
 steps:
   - id: validate_models
-    name: "Pré-condição: Modelos Selecionados (fail-fast)"
-    fail_fast: true
-    description: "Aborta o pipeline com mensagem clara se qualquer variável de modelo estiver vazia. Defina por tarefa antes de executar — PowerShell: $env:MODEL_REASONING='<seu-modelo>'; Bash: export MODEL_REASONING='<seu-modelo>'. Variáveis exigidas: MODEL_REASONING, MODEL_CODING, MODEL_DESIGN, MODEL_OPS."
+    name: "Pré-condição: Perfis de Modelo (inherit por padrão)"
+    fail_fast: false
+    description: "Os perfis definidos em .agents/harness.yaml usam 'inherit' como padrão: o agente herda o modelo já logado na CLI/IDE, sem exigir configuração. Opcionalmente, sobrescreva por tarefa com AI_MODEL_REASONING, AI_MODEL_CODING, AI_MODEL_DESIGN e AI_MODEL_FAST. Nenhuma variável ausente aborta o pipeline."
     actions:
-      - description: "Aborta (exit 1) listando qual variável está vazia"
+      - description: "Exibe os perfis resolvidos (inherit quando a variável não estiver definida)"
         command: >
-          for v in MODEL_REASONING MODEL_CODING MODEL_DESIGN MODEL_OPS; do
-            if [ -z "${!v}" ]; then echo "ERRO: $v não definida. Defina antes de executar (ex: export $v='<seu-modelo>') e rode novamente."; exit 1; fi;
+          for v in AI_MODEL_REASONING AI_MODEL_CODING AI_MODEL_DESIGN AI_MODEL_FAST; do
+            printf '%s=%s\n' "$v" "${!v:-inherit}";
           done
 
   - id: select_task
@@ -85,7 +85,7 @@ steps:
     name: "6. Validação Contínua (Linter, Tipos e Testes)"
     skill: code-quality-tests
     thinking_budget: 1000
-    description: "Executa flutter test e dart analyze até garantir estabilidade completa."
+    description: "Executa os comandos de teste e lint do workspace alvo (mobile: flutter test / dart analyze; web: npm test / npm run lint) até garantir estabilidade completa."
 
   - id: git_semantic_commit
     name: "7. Versionamento Semântico no Git"
@@ -98,7 +98,6 @@ steps:
 
   - id: release
     name: "8. Release (gates, versionamento, build, entrega)"
-    agent: "release_manager"
     condition: "${inputs.release == true}"
     thinking_budget: 2000
     description: "Roda só com release: true. Segue flutter-release (gates via flutter test/dart analyze, bump no pubspec, tag v*, builds por platform com flavor prod) e entrega via mobile-cicd/store-publishing (beta interno ou produção com staged rollout)."

@@ -1,42 +1,55 @@
-version: "1.0"
-name: "mobile-developer-harness"
-description: "Harness mobile-first (Flutter) com TDD, Stitch MCP, Graft e ai-memory."
+version: "2.0-universal"
+name: "universal-developer-harness"
+description: "Harness agnóstico de fornecedor de IA com 8 componentes canônicos e interoperabilidade com Claude Code, Codex, Antigravity e Cursor."
 
-# -------------------------------------------------------------
-# 1. Seleção de Modelos por Tarefa (sem nenhum modelo fixado)
-# -------------------------------------------------------------
-# O harness NÃO define modelo padrão. Você escolhe o modelo na hora de
-# executar, via variáveis de ambiente — pode trocar por tarefa sem editar
-# este arquivo. Exemplos (PowerShell / Bash):
-#   $env:MODEL_REASONING="seu-modelo-forte"; $env:MODEL_CODING="seu-modelo-rapido"
-#   export MODEL_REASONING="seu-modelo-forte" MODEL_CODING="seu-modelo-rapido"
-# Papéis sugeridos:
-#   reasoning         -> PRD, arquitetura, decisões (modelo forte de raciocínio)
-#   coding            -> TDD, builders, refatoração (modelo rápido de código)
-#   multimodal_design -> Stitch, tokens visuais (modelo com visão)
-#   fast_ops          -> git commits, comandos (modelo leve e barato)
-models:
-  reasoning: "${MODEL_REASONING}"
+# ==============================================================================
+# 1. Perfis de Modelos Abstratos (Zero Vendor Lock-in)
+# ==============================================================================
+# Por padrão, assume 'inherit' (usa o modelo atualmente logado na sua CLI/IDE).
+# Sobrescrita opcional via variáveis de ambiente limpas:
+model_profiles:
+  reasoning: "${AI_MODEL_REASONING:-inherit}"
+  coding: "${AI_MODEL_CODING:-inherit}"
+  multimodal_design: "${AI_MODEL_DESIGN:-inherit}"
+  fast_ops: "${AI_MODEL_FAST:-inherit}"
 
-  coding: "${MODEL_CODING}"
-
-  multimodal_design: "${MODEL_DESIGN}"
-
-  fast_ops: "${MODEL_OPS}"
-
-# -------------------------------------------------------------
-# 2. Configurações Gerais
-# -------------------------------------------------------------
+# ==============================================================================
+# 2. Configurações Globais
+# ==============================================================================
 settings:
-  prd_path: "_specs/prd.md"
   language: "pt-BR"
   enforce_tdd: true
   max_repair_cycles: 3
-  active_profile: "mobile" # Harness mobile-only: sem alternância de targets
+  prd_path: "_specs/prd.md"
+  task_board: "_specs/task-board.md"
+  memory_target: ".agents/PROJECT_BRAIN.md"
+  recursive_learning: true # Habilita síntese de aprendizado pós-reparo
 
-# -------------------------------------------------------------
-# 3. Workspaces e Comandos de Validação por Target
-# -------------------------------------------------------------
+# ==============================================================================
+# 3. Os 8 Componentes do Harness (Padrão Google Research Harness²)
+# ==============================================================================
+scaffolding:
+  system_prompts:
+    - ".agents/rules/global.md"
+  guardrails:
+    - ".agents/rules/mobile.md"
+    - ".agents/rules/web.md"
+  memory:
+    brain: ".agents/PROJECT_BRAIN.md"
+    db_path: ".agents/memory/context.db"
+  tool_guidance: ".agents/mcp.json"
+  subagents_ref: ".agents/harness.yaml#subagents"
+  skills_ref: ".agents/skills/"
+  scripts_ref:
+    windows_install: "install.ps1"
+    posix_install: "install.sh"
+    windows_update: "update.ps1"
+    posix_update: "update.sh"
+  plugins_ref: ".agents/mcp.json"
+
+# ==============================================================================
+# 4. Workspaces e Comandos de Validação
+# ==============================================================================
 workspaces:
   shared:
     paths:
@@ -44,20 +57,28 @@ workspaces:
       - "_references/"
       - ".agents/"
   mobile:
-    path: "apps/mobile/"
-    test_command: "cd apps/mobile && flutter test"
-    lint_command: "cd apps/mobile && dart analyze"
+    path: "./"
+    test_command: "flutter test"
+    lint_command: "dart analyze"
+  web:
+    path: "apps/web/"
+    test_command: "npm test"
+    lint_command: "npm run lint"
+  landing:
+    path: "apps/landing/"
+    test_command: "npm test"
+    lint_command: "npm run lint"
 
-# -------------------------------------------------------------
-# 4. Ferramentas Externas e MCPs Conectados
-# -------------------------------------------------------------
+# ==============================================================================
+# 5. Ferramentas e MCPs
+# ==============================================================================
 tools:
   ai_memory:
     cli: "ai-memory"
     description: "Handoffs atômicos entre agentes e histórico de aprendizado do ciclo TDD."
   graft:
     cli: "graft"
-    description: "Grafo de símbolos e chamadas via AST Tree-sitter para navegação precisa no código."
+    description: "Grafo estático via AST Tree-sitter para consulta determinística de símbolos."
   google_stitch_mcp:
     server_id: "google-stitch"
     description: "Leitor de referências visuais de telas e prototipagem de UI."
@@ -65,102 +86,66 @@ tools:
     cli: "git"
     description: "Controle de versão e commits semânticos atômicos."
 
-# -------------------------------------------------------------
-# 5. Elenco de Subagentes Especializados
-# -------------------------------------------------------------
+# ==============================================================================
+# 6. Elenco de Subagentes
+# ==============================================================================
 subagents:
-  # Agente 1: Descoberta e PRD
   product_architect:
-    model: "${MODEL_REASONING}"
-    role: "Entrevista o desenvolvedor, define requisitos de negócio e gera o PRD agnóstico em _specs/ com diagramas Archify."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/spec-discovery/SKILL.md"
+    profile: "reasoning"
+    role: "Entrevista o desenvolvedor, decompõe requisitos em _specs/tasks/ e coordena o task-board."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/spec-discovery/SKILL.md", ".agents/skills/antigravity-skill-orchestrator/SKILL.md"]
     tools: ["file_read", "file_write", "ai_memory"]
 
-  # Agente 2: UX/UI e Prototipagem Visual
   ui_ux_designer:
-    model: "${MODEL_DESIGN}"
-    role: "Inspeciona capturas em _references/screens/ usando Google Stitch MCP e gera os tokens de design em _specs/design-tokens.json."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/mobile-ux/SKILL.md"
-      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-setup-localization/SKILL.md"
+    profile: "multimodal_design"
+    role: "Inspeciona capturas visuais via Google Stitch MCP e extrai tokens de design para _specs/design-tokens.json."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/mobile-ux/SKILL.md"]
     tools: ["google_stitch_mcp", "file_read", "file_write", "ai_memory"]
 
-  # Agente 3: TDD Tester (Fase Vermelha - RED)
   tdd_tester:
-    model: "${MODEL_CODING}"
-    role: "Lê a spec da feature e cria testes unitários/widgets/componentes que obrigatoriamente falham antes do código."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/clean-architecture/SKILL.md"
-      - ".agents/skills/flutter-add-widget-test/SKILL.md"
-      - ".agents/skills/flutter-add-integration-test/SKILL.md"
+    profile: "coding"
+    role: "Fase Vermelha (RED): cria testes unitários e de widgets que obrigatoriamente falham antes do código."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/clean-architecture/SKILL.md", ".agents/skills/flutter-add-widget-test/SKILL.md"]
     tools: ["file_read", "file_write", "bash", "graft", "ai_memory"]
 
-  # Agente 4: Desenvolvedor Mobile (Fase Verde - GREEN)
   mobile_builder:
-    model: "${MODEL_CODING}"
-    role: "Escreve código Flutter estritamente tipado, modular e aderente à Clean Architecture para passar nos testes."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/mobile-ux/SKILL.md"
-      - ".agents/skills/clean-architecture/SKILL.md"
-      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
-      - ".agents/skills/flutter-state-riverpod/SKILL.md"
-      - ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
-      - ".agents/skills/flutter-setup-localization/SKILL.md"
-      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-use-http-package/SKILL.md"
-      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
-      - ".agents/skills/supabase-flutter/SKILL.md"
-      - ".agents/skills/local-first-data/SKILL.md"
+    profile: "coding"
+    role: "Fase Verde (GREEN): escreve código Flutter estritamente tipado e modular com Clean Architecture."
+    rules: [".agents/rules/global.md", ".agents/rules/mobile.md"]
+    skills: [".agents/skills/clean-architecture/SKILL.md", ".agents/skills/local-first-data/SKILL.md"]
     tools: ["file_read", "file_write", "graft", "ai_memory"]
 
-  # Agente 5: Auditor de Qualidade e Autorreparo (Fase REFACTOR)
+  web_builder:
+    profile: "coding"
+    role: "Fase Verde (GREEN): escreve componentes React/Next.js com Server Components e otimização Core Web Vitals."
+    rules: [".agents/rules/global.md", ".agents/rules/web.md"]
+    skills: [".agents/skills/web-performance-seo/SKILL.md"]
+    tools: ["file_read", "file_write", "graft", "ai_memory"]
+
   qa_validator:
-    model: "${MODEL_CODING}"
-    role: "Executa testes e linters do app mobile, orquestrando até 3 ciclos de autorreparo automático caso algo quebre."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/code-quality-tests/SKILL.md"
-      - ".agents/skills/dart-collect-coverage/SKILL.md"
-      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
+    profile: "coding"
+    role: "Fase Refatoração & QA: executa linters, testes e orquestra até 3 ciclos de autorreparo automático."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/code-quality-tests/SKILL.md"]
     tools: ["bash", "file_read", "file_write", "ai_memory"]
 
-  # Agente 6: Versionador Semântico
+  harness_evolver:
+    profile: "reasoning"
+    role: "Ciclo Propose-Probe-Compose: analisa falhas ocorridas e atualiza as regras ou skills do harness para evitar reincidência."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/harness-evolver/SKILL.md"]
+    tools: ["file_read", "file_write", "bash"]
+
   git_committer:
-    model: "${MODEL_OPS}"
+    profile: "fast_ops"
     role: "Inspeciona o diff staged, extrai o contexto do ticket no ai-memory e cria o commit semântico atômico."
-    rules:
-      - ".agents/rules/global.md"
+    rules: [".agents/rules/global.md"]
     tools: ["git", "ai_memory", "bash"]
 
-  # Agente 7: Gerente de Release (Play Store + App Store)
-  release_manager:
-    model: "${MODEL_CODING}"
-    role: "Executa o pipeline de release Flutter (gates, versionamento, build, entrega) e publica nas lojas com rollout controlado."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/flutter-release/SKILL.md"
-      - ".agents/skills/mobile-cicd/SKILL.md"
-      - ".agents/skills/store-publishing/SKILL.md"
-    tools: ["bash", "file_read", "file_write", "ai_memory"]
-
-# -------------------------------------------------------------
-# 6. Workflows
-# -------------------------------------------------------------
 workflows:
   dev_cycle:
     file: ".agents/workflows/dev-cycle.yaml"
-    description: "Ciclo ponta a ponta: Ingestão -> Design -> TDD Red -> Green -> Refactor -> Commit."
+    description: "Ciclo ponta a ponta: Ingestão -> Design -> TDD Red -> Green -> Refactor -> Autoevolução -> Commit."
