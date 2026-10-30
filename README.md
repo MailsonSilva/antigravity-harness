@@ -18,7 +18,7 @@ O harness centraliza as regras de negócio e a identidade de produto, com o app 
 ## 📂 Estrutura do Repositório
 
 ```text
-antigravity-harness-base/
+antigravity-harness/
 ├── _references/                     # Ativos visuais e capturas para leitura por IA
 │   ├── brand/                       # Guias visuais, identidades e logótipos
 │   └── screens/                     # Capturas de ecrã para o Google Stitch MCP
@@ -61,13 +61,13 @@ Para configurar um novo projeto a partir de uma pasta limpa, execute o comando c
 
 Windows (PowerShell)
 ```powershell
-irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/install.ps1 | iex
 ```
 Linux / macOS / WSL
 ```bash
-curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/install.sh | bash
 ```
-> Ajuste `MailsonSilva/antigravity-harness-base` para o seu `USUARIO/REPO` se fizer fork.
+> Ajuste `MailsonSilva/antigravity-harness` para o seu `USUARIO/REPO` se fizer fork.
 
 ## 🔄 Atualizando um projeto existente
 
@@ -75,36 +75,37 @@ Se o harness já está instalado e você quer as skills/regras novas **sem perde
 
 ```powershell
 # Windows (PowerShell) — rode na raiz do projeto
-irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/update.ps1 | iex
+irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/update.ps1 | iex
 ```
 
 ```bash
 # Linux / macOS / WSL — rode na raiz do projeto
-curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/update.sh | bash
+curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/update.sh | bash
 ```
 
-- **Atualiza**: `.agents/`, `_specs/prd-template.md`, `_specs/tasks/_template.md`, instaladores (com backup automático em `.agents.bak-<data>`).
-- **Preserva**: `apps/`, `_specs/prd.md`, `_specs/features/`, suas tarefas e board, `_references/`, `README.md`, `.git/`.
+- **Atualiza**: `.agents/harness.yaml`, `.agents/mcp.json`, `.agents/rules/`, `.agents/workflows/`, templates e os scripts `install.*` / `update.*` (com backup prévio em `%TEMP%/harness-backup-<data>`).
+- **Preserva**: `.agents/PROJECT_BRAIN.md`, **todas as skills existentes** em `.agents/skills/`, `.agents/memory/`, `apps/`, `_specs/prd.md`, `_specs/features/`, suas tarefas e board, `_references/`, `README.md`, `.git/`.
+- Skills novas publicadas no upstream são adicionadas automaticamente, sem tocar nas suas.
 
 ## 🤖 Seleção de Modelos por Tarefa
 
-O harness **não fixa nenhum modelo**. Você escolhe qual modelo cada subagente usa na hora de executar, via variáveis de ambiente — sem editar arquivos:
+O harness **não fixa nenhum modelo**: por padrão cada subagente usa `inherit`, ou seja, o modelo já autenticado na sua CLI/IDE. Se quiser diferenciar por tarefa, sobrescreva os perfis — sem editar arquivos:
 
 ```powershell
 # Windows (PowerShell) — vale para a sessão atual
-$env:MODEL_REASONING = "seu-modelo-forte"    # PRD, arquitetura (product_architect)
-$env:MODEL_CODING = "seu-modelo-rapido"      # TDD e builders (tdd_tester, mobile_builder, qa)
-$env:MODEL_DESIGN = "seu-modelo-com-visao"   # Protótipos visuais (ui_ux_designer)
-$env:MODEL_OPS = "seu-modelo-leve"           # Commits e comandos (git_committer)
+$env:AI_MODEL_REASONING = "seu-modelo-forte"    # PRD, arquitetura (product_architect)
+$env:AI_MODEL_CODING = "seu-modelo-rapido"      # TDD e builders (tdd_tester, mobile_builder, web_builder, qa)
+$env:AI_MODEL_DESIGN = "seu-modelo-com-visao"   # Protótipos visuais (ui_ux_designer)
+$env:AI_MODEL_FAST = "seu-modelo-leve"          # Commits e comandos (git_committer)
 ```
 
 ```bash
 # Linux / macOS / WSL
-export MODEL_REASONING="seu-modelo-forte" MODEL_CODING="seu-modelo-rapido" \
-       MODEL_DESIGN="seu-modelo-com-visao" MODEL_OPS="seu-modelo-leve"
+export AI_MODEL_REASONING="seu-modelo-forte" AI_MODEL_CODING="seu-modelo-rapido" \
+       AI_MODEL_DESIGN="seu-modelo-com-visao" AI_MODEL_FAST="seu-modelo-leve"
 ```
 
-Troque os valores a cada tarefa conforme custo/qualidade desejados; o `harness.yaml` apenas lê essas variáveis.
+Sem variáveis definidas, tudo roda com o modelo logado (herança total).
 
 ## 📋 Tarefas e priorização (dificuldade × urgência)
 
@@ -131,21 +132,22 @@ Auditoria e Autorreparo (qa-validator): Executa validações estáticas e testes
 
 Registo Semântico (git_committer): Valida as alterações pendentes no Git e cria commits atómicos no formato Conventional Commits baseando-se no contexto registado pelo ai-memory.
 
-Release (release_manager, opcional via `release: true`): Executa gates, versionamento, builds por plataforma (android/ios) e entrega nas lojas com rollout controlado.
+Release (opcional via `release: true`): as skills `flutter-release`, `mobile-cicd` e `store-publishing` executam gates, versionamento, builds por plataforma (android/ios) e entrega nas lojas com rollout controlado.
 
-🤖 Agentes × Skills (7 agentes, 20 skills)
+🤖 Agentes × Skills (8 agentes, 22 skills)
 
 Cada subagente carrega só as skills do seu papel (ver `subagents:` em `.agents/harness.yaml`):
 
 | Agente | Skills |
 |---|---|
-| `product_architect` | `spec-discovery` |
-| `ui_ux_designer` | `mobile-ux`, `flutter-build-responsive-layout`, `flutter-setup-localization` |
-| `tdd_tester` | `clean-architecture`, `flutter-add-widget-test`, `flutter-add-integration-test` |
-| `mobile_builder` | `mobile-ux`, `clean-architecture`, `flutter-apply-architecture-best-practices`, `flutter-state-riverpod`, `flutter-setup-declarative-routing`, `flutter-setup-localization`, `flutter-build-responsive-layout`, `flutter-use-http-package`, `dart-use-pattern-matching`, `supabase-flutter`, `local-first-data` |
-| `qa_validator` | `code-quality-tests`, `dart-collect-coverage`, `dart-use-pattern-matching` |
+| `product_architect` | `spec-discovery`, `antigravity-skill-orchestrator` |
+| `ui_ux_designer` | `mobile-ux` |
+| `tdd_tester` | `clean-architecture`, `flutter-add-widget-test` |
+| `mobile_builder` | `clean-architecture`, `local-first-data` |
+| `web_builder` | `web-performance-seo` |
+| `qa_validator` | `code-quality-tests` |
+| `harness_evolver` | `harness-evolver` |
 | `git_committer` | (nenhuma — usa `ai-memory` + diff) |
-| `release_manager` | `flutter-release`, `mobile-cicd`, `store-publishing` |
 
 O `antigravity-skill-orchestrator` sabe qual chamar para cada tipo de tarefa — ver **Tabela de Roteamento** em `.agents/skills/antigravity-skill-orchestrator/SKILL.md` (máx. 2 skills por turno).
 

@@ -77,6 +77,8 @@ mkdir -p .agents/skills/flutter-setup-localization
 mkdir -p .agents/skills/flutter-build-responsive-layout
 mkdir -p .agents/skills/dart-use-pattern-matching
 mkdir -p .agents/skills/dart-collect-coverage
+mkdir -p .agents/skills/harness-evolver
+mkdir -p .agents/skills/web-performance-seo
 mkdir -p .agents/workflows
 mkdir -p .agents/memory
 mkdir -p _specs/features
@@ -88,6 +90,7 @@ mkdir -p apps/mobile
 # Criação de .gitkeep para garantir que as pastas de referências subam para o Git
 touch _references/screens/.gitkeep
 touch _references/brand/.gitkeep
+touch .agents/memory/.gitkeep
 
 echo -e "${GREEN}✔ Diretórios criados com sucesso.${NC}"
 echo -e "${YELLOW}📄 Gerando arquivos de configuração, regras, skills e workflows...${NC}"
@@ -181,28 +184,61 @@ technology_choices:
 EOF
 
 # ------------------------------------------------------------------------------
-# 4. .agents/harness.yaml (Modelos Dinâmicos Gemini 3.8 & Subagentes)
+# 4. .agents/harness.yaml (Arquitetura Agnóstica v2 — 8 Componentes)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/harness.yaml
-version: "1.0"
-name: "unified-developer-harness"
-description: "Harness unificado multi-alvo com alocação dinâmica de modelos de IA, TDD, Stitch MCP, Graft e ai-memory."
+version: "2.0-universal"
+name: "universal-developer-harness"
+description: "Harness agnóstico de fornecedor de IA com 8 componentes canônicos e interoperabilidade com Claude Code, Codex, Antigravity e Cursor."
 
-# Nenhum modelo é fixado: escolha via variáveis de ambiente por tarefa.
-# Ex: export MODEL_REASONING="seu-modelo-forte" MODEL_CODING="seu-modelo-rapido"
-models:
-  reasoning: "${MODEL_REASONING}"
-  coding: "${MODEL_CODING}"
-  multimodal_design: "${MODEL_DESIGN}"
-  fast_ops: "${MODEL_OPS}"
+# ==============================================================================
+# 1. Perfis de Modelos Abstratos (Zero Vendor Lock-in)
+# ==============================================================================
+# Por padrão, assume 'inherit' (usa o modelo atualmente logado na sua CLI/IDE).
+# Sobrescrita opcional via variáveis de ambiente limpas:
+model_profiles:
+  reasoning: "${AI_MODEL_REASONING:-inherit}"
+  coding: "${AI_MODEL_CODING:-inherit}"
+  multimodal_design: "${AI_MODEL_DESIGN:-inherit}"
+  fast_ops: "${AI_MODEL_FAST:-inherit}"
 
+# ==============================================================================
+# 2. Configurações Globais
+# ==============================================================================
 settings:
-  prd_path: "_specs/prd.md"
   language: "pt-BR"
   enforce_tdd: true
   max_repair_cycles: 3
-  active_profile: "dynamic"
+  prd_path: "_specs/prd.md"
+  task_board: "_specs/task-board.md"
+  memory_target: ".agents/PROJECT_BRAIN.md"
+  recursive_learning: true # Habilita síntese de aprendizado pós-reparo
 
+# ==============================================================================
+# 3. Os 8 Componentes do Harness (Padrão Google Research Harness²)
+# ==============================================================================
+scaffolding:
+  system_prompts:
+    - ".agents/rules/global.md"
+  guardrails:
+    - ".agents/rules/mobile.md"
+    - ".agents/rules/web.md"
+  memory:
+    brain: ".agents/PROJECT_BRAIN.md"
+    db_path: ".agents/memory/context.db"
+  tool_guidance: ".agents/mcp.json"
+  subagents_ref: ".agents/harness.yaml#subagents"
+  skills_ref: ".agents/skills/"
+  scripts_ref:
+    windows_install: "install.ps1"
+    posix_install: "install.sh"
+    windows_update: "update.ps1"
+    posix_update: "update.sh"
+  plugins_ref: ".agents/mcp.json"
+
+# ==============================================================================
+# 4. Workspaces e Comandos de Validação
+# ==============================================================================
 workspaces:
   shared:
     paths:
@@ -210,17 +246,28 @@ workspaces:
       - "_references/"
       - ".agents/"
   mobile:
-    path: "apps/mobile/"
-    test_command: "cd apps/mobile && flutter test"
-    lint_command: "cd apps/mobile && dart analyze"
+    path: "./"
+    test_command: "flutter test"
+    lint_command: "dart analyze"
+  web:
+    path: "apps/web/"
+    test_command: "npm test"
+    lint_command: "npm run lint"
+  landing:
+    path: "apps/landing/"
+    test_command: "npm test"
+    lint_command: "npm run lint"
 
+# ==============================================================================
+# 5. Ferramentas e MCPs
+# ==============================================================================
 tools:
   ai_memory:
     cli: "ai-memory"
     description: "Handoffs atômicos entre agentes e histórico de aprendizado do ciclo TDD."
   graft:
     cli: "graft"
-    description: "Grafo de símbolos e chamadas via AST Tree-sitter para navegação precisa no código."
+    description: "Grafo estático via AST Tree-sitter para consulta determinística de símbolos."
   google_stitch_mcp:
     server_id: "google-stitch"
     description: "Leitor de referências visuais de telas e prototipagem de UI."
@@ -228,92 +275,69 @@ tools:
     cli: "git"
     description: "Controle de versão e commits semânticos atômicos."
 
+# ==============================================================================
+# 6. Elenco de Subagentes
+# ==============================================================================
 subagents:
   product_architect:
-    model: "${MODEL_REASONING}"
-    role: "Entrevista o desenvolvedor, define requisitos de negócio e gera o PRD agnóstico em _specs/ com diagramas Archify."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/spec-discovery/SKILL.md"
+    profile: "reasoning"
+    role: "Entrevista o desenvolvedor, decompõe requisitos em _specs/tasks/ e coordena o task-board."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/spec-discovery/SKILL.md", ".agents/skills/antigravity-skill-orchestrator/SKILL.md"]
     tools: ["file_read", "file_write", "ai_memory"]
 
   ui_ux_designer:
-    model: "${MODEL_DESIGN}"
-    role: "Inspeciona capturas em _references/screens/ usando Google Stitch MCP e gera os tokens de design em _specs/design-tokens.json."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/mobile-ux/SKILL.md"
-      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-setup-localization/SKILL.md"
+    profile: "multimodal_design"
+    role: "Inspeciona capturas visuais via Google Stitch MCP e extrai tokens de design para _specs/design-tokens.json."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/mobile-ux/SKILL.md"]
     tools: ["google_stitch_mcp", "file_read", "file_write", "ai_memory"]
 
   tdd_tester:
-    model: "${MODEL_CODING}"
-    role: "Lê a spec da feature e cria testes unitários/widgets/componentes que obrigatoriamente falham antes do código."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/clean-architecture/SKILL.md"
-      - ".agents/skills/flutter-add-widget-test/SKILL.md"
-      - ".agents/skills/flutter-add-integration-test/SKILL.md"
+    profile: "coding"
+    role: "Fase Vermelha (RED): cria testes unitários e de widgets que obrigatoriamente falham antes do código."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/clean-architecture/SKILL.md", ".agents/skills/flutter-add-widget-test/SKILL.md"]
     tools: ["file_read", "file_write", "bash", "graft", "ai_memory"]
 
   mobile_builder:
-    model: "${MODEL_CODING}"
-    role: "Escreve código Flutter estritamente tipado, modular e aderente à Clean Architecture para passar nos testes."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/mobile-ux/SKILL.md"
-      - ".agents/skills/clean-architecture/SKILL.md"
-      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
-      - ".agents/skills/flutter-state-riverpod/SKILL.md"
-      - ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
-      - ".agents/skills/flutter-setup-localization/SKILL.md"
-      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-use-http-package/SKILL.md"
-      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
-      - ".agents/skills/supabase-flutter/SKILL.md"
-      - ".agents/skills/local-first-data/SKILL.md"
+    profile: "coding"
+    role: "Fase Verde (GREEN): escreve código Flutter estritamente tipado e modular com Clean Architecture."
+    rules: [".agents/rules/global.md", ".agents/rules/mobile.md"]
+    skills: [".agents/skills/clean-architecture/SKILL.md", ".agents/skills/local-first-data/SKILL.md"]
+    tools: ["file_read", "file_write", "graft", "ai_memory"]
+
+  web_builder:
+    profile: "coding"
+    role: "Fase Verde (GREEN): escreve componentes React/Next.js com Server Components e otimização Core Web Vitals."
+    rules: [".agents/rules/global.md", ".agents/rules/web.md"]
+    skills: [".agents/skills/web-performance-seo/SKILL.md"]
     tools: ["file_read", "file_write", "graft", "ai_memory"]
 
   qa_validator:
-    model: "${MODEL_CODING}"
-    role: "Executa testes e linters do app mobile, orquestrando até 3 ciclos de autorreparo automático caso algo quebre."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/code-quality-tests/SKILL.md"
-      - ".agents/skills/dart-collect-coverage/SKILL.md"
-      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
+    profile: "coding"
+    role: "Fase Refatoração & QA: executa linters, testes e orquestra até 3 ciclos de autorreparo automático."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/code-quality-tests/SKILL.md"]
     tools: ["bash", "file_read", "file_write", "ai_memory"]
+
+  harness_evolver:
+    profile: "reasoning"
+    role: "Ciclo Propose-Probe-Compose: analisa falhas ocorridas e atualiza as regras ou skills do harness para evitar reincidência."
+    rules: [".agents/rules/global.md"]
+    skills: [".agents/skills/harness-evolver/SKILL.md"]
+    tools: ["file_read", "file_write", "bash"]
 
   git_committer:
-    model: "${MODEL_OPS}"
+    profile: "fast_ops"
     role: "Inspeciona o diff staged, extrai o contexto do ticket no ai-memory e cria o commit semântico atômico."
-    rules:
-      - ".agents/rules/global.md"
+    rules: [".agents/rules/global.md"]
     tools: ["git", "ai_memory", "bash"]
-
-  release_manager:
-    model: "${MODEL_CODING}"
-    role: "Executa o pipeline de release Flutter (gates, versionamento, build, entrega) e publica nas lojas com rollout controlado."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/flutter-release/SKILL.md"
-      - ".agents/skills/mobile-cicd/SKILL.md"
-      - ".agents/skills/store-publishing/SKILL.md"
-    tools: ["bash", "file_read", "file_write", "ai_memory"]
 
 workflows:
   dev_cycle:
     file: ".agents/workflows/dev-cycle.yaml"
-    description: "Ciclo ponta a ponta: Ingestão -> Design -> TDD Red -> Green -> Refactor -> Commit."
+    description: "Ciclo ponta a ponta: Ingestão -> Design -> TDD Red -> Green -> Refactor -> Autoevolução -> Commit."
 EOF
 
 # ------------------------------------------------------------------------------
@@ -427,10 +451,12 @@ cat << 'EOF' > .agents/rules/mobile.md
 
 Este guia estabelece os padrões arquiteturais, convenções de código, gestão de estado, persistência de dados e ergonomia de interface para as aplicações em `apps/mobile/`.
 
+---
+
 ## 1. Arquitetura de Software e Separação de Camadas
 Adotamos uma abordagem modular e desacoplada inspirada em **Clean Architecture**:
 
-```
+```text
 apps/mobile/lib/
 ├── core/                  # Serviços globais, tema, utilitários e clientes (HTTP/DB)
 │   ├── database/          # SQLite (migrations, helpers, DAOs)
@@ -445,7 +471,7 @@ apps/mobile/lib/
 ```
 
 ### Regras de Dependência:
-- A camada de **Apresentação (Presentation)** depende apenas do **Domínio (Domain)**. Nunca chame a camada de dados diretamente de dentro de um Widget.
+- A camada de **Apresentação (Presentation)** depende apenas do **Domínio (Domain)**. Nunca chame o SQLite, Supabase ou HTTP diretamente de dentro de um Widget.
 - A camada de **Dados (Data)** implementa os contratos da camada de **Domínio**.
 - O **Domínio (Domain)** é composto por Dart puro: livre de dependências do framework Flutter, widgets ou pacotes externos de terceiros.
 
@@ -453,12 +479,13 @@ apps/mobile/lib/
 
 ## 2. Gerenciamento de Estados de Tela (Regra dos 4 Estados)
 Toda tela que consulta, carrega ou submete informações DEVE implementar explicitamente os quatro estados visuais da UI:
+
 1. **Estado de Carregamento (`LoadingState`)**:
    - Usar *shimmer skeleton* ou indicador visual de progresso contextualizado.
    - Evitar bloquear a tela inteira se parte do conteúdo já estiver em cache.
 2. **Estado de Conteúdo Vazio (`EmptyState`)**:
    - Mensagem amigável explicando por que não há itens na lista.
-   - Ação visual clara e direta (*Call to Action*), com botão destacado.
+   - Ação visual clara e direta (*Call to Action*), por exemplo: *"Nenhum agendamento encontrado. Clique no botão abaixo para agendar."*
 3. **Estado de Falha/Erro (`ErrorState`)**:
    - Mensagem em Português claro, sem termos técnicos indecifráveis para o usuário final.
    - Botão obrigatório de *"Tentar Novamente"* para reexecutar a consulta.
@@ -512,8 +539,127 @@ Quando o projeto utilizar persistência local em SQLite:
    - Nenhum build sobe para loja sem `flutter test` + `dart analyze` verdes na mesma revisão.
 EOF
 
+cat << 'EOF' > .agents/rules/web.md
+# Diretrizes Técnicas para Desenvolvimento Web (React / Next.js)
+
+Este guia estabelece os padrões de arquitetura, renderização, performance, SEO e segurança para as aplicações em `apps/web/` e `apps/landing/`.
+
+---
+
+## 1. Arquitetura e Separação de Camadas
+Adotamos o App Router do Next.js com Server Components como padrão:
+
+```text
+apps/web/
+├── app/                   # Rotas, layouts e metadata por segmento
+├── components/            # Apresentação reutilizável (UI pura)
+├── features/              # Módulos funcionais isolados
+│   └── [feature_name]/
+│       ├── components/    # Componentes específicos da feature
+│       ├── data/          # Server actions, route handlers e clientes
+│       └── domain/        # Tipos, regras e validações puras
+├── lib/                   # Utilitários, clientes HTTP e configuração
+└── styles/                # Tokens visuais e estilos globais
+```
+
+### Regras de Dependência:
+- **Server Components por padrão**: use `"use client"` apenas quando houver estado local, efeitos ou APIs exclusivas do browser.
+- A camada de **apresentação** (`components/`) não acessa banco de dados, SDKs ou `fetch` direto; dados entram por props ou server actions em `features/*/data/`.
+- O **domínio** (`domain/`) é TypeScript puro: sem imports de React, Next.js ou SDKs externos.
+- Segredos nunca no bundle do cliente: apenas variáveis de servidor. `NEXT_PUBLIC_*` é reservado a valores públicos.
+
+---
+
+## 2. Performance e Core Web Vitals
+1. **Metas de qualidade (p75 mobile)**:
+   - `LCP` ≤ 2,5 s · `INP` ≤ 200 ms · `CLS` ≤ 0,1.
+2. **Imagens**: use `next/image` com `width`/`height` explícitos e formatos modernos; `priority` apenas na imagem hero.
+3. **Fontes**: carregue via `next/font` com `display: swap`; sem requisições bloqueantes de terceiros.
+4. **JavaScript**: orçamento de até 170 KB gzip no primeiro carregamento; use `dynamic import` para componentes pesados e bibliotecas de gráficos/editores.
+5. **Dados**: prefira Server Components para busca; defina `revalidate` ou cache explícito e nunca dependa de cache implícito indefinido.
+
+---
+
+## 3. SEO Técnico
+1. **Metadata por rota**: `title`, `description`, `canonical` e Open Graph definidos no `metadata` do segmento.
+2. **Arquivos obrigatórios**: `app/sitemap.ts` e `app/robots.ts` mantidos atualizados.
+3. **Conteúdo indexável**: a landing deve renderizar conteúdo principal no servidor, sem depender de JavaScript no cliente.
+4. **Semântica**: um único `h1` por página, hierarquia de headings consistente e dados estruturados JSON-LD quando aplicável.
+5. **URLs**: canônicas, sem duplicidade de barra final e sem parâmetros de rastreamento indexáveis.
+
+---
+
+## 4. Acessibilidade (a11y)
+- Contraste mínimo AA, foco visível e navegação completa por teclado.
+- Todo input com `label` associado; erros anunciados via `aria-live`.
+- Elementos interativos não semânticos recebem `role` e tratamento de teclado.
+- Respeite `prefers-reduced-motion` em animações e transições.
+
+---
+
+## 5. Tipagem e Qualidade de Código
+- TypeScript em modo `strict`; proibido `any` implícito ou `@ts-ignore` sem justificativa documentada.
+- Props sempre tipadas; sem lógica de negócio em componentes de apresentação.
+- `npm run lint` e `npm test` devem passar antes de qualquer commit.
+- `npm run build` de produção sem warnings bloqueantes.
+
+---
+
+## 6. Testes
+1. **Unitários** (Vitest/Jest) para regras de domínio, formatadores e validadores.
+2. **Componentes** com Testing Library, priorizando comportamento observável pelo usuário em vez de detalhes de implementação.
+3. **E2E** (Playwright) para jornadas críticas: cadastro, login, checkout e formulários de conversão.
+
+---
+
+## 7. Segurança e Entrega
+1. **Validação no servidor**: toda entrada é validada e higienizada no backend (ex.: Zod), nunca apenas no cliente.
+2. **Headers de segurança**: CSP, `X-Content-Type-Options` e `Referrer-Policy` configurados no `next.config`.
+3. **Gate de release**: nenhum deploy sobe sem build de produção, lint e testes verdes na mesma revisão.
+EOF
+
+if [ ! -f .agents/PROJECT_BRAIN.md ]; then
+cat << 'EOF' > .agents/PROJECT_BRAIN.md
+# PROJECT_BRAIN — Memória Persistente do Projeto
+
+> Componente de **memory** do harness. Este arquivo é preservado integralmente por `update.ps1` e `update.sh`.
+> Não apague e não o sobrescreva automaticamente: registre aqui apenas aprendizados consolidados.
+
+---
+
+## 1. Contexto do Projeto
+- **Objetivo**: (preencher na descoberta inicial)
+- **Stack principal**: (preencher — ex.: Flutter, Next.js)
+- **Workspaces ativos**: `mobile` · `web` · `landing`
+- **Idioma dos artefatos**: pt-BR (código e commits em inglês)
+
+---
+
+## 2. Decisões Arquiteturais (resumo de ADRs)
+| Data | Decisão | Motivo | Impacto |
+|---|---|---|---|
+| — | — | — | — |
+
+---
+
+## 3. Aprendizados Recorrentes
+> Alimentado pelo agente `harness_evolver` após ciclos de autorreparo.
+
+- (erro observado) → (regra preventiva adotada em `.agents/rules/` ou skill)
+
+---
+
+## 4. Histórico de Evolução do Harness
+> Seção obrigatória do ciclo **Propose–Probe–Compose** (skill `harness-evolver`).
+
+| Data | Arquivo alterado | Gatilho | Validação | Resultado |
+|---|---|---|---|---|
+| — | — | — | — | — |
+EOF
+fi
+
 # ------------------------------------------------------------------------------
-# 7. .agents/skills/ (As 4 Skills Fundamentais)
+# 7. .agents/skills/ (Skills Fundamentais e Especializadas)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/skills/spec-discovery/SKILL.md
 ---
@@ -662,8 +808,6 @@ Consulte esta tabela para delegar; ative no máximo 2 skills por turno, prioriza
 | Teste E2E em device | `tdd_tester` | `flutter-add-integration-test`, `code-quality-tests` |
 | QA, lint, autorreparo | `qa_validator` | `code-quality-tests`, `dart-use-pattern-matching` |
 | Cobertura e gate de CI | `qa_validator` | `dart-collect-coverage`, `code-quality-tests` |
-| CI/CD, lanes beta/produção | `release_manager` | `mobile-cicd`, `flutter-release` |
-| Subir para Play/App Store | `release_manager` | `store-publishing`, `flutter-release` |
 | Commit semântico | `git_committer` | (nenhuma — usa `ai-memory` + diff) |
 
 ## Protocolo de Decisão
@@ -1386,14 +1530,86 @@ Valida `coverage/coverage.json` + `coverage/lcov.info`. Em monorepo, passar os d
 - [ ] Adicionar testes onde a cobertura caiu antes de novas features.
 EOF
 
+cat << 'EOF' > .agents/skills/harness-evolver/SKILL.md
+---
+name: harness-evolver
+description: Implementa o ciclo recursivo Propose-Probe-Compose do Google Research Harness² para autoaperfeiçoamento contínuo das skills e diretrizes operacionais.
+---
+
+# Skill: Harness Recursive Self-Improvement (Propose–Probe–Compose)
+
+Esta skill orienta o agente na autoevolução do ecossistema `.agents/` sempre que um ciclo de desenvolvimento encontrar arestas ou demandar autorreparo.
+
+## 1. Gatilho de Ativação
+Acionada automaticamente quando:
+- Um ciclo de autorreparo de QA exigir 2 ou mais iterações para passar.
+- Um bug corrigido for identificado como reincidente.
+- Uma nova biblioteca for adicionada ao projeto sem diretriz prévia.
+
+## 2. O Ciclo Propose–Probe–Compose
+1. **Propose (Proposta de Ajuste no Harness)**:
+   - Identifique a causa raiz da falha ou lentidão.
+   - Formule uma regra preventiva clara para a respectiva skill em `.agents/skills/` ou adicione uma trava em `.agents/rules/`.
+2. **Probe (Validação Experimental)**:
+   - Execute a suíte de testes do projeto para certificar que a nova diretriz não introduz contradições nem quebra fluxos válidos.
+3. **Compose (Consolidação Permanente)**:
+   - Grave a adição defensiva no arquivo `.md` correspondente.
+   - Registre o aprendizado na seção de histórico do `.agents/PROJECT_BRAIN.md`.
+EOF
+
+cat << 'EOF' > .agents/skills/web-performance-seo/SKILL.md
+---
+name: web-performance-seo
+description: Otimização de Core Web Vitals, renderização no servidor e SEO técnico em aplicações React/Next.js. Use ao criar rotas, componentes pesados ou revisar performance, indexação e acessibilidade do web.
+---
+
+# Skill: Performance Web e SEO Técnico
+
+Esta skill orienta a construção e a revisão de aplicações web em `apps/web/` e `apps/landing/`, sempre subordinada às regras de `.agents/rules/web.md` e `.agents/rules/global.md`.
+
+## 1. Gatilho de Ativação
+Acione quando:
+- Uma nova rota, layout ou landing page for criada.
+- Houver regressão de Core Web Vitals ou aumento do bundle.
+- For necessário revisar indexação, metadata ou dados estruturados.
+
+## 2. Fluxo de Trabalho
+1. **Medir antes de otimizar**:
+   - Execute o build de produção e registre `LCP`, `INP` e `CLS` (p75 mobile).
+   - Identifique o maior contribuinte do bundle com análise de build.
+2. **Corrigir a causa raiz**:
+   - Dados buscados em Server Components quando não houver interatividade.
+   - `dynamic import` para bibliotecas pesadas; `next/image` e `next/font` sempre.
+   - Elimine dependências duplicadas e código de cliente desnecessário.
+3. **Validar SEO técnico**:
+   - `metadata` por rota, `canonical`, `sitemap.ts` e `robots.ts` presentes.
+   - Conteúdo principal renderizado no servidor; um único `h1`.
+4. **Revalidar**:
+   - Rebuild + nova medição; compare com a linha de base registrada.
+   - `npm run lint` e `npm test` verdes antes de encerrar.
+
+## 3. Checklist de Aceitação
+- [ ] `LCP` ≤ 2,5 s, `INP` ≤ 200 ms e `CLS` ≤ 0,1 no p75 mobile.
+- [ ] Nenhum segredo ou chave privada no bundle do cliente.
+- [ ] Rotas commetadata única e canônica; `sitemap` e `robots` atualizados.
+- [ ] Imagens com dimensões explícitas e formatos modernos.
+- [ ] Navegação por teclado e contraste AA preservados.
+
+## 4. Anti-Padrões
+- `"use client"` no topo de árvores inteiras sem necessidade real.
+- `fetch` em componente de apresentação ou acesso direto a SDK no cliente.
+- Otimização baseada em percepção, sem medição antes/depois.
+EOF
+
 # ------------------------------------------------------------------------------
 # 8. .agents/workflows/dev-cycle.yaml (Workflow Completo com TDD e Git)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/workflows/dev-cycle.yaml
 version: "1.0"
 name: "dev-cycle"
-description: "Pipeline completo orientado a Spec com TDD (Red-Green-Refactor), loop autônomo de autorreparo e Git committer semântico."
+description: "Pipeline orientado a Spec com TDD (Red-Green-Refactor), validação estática e Git commit semântico."
 
+# 1. Parâmetros de Entrada
 inputs:
   task_id:
     type: string
@@ -1402,7 +1618,7 @@ inputs:
     default: ""
   feature_spec:
     type: string
-    description: "Caminho relativo da especificação da funcionalidade (ex: _specs/features/auth-login.md). Opcional quando task_id é informado"
+    description: "Caminho da especificação da funcionalidade (ex: _specs/prd-template.md ou _specs/features/nova-tela.md). Opcional quando task_id é informado"
     required: false
     default: ""
   target:
@@ -1411,117 +1627,91 @@ inputs:
     default: "both"
   skip_design:
     type: boolean
-    description: "Pular inspeção visual caso a tarefa seja puramente backend/lógica de negócio"
+    description: "Pular inspeção visual para tarefas puramente de lógica ou backend"
     default: false
   release:
     type: boolean
-    description: "Executar a etapa de release ao final (gates, versionamento, build e entrega)"
+    description: "Executar a etapa de release ao final (gates, versionamento, build e entrega). Exige tag v* para produção"
     default: false
 
+# 2. Pipeline Sequencial Unificado
 steps:
-  - id: step_select_task
-    name: "0. Seleção da Tarefa (ranking por dificuldade x urgência)"
+  - id: validate_models
+    name: "Pré-condição: Perfis de Modelo (inherit por padrão)"
+    fail_fast: false
+    description: "Os perfis definidos em .agents/harness.yaml usam 'inherit' como padrão: o agente herda o modelo já logado na CLI/IDE, sem exigir configuração. Opcionalmente, sobrescreva por tarefa com AI_MODEL_REASONING, AI_MODEL_CODING, AI_MODEL_DESIGN e AI_MODEL_FAST. Nenhuma variável ausente aborta o pipeline."
+    actions:
+      - description: "Exibe os perfis resolvidos (inherit quando a variável não estiver definida)"
+        command: >
+          for v in AI_MODEL_REASONING AI_MODEL_CODING AI_MODEL_DESIGN AI_MODEL_FAST; do
+            printf '%s=%s\n' "$v" "${!v:-inherit}";
+          done
+
+  - id: select_task
+    name: "Seleção da Tarefa (ranking por dificuldade × urgência)"
+    fail_fast: true
+    description: "Sem task_id: lê _specs/task-board.md, apresenta o ranking (score = urgência×10 − dificuldade) e pausa pedindo sua escolha (informe o ID ou confirme o top 1). Com task_id: valida que existe em _specs/tasks/ com status todo, deriva a spec do campo spec da tarefa e marca a tarefa como doing."
     actions:
       - description: "Aborta se nem task_id nem feature_spec foram informados"
         command: >
           if [ -z "${inputs.task_id}" ] && [ -z "${inputs.feature_spec}" ]; then echo "ERRO: informe task_id (ex: T01, veja o ranking em _specs/task-board.md) ou feature_spec."; exit 1; fi
-      - description: "Com task_id: valida existência em _specs/tasks/ com status todo e deriva a spec da tarefa"
+      - description: "Com task_id: valida existência, status todo e deriva a spec da tarefa"
         command: >
           if [ -n "${inputs.task_id}" ]; then f=$(grep -rl "^id: \"${inputs.task_id}\"$" _specs/tasks/ | head -n 1); if [ -z "$f" ]; then echo "ERRO: tarefa ${inputs.task_id} não encontrada em _specs/tasks/."; exit 1; fi; st=$(grep "^status:" "$f" | head -n 1); case "$st" in *todo*) ;; *) echo "ERRO: tarefa ${inputs.task_id} não está com status todo ($st)."; exit 1;; esac; fi
-  - id: step_ingest_context
-    name: "1. Ingestão de Contexto e Análise de Símbolos"
-    agent: "product_architect"
+
+  - id: triage
+    name: "0. Triagem Cognitiva e Alocação de Contexto"
+    skill: antigravity-skill-orchestrator
+    thinking_budget: 1000
+    description: "Avalia complexidade da tarefa e define a rota ideal evitando saturação de tokens."
+
+  - id: spec_discovery
+    name: "1. Leitura e Análise da Especificação"
+    skill: spec-discovery
+    thinking_budget: 4000
+    description: "Lê ${inputs.feature_spec} (ou a spec derivada do campo spec da tarefa quando task_id foi informado) e mapeia critérios de aceitação e contratos de interface."
+
+  - id: architecture_review
+    name: "2. Arquitetura e Estrutura Limpa"
+    skill: clean-architecture
+    thinking_budget: 2000
+    description: "Valida regras de design, separação de camadas e responsabilidades no código."
+
+  - id: tdd_red_phase
+    name: "3. TDD Fase Vermelha (RED) - Escrita de Testes"
+    skill: code-quality-tests
+    thinking_budget: 2000
+    description: "Cria testes unitários ou de integração que devem falhar antes da implementação."
+
+  - id: implementation_green
+    name: "4. Implementação de Código (GREEN)"
+    thinking_budget: 0
+    description: "Escreve o código estritamente necessário para satisfazer os testes e a spec."
+
+  - id: automated_validation_loop
+    name: "6. Validação Contínua (Linter, Tipos e Testes)"
+    skill: code-quality-tests
+    thinking_budget: 1000
+    description: "Executa os comandos de teste e lint do workspace alvo (mobile: flutter test / dart analyze; web: npm test / npm run lint) até garantir estabilidade completa."
+
+  - id: git_semantic_commit
+    name: "7. Versionamento Semântico no Git"
+    thinking_budget: 0
+    description: "Gera o commit convencional padronizado refletindo a spec implementada. Se task_id foi informado: marca a tarefa como done em _specs/tasks/ e regenera _specs/task-board.md (ranking, quadrantes e seção por target)."
     actions:
-      - description: "Resolver spec (da tarefa quando feature_spec vazio) e validar existência"
+      - description: "Com task_id: marca status done na tarefa (todo/doing -> done)"
         command: >
-          SPEC="${inputs.feature_spec}"; if [ -z "$SPEC" ]; then SPEC=$(grep -h "^spec:" $(grep -rl "^id: \"${inputs.task_id}\"$" _specs/tasks/ | head -n 1) | head -n 1 | sed 's/^spec: "\(.*\)"$/\1/'); fi; if [ -z "$SPEC" ]; then echo "ERRO: nenhuma spec resolvida (informe feature_spec ou task_id com campo spec)."; exit 1; fi; test -f "$SPEC" || { echo "ERRO: spec não encontrada: $SPEC. Rode spec-discovery para criá-la antes do dev-cycle."; exit 1; }
-      - description: "Fail-fast: aborta se algum MODEL_* (REASONING/CODING/DESIGN/OPS) estiver vazio"
-        command: >
-          for v in MODEL_REASONING MODEL_CODING MODEL_DESIGN MODEL_OPS; do
-            if [ -z "${!v}" ]; then echo "ERRO: $v não definida. Defina antes de executar (ex: export $v='<seu-modelo>') e rode novamente."; exit 1; fi;
-          done
-      - description: "Consultar grafo estático via Graft para mapear arquivos impactados"
-        command: "graft scan --path apps/mobile"
-      - description: "Inicializar ticket de execução no ai-memory"
-        command: >
-          ai-memory ticket create
-          --title "Dev Cycle: ${inputs.feature_spec}"
-          --tags "platform:${inputs.target},tdd,in_progress"
+          if [ -n "${inputs.task_id}" ]; then f=$(grep -rl "^id: \"${inputs.task_id}\"$" _specs/tasks/ | head -n 1); if [ -n "$f" ]; then sed -i 's/^status: .*/status: "done"/' "$f" && echo "Tarefa ${inputs.task_id} marcada como done em $f."; fi; fi
 
-  - id: step_design_tokens
-    name: "2. Verificação de Tokens e Referências Visuais"
-    agent: "ui_ux_designer"
-    condition: "${inputs.skip_design == false}"
-    actions:
-      - description: "Verificar referências em _references/screens/ via Google Stitch MCP"
-        tool: "google_stitch_mcp"
-        parameters:
-          action: "extract_design_context"
-          source_dir: "_references/screens/"
-      - description: "Garantir consistência das cores e tipografia em _specs/design-tokens.json"
-        tool: "file_read"
-        path: "_specs/design-tokens.json"
-
-  - id: step_tdd_red
-    name: "3. TDD Fase Vermelha (RED) - Escrita de Testes Que Devem Falhar"
-    agent: "tdd_tester"
-    actions:
-      - description: "Ler contratos e critérios de aceitação na spec"
-        tool: "file_read"
-        path: "${inputs.feature_spec}"
-      - description: "Escrever testes unitários e de interface cobrindo os cenários"
-        tool: "file_write"
-      - description: "Executar testes e certificar que falham (Red)"
-        command: "cd apps/mobile && flutter test || true"
-
-  - id: step_tdd_green
-    name: "4. TDD Fase Verde (GREEN) - Implementação de Código de Produção"
-    agent: "mobile_builder"
-    actions:
-      - description: "Escrever código de produção estritamente necessário para satisfazer os testes"
-        tool: "file_write"
-
-  - id: step_repair_loop
-    name: "5. Validação de Testes e Loop Fechado de Autorreparo"
-    agent: "qa_validator"
-    loop:
-      max_iterations: 3
-      until: "test_result.exit_code == 0 && lint_result.exit_code == 0"
-      on_iteration:
-        - name: "Executar Linter e Checagem de Tipos"
-          command: "cd apps/mobile && dart analyze"
-          catch_output: "lint_result"
-        - name: "Executar Suíte de Testes"
-          command: "cd apps/mobile && flutter test"
-          catch_output: "test_result"
-
-  - id: step_refactor
-    name: "6. Refatoração de Código, Limpeza e Formatação"
-    agent: "qa_validator"
-    actions:
-      - description: "Aplicar formatador de código oficial"
-        command: "cd apps/mobile && dart format ."
-
-  - id: step_git_commit
-    name: "7. Versionamento Atômico e Fechamento no Git"
-    agent: "git_committer"
-    actions:
-      - description: "Adicionar arquivos alterados à staging area"
-        command: "git add apps/mobile _specs/"
-      - description: "Executar commit semântico atômico"
-        command: >
-          git commit -m "feat(mobile): implement ${inputs.feature_spec} with TDD coverage"
-          -m "- Verified against criteria in ${inputs.feature_spec}"
-          -m "- Clean Architecture and full test suite passed"
-
-  - id: step_release
+  - id: release
     name: "8. Release (gates, versionamento, build, entrega)"
-    agent: "release_manager"
     condition: "${inputs.release == true}"
-    actions:
-      - description: "Seguir flutter-release com mobile-cicd/store-publishing conforme platform"
-        tool: "file_read"
-        path: "_specs/prd.md"
+    thinking_budget: 2000
+    description: "Roda só com release: true. Segue flutter-release (gates via flutter test/dart analyze, bump no pubspec, tag v*, builds por platform com flavor prod) e entrega via mobile-cicd/store-publishing (beta interno ou produção com staged rollout)."
+    skills:
+      - flutter-release
+      - mobile-cicd
+      - store-publishing
 EOF
 
 # ------------------------------------------------------------------------------
@@ -1558,5 +1748,5 @@ echo ""
 echo -e "Próximos passos recomendados:"
 echo -e " 1. Adicione prints/telas de inspiração em:  ${CYAN}_references/screens/${NC}"
 echo -e " 2. Inicie a descoberta do produto:          ${CYAN}Copie _specs/prd-template.md para _specs/prd.md${NC}"
-echo -e " 3. Escolha os modelos por tarefa:          ${CYAN}export MODEL_REASONING='seu-modelo-forte' MODEL_CODING='seu-modelo-rapido'${NC}"
+echo -e " 3. Modelos: herda o modelo logado por padrão (inherit). Opcional: ${CYAN}export AI_MODEL_REASONING='...' AI_MODEL_CODING='...'${NC}"
 echo ""

@@ -48,8 +48,6 @@ Consulte esta tabela para delegar; ative no máximo 2 skills por turno, prioriza
 | Teste E2E em device | `tdd_tester` | `flutter-add-integration-test`, `code-quality-tests` |
 | QA, lint, autorreparo | `qa_validator` | `code-quality-tests`, `dart-use-pattern-matching` |
 | Cobertura e gate de CI | `qa_validator` | `dart-collect-coverage`, `code-quality-tests` |
-| CI/CD, lanes beta/produção | `release_manager` | `mobile-cicd`, `flutter-release` |
-| Subir para Play/App Store | `release_manager` | `store-publishing`, `flutter-release` |
 | Commit semântico | `git_committer` | (nenhuma — usa `ai-memory` + diff) |
 
 ## Protocolo de Decisão

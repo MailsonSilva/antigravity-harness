@@ -19,28 +19,28 @@ node -v; flutter doctor; git --version
 
 ```powershell
 # Windows — dentro da pasta vazia do projeto
-irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/install.ps1 | iex
 ```
 
 ```bash
 # Linux/macOS/WSL — dentro da pasta vazia do projeto
-curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/install.sh | bash
 ```
 
-## 3. Escolher os modelos (toda sessão nova — sem isso o pipeline aborta)
+## 3. Perfis de modelo (opcional — o padrão é herdar o modelo logado)
 
 ```powershell
-# Windows
-$env:MODEL_REASONING = "seu-modelo-forte"     # PRD, arquitetura
-$env:MODEL_CODING = "seu-modelo-rapido"       # TDD, builders, QA
-$env:MODEL_DESIGN = "seu-modelo-com-visao"    # Stitch, tokens
-$env:MODEL_OPS = "seu-modelo-leve"            # git, comandos
+# Windows — sem estas variáveis, tudo roda com o modelo já autenticado (inherit)
+$env:AI_MODEL_REASONING = "seu-modelo-forte"     # PRD, arquitetura
+$env:AI_MODEL_CODING = "seu-modelo-rapido"       # TDD, builders, QA
+$env:AI_MODEL_DESIGN = "seu-modelo-com-visao"    # Stitch, tokens
+$env:AI_MODEL_FAST = "seu-modelo-leve"           # git, comandos
 ```
 
 ```bash
 # Linux/macOS/WSL
-export MODEL_REASONING="seu-modelo-forte" MODEL_CODING="seu-modelo-rapido" \
-       MODEL_DESIGN="seu-modelo-com-visao" MODEL_OPS="seu-modelo-leve"
+export AI_MODEL_REASONING="seu-modelo-forte" AI_MODEL_CODING="seu-modelo-rapido" \
+       AI_MODEL_DESIGN="seu-modelo-com-visao" AI_MODEL_FAST="seu-modelo-leve"
 ```
 
 ## 4. Descoberta → PRD → tarefas → board
@@ -76,18 +76,18 @@ flutter test --coverage      # LCOV em coverage/lcov.info
 
 ```powershell
 # Windows — na raiz do projeto
-irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/update.ps1 | iex
+irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/update.ps1 | iex
 ```
 
 ```bash
 # Linux/macOS/WSL — na raiz do projeto
-curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness-base/main/update.sh | bash
+curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/update.sh | bash
 ```
 
 ```bash
 git status --short          # confira o que mudou
 git diff .agents/harness.yaml   # revise antes de commitar
-# Rollback (se algo falhar): apague .agents e renomeie .agents.bak-<data> de volta
+# Rollback (se algo falhar): restaure o backup impresso ao final (em %TEMP%/harness-backup-<data>)
 ```
 
 ## 8. Atalho mental
@@ -95,7 +95,7 @@ git diff .agents/harness.yaml   # revise antes de commitar
 | Quero... | Comando |
 |---|---|
 | Projeto novo | `install.ps1` / `install.sh` |
-| Definir modelos | `$env:` / `export MODEL_*` |
+| Ajustar perfis de modelo | `$env:AI_MODEL_*` (padrão: `inherit`) |
 | Nova tarefa | copiar `_template.md` → `T<NN>-*.md` |
 | Ver prioridades | ler `_specs/task-board.md` |
 | Desenvolver | dev-cycle (+ `task_id`, `+release` se for publicar) |
