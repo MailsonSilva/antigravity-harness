@@ -1,217 +1,51 @@
-version: "2.1-flutter-mobile"
-name: "universal-flutter-mobile-harness"
-description: "Harness Mobile Flutter oficial com Dart MCP Server, Kanban, TDD Loop e associação 1:N de Skills por Agente."
+version: "2.2-flutter-mobile-modular"
 
-# ==============================================================================
-# 1. Perfis de Modelos Abstratos (Agnóstico: Antigravity, Claude Code, Cursor, Codex)
-# ==============================================================================
-model_profiles:
-  reasoning: "${AI_MODEL_REASONING:-inherit}"
-  coding: "${AI_MODEL_CODING:-inherit}"
-  multimodal_design: "${AI_MODEL_DESIGN:-inherit}"
-  fast_ops: "${AI_MODEL_FAST:-inherit}"
+# 1. CATÁLOGO GLOBAL DE SKILLS (Reutilizáveis por qualquer agente)
+skills_registry:
+  mobile_ux:
+    name: "Mobile UX & Micro-interactions"
+    file: ".agents/skills/mobile-ux/SKILL.md"
+    description: "Diretrizes de toque de 48dp, feedback háptico e micro-interações."
+  clean_architecture:
+    name: "Clean Architecture & SOLID"
+    file: ".agents/skills/clean-architecture/SKILL.md"
+    description: "Separação estrita entre Presentation, Domain e Data."
+  flutter_responsive:
+    name: "Layout Responsivo & Design System"
+    file: ".agents/skills/flutter-build-responsive-layout/SKILL.md"
+    description: "Design adaptativo para celulares e tablets com Design Tokens."
+  tdd_red_green:
+    name: "TDD Rigoroso (Red-Green-Refactor)"
+    file: ".agents/skills/code-quality-tests/SKILL.md"
+    description: "Criação de testes unitários que falham antes de escrever código."
+  local_first_sqlite:
+    name: "Armazenamento Local First & SQLite"
+    file: ".agents/skills/local-first-data/SKILL.md"
+    description: "Persistência offline-first com SQLite/Drift e sincronização assíncrona."
 
-# ==============================================================================
-# 2. Configurações Globais e Caminhos do Projeto
-# ==============================================================================
-settings:
-  language: "pt-BR"
-  enforce_tdd: true
-  max_repair_cycles: 3
-  prd_path: "_specs/prd.md"
-  task_board: "_specs/task-board.md"
-  visual_studio_html: "harness-studio.html"
-  memory_target: ".agents/PROJECT_BRAIN.md"
-  recursive_learning: true
-
-# ==============================================================================
-# 3. Os 8 Componentes Canônicos (Google Research Harness² + Flutter AI)
-# ==============================================================================
-scaffolding:
-  system_prompts:
-    - ".agents/rules/global.md"
-  guardrails:
-    - ".agents/rules/mobile.md"
-    - ".agents/rules/web.md"
-  memory:
-    brain: ".agents/PROJECT_BRAIN.md"
-    db_path: ".agents/memory/context.db"
-  tool_guidance: ".agents/mcp.json"
-  subagents_ref: ".agents/harness.yaml#subagents"
-  skills_ref: ".agents/skills/"
-  scripts_ref:
-    windows_install: "install.ps1"
-    posix_install: "install.sh"
-    windows_update: "update.ps1"
-    posix_update: "update.sh"
-  plugins_ref: ".agents/mcp.json"
-
-# ==============================================================================
-# 4. Workspaces
-# ==============================================================================
-workspaces:
-  shared:
-    paths:
-      - "_specs/"
-      - "_references/"
-      - ".agents/"
-  mobile:
-    path: "./"
-    test_command: "flutter test"
-    lint_command: "dart analyze"
-    format_command: "dart format ."
-
-# ==============================================================================
-# 5. Ferramentas e Servidores MCP Oficiais
-# ==============================================================================
-tools:
-  dart:
-    server_id: "dart"
-    command: "dart mcp-server"
-    description: "Servidor MCP oficial do Dart/Flutter SDK: analyzer, resolução de símbolos, test runner e inspeção de runtime."
-  google_stitch_mcp:
-    server_id: "google-stitch"
-    description: "Leitor de referências visuais de telas e prototipagem de UI."
-  graft:
-    server_id: "graft-ast"
-    description: "Grafo estático via AST Tree-sitter para consulta determinística de símbolos."
-  ai_memory:
-    server_id: "ai-memory"
-    description: "Handoffs atômicos entre agentes e histórico de aprendizado do ciclo TDD."
-  git:
-    cli: "git"
-    description: "Controle de versão e commits semânticos atômicos."
-
-# ==============================================================================
-# 6. Subagentes Especializados para Cada Fase do Projeto Flutter (1:N Skills)
-# ==============================================================================
-subagents:
-  # FASE 1: Planejamento, Entrevista de Perguntas e Kanban
-  product_architect:
-    profile: "reasoning"
-    phase: "Fase 1 - Descoberta, Specs & Kanban"
-    role: "Orquestrador principal: analisa pedidos do desenvolvedor, formula perguntas de esclarecimento, cria specs em _specs/features/ e organiza o Kanban em _specs/task-board.md."
-    rules:
-      - ".agents/rules/global.md"
+# 2. CATÁLOGO DE AGENTES (Personas completas com skills selecionadas 1:N)
+agents:
+  # Agente Orquestrador Soberano (Conhece o projeto todo e delega)
+  master_orchestrator:
+    role: "Orquestrador Chefe e Arquiteto Geral de Software"
+    persona: "Tech Lead com mais de 15 anos de experiência em ecossistemas móveis, arquitetura distribuída e gestão técnica de produtos. Conhece a fundo todo o PROJECT_BRAIN.md e o mapa do repositório."
+    responsibilities:
+      - "Receber demandas em linguagem natural e avaliar escopo e impacto estrutural."
+      - "Identificar qual agente do catálogo é o mais qualificado para executar a tarefa."
+      - "Alimentar o Kanban com critérios de aceitação e acompanhar a aprovação humana."
     skills:
-      - ".agents/skills/spec-discovery/SKILL.md"
-      - ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
-      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
-    tools: ["file_read", "file_write", "ai_memory"]
+      - "clean_architecture"
+      - "tdd_red_green"
+    tools: ["file_read", "file_write", "graft", "ai_memory", "dart"]
 
-  # FASE 2: Design, UX, Layouts Responsivos e Rotas
-  ui_ux_designer:
-    profile: "multimodal_design"
-    phase: "Fase 2 - UI/UX, Tokens, Responsividade & Rotas"
-    role: "Extrai tokens de _references/screens/ via Stitch MCP, projeta layouts responsivos e implementa navegação declarativa respeitando os 4 estados de tela."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
+  # Exemplo de Agente UI/UX Especialista configurado sob medida
+  senior_ui_designer:
+    role: "Designer de Interfaces Mobile & Especialista em Design Systems"
+    persona: "Especialista sênior com 10 anos de carreira focado em Flutter Material 3, acessibilidade motora/visual, hierarquia tipográfica e design tokens mobile."
+    responsibilities:
+      - "Transformar especificações e referências visuais em código Flutter com fidelidade de pixels."
+      - "Garantir conformidade com contraste e áreas mínimas de toque."
     skills:
-      - ".agents/skills/mobile-ux/SKILL.md"
-      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
-      - ".agents/skills/flutter-setup-localization/SKILL.md"
-    tools: ["google_stitch_mcp", "dart", "file_read", "file_write"]
-
-  # FASE 3: TDD Fase Vermelha (Testes Antes do Código)
-  tdd_tester:
-    profile: "coding"
-    phase: "Fase 3 - TDD Fase Vermelha (RED)"
-    role: "Cria testes unitários (com sqflite_common_ffi isolado em memória), widget tests e integration tests que obrigatoriamente falham antes da implementação."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/code-quality-tests/SKILL.md"
-      - ".agents/skills/flutter-add-widget-test/SKILL.md"
-      - ".agents/skills/flutter-add-integration-test/SKILL.md"
-      - ".agents/skills/dart-collect-coverage/SKILL.md"
-    tools: ["dart", "file_read", "file_write", "bash", "graft"]
-
-  # FASE 4A: Implementação de Domínio, Estado e UI Flutter (GREEN)
-  mobile_builder:
-    profile: "coding"
-    phase: "Fase 4A - Construção Flutter & Gerenciamento de Estado (GREEN)"
-    role: "Escreve código Dart 3 e Flutter estritamente tipado, desacoplado em Clean Architecture para fazer os testes da Fase RED passarem."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/clean-architecture/SKILL.md"
-      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
-      - ".agents/skills/flutter-state-riverpod/SKILL.md"
-      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
-    tools: ["dart", "file_read", "file_write", "graft"]
-
-  # FASE 4B: Persistência Local SQLite, Performance de Busca e APIs
-  data_offline_specialist:
-    profile: "coding"
-    phase: "Fase 4B - Banco Local SQLite, Índices, Sincronização & APIs"
-    role: "Implementa DAOs, repositórios offline-first, índices de performance SQLite, pacotes .pac/FTP e integrações REST/Supabase."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/local-first-data/SKILL.md"
-      - ".agents/skills/flutter-use-http-package/SKILL.md"
-      - ".agents/skills/supabase-flutter/SKILL.md"
-      - ".agents/skills/clean-architecture/SKILL.md"
-    tools: ["dart", "file_read", "file_write", "graft"]
-
-  # FASE 5: Loop de Autorreparo e Validação (QA)
-  qa_validator:
-    profile: "coding"
-    phase: "Fase 5 - Validação, Linter & Loop de Autorreparo (REFACTOR)"
-    role: "Executa dart analyze e flutter test via Dart MCP Server, conduzindo até 3 ciclos autônomos de autorreparo."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/code-quality-tests/SKILL.md"
-      - ".agents/skills/dart-collect-coverage/SKILL.md"
-    tools: ["dart", "bash", "file_read", "file_write"]
-
-  # FASE 6: Acessibilidade Oficial Flutter (a11y)
-  flutter_a11y_auditor:
-    profile: "coding"
-    phase: "Fase 6 - Auditoria de Acessibilidade (a11y) & Ergonomia"
-    role: "Persona oficial recomendada pelo Flutter AI para auditar Semantics, leitores de tela, contraste WCAG AA e touch targets mínimos de 48x48dp."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/mobile-ux/SKILL.md"
-      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-add-widget-test/SKILL.md"
-    tools: ["dart", "file_read", "file_write"]
-
-  # FASE 7: Auto-Aperfeiçoamento Recursivo (Harness²)
-  harness_evolver:
-    profile: "reasoning"
-    phase: "Fase 7 - Evolução Propose-Probe-Compose"
-    role: "Analisa falhas que exigiram autorreparo e atualiza as SKILL.md ou PROJECT_BRAIN.md para evitar reincidência."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/harness-evolver/SKILL.md"
-      - ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
-    tools: ["file_read", "file_write"]
-
-  # FASE 8: Fechamento Git, Build e Publicação nas Lojas
-  git_committer:
-    profile: "fast_ops"
-    phase: "Fase 8 - Commit Atômico, CI/CD & Publicação"
-    role: "Inspeciona o git diff, atualiza o Kanban para Concluído, executa commit semântico e prepara releases."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/flutter-release/SKILL.md"
-      - ".agents/skills/mobile-cicd/SKILL.md"
-      - ".agents/skills/store-publishing/SKILL.md"
-    tools: ["git", "bash", "file_read", "file_write"]
-
-workflows:
-  dev_cycle:
-    file: ".agents/workflows/dev-cycle.yaml"
-    description: "Ciclo completo: Descoberta/Kanban -> Design -> TDD Red -> Green -> Repair Loop (3x) -> A11y -> Evolver -> Commit."
+      - "mobile_ux"
+      - "flutter_responsive"
+    tools: ["file_read", "file_write", "google_stitch"]
