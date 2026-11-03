@@ -1,30 +1,61 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Antigravity Harness - Script de Atualização Segura
-# Preserva PROJECT_BRAIN.md, .agents/skills/ e .agents/memory/
+# Antigravity Harness - Atualizador Universal (Linux / macOS / WSL / Git Bash)
+# Sincroniza o harness com o upstream preservando dados locais.
+#
+# Uso:  ./update.sh [diretorio]     (env: REPO=owner/repo, BRANCH=main)
+#
+# PRESERVADO (nunca sobrescrito):
+#   .agents/PROJECT_BRAIN.md     .agents/skills/** (skills existentes)
+#   .agents/memory/**            apps/  _references/
+#   _specs/prd.md  _specs/features/  _specs/tasks/T*.md  README.md  .git/
+#
+# ATUALIZADO (backup previo em diretorio temporario):
+#   .agents/harness.yaml  .agents/mcp.json  .agents/rules/**  .agents/workflows/**
+#   _specs/prd-template.md  _specs/tasks/_template.md
+#   install.ps1  install.sh  update.ps1  update.sh
 # ==============================================================================
 
-set -e
+set -euo pipefail
 
-REPO_URL="https://github.com/MailsonSilva/antigravity-harness"
-BRANCH="main"
-TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
-BACKUP_DIR=".agents.bak-${TIMESTAMP}"
-TMP_DIR=".tmp-harness-update-${TIMESTAMP}"
+TARGET_DIR="${1:-.}"
+REPO="${REPO:-MailsonSilva/antigravity-harness}"
+BRANCH="${BRANCH:-main}"
+
+cd "$TARGET_DIR"
+
+command -v git >/dev/null 2>&1 || { echo "ERRO: git nao encontrado no PATH." >&2; exit 1; }
+[ -f .agents/harness.yaml ] || { echo "ERRO: harness nao encontrado em $(pwd). Rode o install.sh primeiro." >&2; exit 1; }
+
+# Aceita "owner/repo", URL completa ou caminho local (util para testes).
+case "$REPO" in
+  http://*|https://*|git@*|file://*|/*|./*|../*|[A-Za-z]:/*) REPO_URL="$REPO" ;;
+  *) REPO_URL="https://github.com/$REPO.git" ;;
+esac
+
+STAMP=$(date +%Y%m%d-%H%M%S)
+WORKDIR=$(mktemp -d "${TMPDIR:-/tmp}/harness-update-XXXXXX")
+BACKUP=$(mktemp -d "${TMPDIR:-/tmp}/harness-backup-XXXXXX")
+
+cleanup() { rm -rf "$WORKDIR"; }
+trap cleanup EXIT
 
 echo "====================================================="
 echo "  Atualizador do Antigravity Harness"
 echo "====================================================="
 echo "Baixando ${REPO_URL} (branch ${BRANCH}) ..."
 
-# 1. Backup de segurança da pasta .agents atual
-if [ -d ".agents" ]; then
-    cp -r .agents "$BACKUP_DIR"
-    echo "Backup criado em: ${BACKUP_DIR}"
-fi
+# 1. Clone temporário da versão upstream
+git clone --quiet --depth 1 --branch "$BRANCH" "$REPO_URL" "$WORKDIR/src"
+SRC="$WORKDIR/src"
 
-# 2. Clone temporário da versão upstream
-git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$TMP_DIR" --quiet
+# 2. Backup dos arquivos gerenciados antes de sobrescrever
+for p in .agents/harness.yaml .agents/mcp.json .agents/rules .agents/workflows; do
+    [ -e "$p" ] || continue
+    mkdir -p "$BACKUP/$(dirname "$p")"
+    cp -R "$p" "$BACKUP/$p"
+done
+echo "Backup criado em: ${BACKUP}"
 
 # 3. Criação segura de pastas de infraestrutura
 mkdir -p .agents/rules
@@ -32,41 +63,56 @@ mkdir -p .agents/workflows
 mkdir -p .agents/memory
 mkdir -p .agents/skills
 mkdir -p _specs/features
+mkdir -p _specs/tasks
 mkdir -p _references/screens
 mkdir -p _references/brand
 
-# 4. Sincronização dos arquivos centrais do harness (mantendo regras locais)
-cp -f "$TMP_DIR/.agents/harness.yaml" .agents/harness.yaml 2>/dev/null || true
-cp -f "$TMP_DIR/.agents/mcp.json" .agents/mcp.json 2>/dev/null || true
-cp -f "$TMP_DIR/.agents/workflows/dev-cycle.yaml" .agents/workflows/dev-cycle.yaml 2>/dev/null || true
-cp -f "$TMP_DIR/_specs/prd-template.md" _specs/prd-template.md 2>/dev/null || true
+# 4. Arquivos gerenciados (sobrescritos pelo upstream)
+for f in .agents/harness.yaml .agents/mcp.json _specs/prd-template.md _specs/tasks/_template.md install.ps1 install.sh update.ps1; do
+    [ -f "$SRC/$f" ] || continue
+    mkdir -p "$(dirname "$f")"
+    cp -f "$SRC/$f" "$f"
+done
 
-# 5. Cópia não destrutiva de skills (só adiciona novas, nunca apaga as existentes)
-if [ -d "$TMP_DIR/.agents/skills" ]; then
-    cp -rn "$TMP_DIR/.agents/skills/"* .agents/skills/ 2>/dev/null || true
-fi
-
-# 6. Atualização dos próprios instaladores na raiz
-cp -f "$TMP_DIR/install.ps1" ./install.ps1 2>/dev/null || true
-cp -f "$TMP_DIR/install.sh" ./install.sh 2>/dev/null || true
-cp -f "$TMP_DIR/update.ps1" ./update.ps1 2>/dev/null || true
 # update.sh é o próprio script em execução: usar rename atômico em vez de
 # "cp -f" (que trunca o inode lido pelo bash e faz o shell executar um trecho
 # corrompido do arquivo novo, ex.: "bash: /: Is a directory").
-if [ -f "$TMP_DIR/update.sh" ]; then
-    if cp -f "$TMP_DIR/update.sh" "./.update.sh.new"; then
+if [ -f "$SRC/update.sh" ]; then
+    if cp -f "$SRC/update.sh" "./.update.sh.new"; then
         mv -f "./.update.sh.new" ./update.sh
     else
         rm -f "./.update.sh.new"
     fi
 fi
 
-# 7. Garantia de rastreamento do Git nas pastas de referências
+# 5. Regras e workflows gerenciados (sobrescreve os do upstream, preserva locais)
+for d in .agents/rules .agents/workflows; do
+    [ -d "$SRC/$d" ] || continue
+    mkdir -p "$d"
+    cp -R "$SRC/$d/." "$d/"
+done
+
+# 6. Skills: preserva as existentes e adiciona apenas as novas
+if [ -d "$SRC/.agents/skills" ]; then
+    for skill in "$SRC/.agents/skills"/*/; do
+        [ -d "$skill" ] || continue
+        name=$(basename "$skill")
+        if [ ! -e ".agents/skills/$name" ]; then
+            cp -R "$skill" ".agents/skills/$name"
+            echo "  + skill nova: $name"
+        fi
+    done
+fi
+
+# 7. PROJECT_BRAIN: cria somente se ainda nao existir
+if [ -f "$SRC/.agents/PROJECT_BRAIN.md" ] && [ ! -f .agents/PROJECT_BRAIN.md ]; then
+    cp "$SRC/.agents/PROJECT_BRAIN.md" .agents/PROJECT_BRAIN.md
+fi
+
+# 8. Marcadores de versionamento das pastas vazias
 touch _references/screens/.gitkeep
 touch _references/brand/.gitkeep
-
-# 8. Limpeza do diretório temporário
-rm -rf "$TMP_DIR"
+touch .agents/memory/.gitkeep
 
 echo "✔ Atualização concluída com sucesso!"
 echo "✔ Memória, skills pré-existentes e regras locais preservadas."
