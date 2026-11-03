@@ -164,7 +164,7 @@ try {
     if (-not (Test-Path "_references\brand\.gitkeep")) { Set-Content -Path "_references\brand\.gitkeep" -Value "" }
     if (-not (Test-Path ".agents\memory\.gitkeep")) { Set-Content -Path ".agents\memory\.gitkeep" -Value "" }
 
-    Write-Ok "Harness v2.1 sincronizado com $repoUrl@$Branch."
+    Write-Ok "Harness v3.0 sincronizado com $repoUrl@$Branch."
     Write-Ok "Preservados: PROJECT_BRAIN.md, .agents/skills/, .agents/memory/ e _specs/task-board.md."
     Write-Ok "Sincronizado quando presente: harness-studio.html, harness.yaml, mcp.json (Dart MCP) e regras."
     Write-Warn "Backup dos arquivos gerenciados: $backup"

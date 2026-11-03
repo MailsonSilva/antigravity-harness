@@ -45,7 +45,7 @@ cleanup() { rm -rf "$WORKDIR"; }
 trap cleanup EXIT
 
 echo "====================================================="
-echo "  Atualizador do Antigravity Flutter Harness (v2.1)"
+echo "  Atualizador do Antigravity Flutter Harness (v3.0)"
 echo "====================================================="
 echo "Baixando ${REPO_URL} (branch ${BRANCH}) ..."
 

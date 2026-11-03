@@ -1,51 +1,162 @@
-version: "2.2-flutter-mobile-modular"
+# Antigravity Harness v3.0 — Catálogo desacoplado de Agentes & Skills
+# Gerado automaticamente pelo Harness Studio (harness-studio.html)
+version: "3.0-google-harness2-modular"
 
-# 1. CATÁLOGO GLOBAL DE SKILLS (Reutilizáveis por qualquer agente)
+model_profiles:
+  reasoning: "inherit"
+  coding: "inherit"
+  design: "inherit"
+  fast_ops: "inherit"
+
+mcp_servers:
+  dart_mcp:
+    enabled: true
+    command: "dart"
+    args: ["mcp-server"]
+  supabase_mcp:
+    enabled: true
+    command: "npx"
+    args: ["-y", "@supabase/mcp-server-supabase@latest"]
+  google_stitch:
+    enabled: true
+    command: "npx"
+    args: ["-y", "@google/stitch-mcp-server"]
+    env:
+      STITCH_REFERENCES_DIR: "./_references/screens"
+      STITCH_OUTPUT_DIR: "./_specs"
+  graft_ast:
+    enabled: true
+    command: "graft"
+    args: ["mcp", "--watch"]
+  ai_memory:
+    enabled: true
+    command: "ai-memory"
+    args: ["mcp"]
+    env:
+      AI_MEMORY_DB_PATH: "./.agents/memory/context.db"
+
 skills_registry:
-  mobile_ux:
-    name: "Mobile UX & Micro-interactions"
-    file: ".agents/skills/mobile-ux/SKILL.md"
-    description: "Diretrizes de toque de 48dp, feedback háptico e micro-interações."
+  spec_discovery:
+    name: "Spec-Driven Discovery & PRD"
+    category: "Arquitetura & Produto"
+    file: ".agents/skills/spec-discovery/SKILL.md"
+    description: "Transforma requisitos vagos em contratos técnicos estritos, mapeando casos de borda e os 4 estados de tela (Loading, Empty, Error, Success)."
   clean_architecture:
-    name: "Clean Architecture & SOLID"
+    name: "Clean Architecture & Domain Purity"
+    category: "Engenharia de Software"
     file: ".agents/skills/clean-architecture/SKILL.md"
-    description: "Separação estrita entre Presentation, Domain e Data."
-  flutter_responsive:
-    name: "Layout Responsivo & Design System"
+    description: "Separação estrita entre Presentation, Domain (Services/Entities puros) e Data (Repositories/DTOs). Centralização de regras críticas."
+  mobile_ux_design_system:
+    name: "Mobile UX & Design Systems"
+    category: "UI/UX & Frontend"
+    file: ".agents/skills/mobile-ux/SKILL.md"
+    description: "Design Tokens semânticos, alvos de toque mínimos de 48x48dp, micro-interações fluidas 60/120fps, Material 3 e responsividade adaptativa."
+  stitch_visual_ingest:
+    name: "Google Stitch Visual Ingestion"
+    category: "UI/UX & Frontend"
     file: ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-    description: "Design adaptativo para celulares e tablets com Design Tokens."
-  tdd_red_green:
-    name: "TDD Rigoroso (Red-Green-Refactor)"
-    file: ".agents/skills/code-quality-tests/SKILL.md"
-    description: "Criação de testes unitários que falham antes de escrever código."
+    description: "Leitura de protótipos e imagens em _references/screens/ via Stitch MCP para extração de espaçamentos, tipografia e componentes."
+  supabase_fullstack:
+    name: "Supabase Auth, RLS & Edge"
+    category: "Backend & Cloud"
+    file: ".agents/skills/supabase-flutter/SKILL.md"
+    description: "Integração segura com Supabase, políticas Row Level Security (RLS), sincronização incremental e funções serverless."
   local_first_sqlite:
-    name: "Armazenamento Local First & SQLite"
+    name: "Local-First SQLite & Performance"
+    category: "Dados & Offline"
     file: ".agents/skills/local-first-data/SKILL.md"
-    description: "Persistência offline-first com SQLite/Drift e sincronização assíncrona."
+    description: "Modelagem SQLite local de alta performance, índices compostos (CREATE INDEX), paginação (LIMIT/OFFSET), debounce de busca e fila offline."
+  tdd_red_green:
+    name: "Strict TDD (Red-Green-Refactor)"
+    category: "Qualidade & Testes"
+    file: ".agents/skills/code-quality-tests/SKILL.md"
+    description: "Desenvolvimento guiado por testes determinísticos: criação do teste que falha (RED) antes da implementação mínima (GREEN)."
+  flutter_riverpod_state:
+    name: "Reactive State Management (Riverpod)"
+    category: "Engenharia Mobile"
+    file: ".agents/skills/flutter-state-riverpod/SKILL.md"
+    description: "Gerenciamento de estado previsível, imutável e reativo usando Notifiers/AsyncNotifiers com descarte seguro de recursos."
+  harness_evolver:
+    name: "Google Harness² Recursive Evolver"
+    category: "Meta-Otimização"
+    file: ".agents/skills/harness-evolver/SKILL.md"
+    description: "Ciclo Propose–Probe–Compose do Google Research Harness²: analisa falhas de QA ou reprovações no Kanban e atualiza as Skills automaticamente."
 
-# 2. CATÁLOGO DE AGENTES (Personas completas com skills selecionadas 1:N)
-agents:
-  # Agente Orquestrador Soberano (Conhece o projeto todo e delega)
+subagents:
   master_orchestrator:
-    role: "Orquestrador Chefe e Arquiteto Geral de Software"
-    persona: "Tech Lead com mais de 15 anos de experiência em ecossistemas móveis, arquitetura distribuída e gestão técnica de produtos. Conhece a fundo todo o PROJECT_BRAIN.md e o mapa do repositório."
-    responsibilities:
-      - "Receber demandas em linguagem natural e avaliar escopo e impacto estrutural."
-      - "Identificar qual agente do catálogo é o mais qualificado para executar a tarefa."
-      - "Alimentar o Kanban com critérios de aceitação e acompanhar a aprovação humana."
+    model: "inherit"
+    role: "Master Orchestrator & Principal Architect"
+    seniority: "Principal / Staff Engineer (15+ anos)"
+    persona: "Conhece profundamente todo o PROJECT_BRAIN.md, a arquitetura do repositório, os contratos de domínio e o status dos servidores MCP conectados. Decompõe épicos em tarefas menores por complexidade e escala o especialista exato."
+    mcps:
+      - "dart_mcp"
+      - "supabase_mcp"
+      - "google_stitch"
+      - "graft_ast"
+      - "ai_memory"
+    skills:
+      - "spec_discovery"
+      - "clean_architecture"
+      - "harness_evolver"
+  ui_ux_specialist:
+    model: "inherit"
+    role: "Senior UI/UX & Design System Engineer"
+    seniority: "Senior Product Designer & Frontend Architect (10+ anos)"
+    persona: "Especialista em Design Systems escaláveis, Material 3, acessibilidade WCAG, micro-interações e conversão de layouts do Google Stitch em componentes Flutter responsivos."
+    mcps:
+      - "google_stitch"
+      - "dart_mcp"
+    skills:
+      - "mobile_ux_design_system"
+      - "stitch_visual_ingest"
+      - "flutter_riverpod_state"
+  tdd_specialist:
+    model: "inherit"
+    role: "Lead TDD & Contract Verification Engineer"
+    seniority: "Senior QA & Test Architect (10+ anos)"
+    persona: "Guardião da Fase RED. Escreve testes unitários, de widget e de contrato de performance antes que qualquer código de produção exista."
+    mcps:
+      - "dart_mcp"
+      - "graft_ast"
+    skills:
+      - "tdd_red_green"
+      - "clean_architecture"
+  mobile_domain_builder:
+    model: "inherit"
+    role: "Senior Flutter & Domain Engineer"
+    seniority: "Senior Mobile Software Engineer (12+ anos)"
+    persona: "Implementa a Fase GREEN com código limpo, serviços de domínio desacoplados (ex: PrecoService) e gerenciamento de estado reativo."
+    mcps:
+      - "dart_mcp"
+      - "graft_ast"
+      - "ai_memory"
     skills:
       - "clean_architecture"
-      - "tdd_red_green"
-    tools: ["file_read", "file_write", "graft", "ai_memory", "dart"]
-
-  # Exemplo de Agente UI/UX Especialista configurado sob medida
-  senior_ui_designer:
-    role: "Designer de Interfaces Mobile & Especialista em Design Systems"
-    persona: "Especialista sênior com 10 anos de carreira focado em Flutter Material 3, acessibilidade motora/visual, hierarquia tipográfica e design tokens mobile."
-    responsibilities:
-      - "Transformar especificações e referências visuais em código Flutter com fidelidade de pixels."
-      - "Garantir conformidade com contraste e áreas mínimas de toque."
+      - "flutter_riverpod_state"
+      - "mobile_ux_design_system"
+  data_supabase_specialist:
+    model: "inherit"
+    role: "Offline-First SQLite & Supabase Architect"
+    seniority: "Senior Data & Cloud Engineer (12+ anos)"
+    persona: "Especialista em motores de busca SQLite ultrarrápidos (índices, paginação, sincronização FTP/REST) e backends Supabase com RLS e Edge Functions."
+    mcps:
+      - "supabase_mcp"
+      - "dart_mcp"
+      - "graft_ast"
     skills:
-      - "mobile_ux"
-      - "flutter_responsive"
-    tools: ["file_read", "file_write", "google_stitch"]
+      - "local_first_sqlite"
+      - "supabase_fullstack"
+      - "clean_architecture"
+  qa_self_healer:
+    model: "inherit"
+    role: "Autonomous QA Validator & Self-Healing Agent"
+    seniority: "Staff Quality & Reliability Engineer"
+    persona: "Executa linters, testes automatizados e auditoria de regressão em loop fechado (até 3 tentativas) e aciona o Harness Evolver para registrar aprendizados."
+    mcps:
+      - "dart_mcp"
+      - "graft_ast"
+      - "ai_memory"
+    skills:
+      - "tdd_red_green"
+      - "harness_evolver"
+      - "clean_architecture"

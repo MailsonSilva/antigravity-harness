@@ -2,7 +2,7 @@
 # ==============================================================================
 # Antigravity Developer Harness - Instalador Universal (Linux / macOS / WSL / Git Bash)
 # 100% Autocontido: Instala ferramentas (ai-memory, graft), regras, skills e workflows
-# v2.1: Dart MCP, 9 agentes, matriz 1:N, Kanban de 5 colunas e harness-studio.html.
+# v3.0: Studio com modal/auto-save, 5 MCPs, catalogo desacoplado de agentes/skills (1:N).
 # Opcional: INSTALL_FLUTTER_SKILLS=1 ./install.sh instala os plugins oficiais do Flutter.
 # ==============================================================================
 
@@ -203,223 +203,168 @@ EOF
 # 4. .agents/harness.yaml (Arquitetura Agnóstica v2 — 8 Componentes)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > .agents/harness.yaml
-version: "2.1-flutter-mobile"
-name: "universal-flutter-mobile-harness"
-description: "Harness Mobile Flutter oficial com Dart MCP Server, Kanban, TDD Loop e associação 1:N de Skills por Agente."
+# Antigravity Harness v3.0 — Catálogo desacoplado de Agentes & Skills
+# Gerado automaticamente pelo Harness Studio (harness-studio.html)
+version: "3.0-google-harness2-modular"
 
-# ==============================================================================
-# 1. Perfis de Modelos Abstratos (Agnóstico: Antigravity, Claude Code, Cursor, Codex)
-# ==============================================================================
 model_profiles:
-  reasoning: "${AI_MODEL_REASONING:-inherit}"
-  coding: "${AI_MODEL_CODING:-inherit}"
-  multimodal_design: "${AI_MODEL_DESIGN:-inherit}"
-  fast_ops: "${AI_MODEL_FAST:-inherit}"
+  reasoning: "inherit"
+  coding: "inherit"
+  design: "inherit"
+  fast_ops: "inherit"
 
-# ==============================================================================
-# 2. Configurações Globais e Caminhos do Projeto
-# ==============================================================================
-settings:
-  language: "pt-BR"
-  enforce_tdd: true
-  max_repair_cycles: 3
-  prd_path: "_specs/prd.md"
-  task_board: "_specs/task-board.md"
-  visual_studio_html: "harness-studio.html"
-  memory_target: ".agents/PROJECT_BRAIN.md"
-  recursive_learning: true
-
-# ==============================================================================
-# 3. Os 8 Componentes Canônicos (Google Research Harness² + Flutter AI)
-# ==============================================================================
-scaffolding:
-  system_prompts:
-    - ".agents/rules/global.md"
-  guardrails:
-    - ".agents/rules/mobile.md"
-    - ".agents/rules/web.md"
-  memory:
-    brain: ".agents/PROJECT_BRAIN.md"
-    db_path: ".agents/memory/context.db"
-  tool_guidance: ".agents/mcp.json"
-  subagents_ref: ".agents/harness.yaml#subagents"
-  skills_ref: ".agents/skills/"
-  scripts_ref:
-    windows_install: "install.ps1"
-    posix_install: "install.sh"
-    windows_update: "update.ps1"
-    posix_update: "update.sh"
-  plugins_ref: ".agents/mcp.json"
-
-# ==============================================================================
-# 4. Workspaces
-# ==============================================================================
-workspaces:
-  shared:
-    paths:
-      - "_specs/"
-      - "_references/"
-      - ".agents/"
-  mobile:
-    path: "./"
-    test_command: "flutter test"
-    lint_command: "dart analyze"
-    format_command: "dart format ."
-
-# ==============================================================================
-# 5. Ferramentas e Servidores MCP Oficiais
-# ==============================================================================
-tools:
-  dart:
-    server_id: "dart"
-    command: "dart mcp-server"
-    description: "Servidor MCP oficial do Dart/Flutter SDK: analyzer, resolução de símbolos, test runner e inspeção de runtime."
-  google_stitch_mcp:
-    server_id: "google-stitch"
-    description: "Leitor de referências visuais de telas e prototipagem de UI."
-  graft:
-    server_id: "graft-ast"
-    description: "Grafo estático via AST Tree-sitter para consulta determinística de símbolos."
+mcp_servers:
+  dart_mcp:
+    enabled: true
+    command: "dart"
+    args: ["mcp-server"]
+  supabase_mcp:
+    enabled: true
+    command: "npx"
+    args: ["-y", "@supabase/mcp-server-supabase@latest"]
+  google_stitch:
+    enabled: true
+    command: "npx"
+    args: ["-y", "@google/stitch-mcp-server"]
+    env:
+      STITCH_REFERENCES_DIR: "./_references/screens"
+      STITCH_OUTPUT_DIR: "./_specs"
+  graft_ast:
+    enabled: true
+    command: "graft"
+    args: ["mcp", "--watch"]
   ai_memory:
-    server_id: "ai-memory"
-    description: "Handoffs atômicos entre agentes e histórico de aprendizado do ciclo TDD."
-  git:
-    cli: "git"
-    description: "Controle de versão e commits semânticos atômicos."
+    enabled: true
+    command: "ai-memory"
+    args: ["mcp"]
+    env:
+      AI_MEMORY_DB_PATH: "./.agents/memory/context.db"
 
-# ==============================================================================
-# 6. Subagentes Especializados para Cada Fase do Projeto Flutter (1:N Skills)
-# ==============================================================================
-subagents:
-  # FASE 1: Planejamento, Entrevista de Perguntas e Kanban
-  product_architect:
-    profile: "reasoning"
-    phase: "Fase 1 - Descoberta, Specs & Kanban"
-    role: "Orquestrador principal: analisa pedidos do desenvolvedor, formula perguntas de esclarecimento, cria specs em _specs/features/ e organiza o Kanban em _specs/task-board.md."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/spec-discovery/SKILL.md"
-      - ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
-      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
-    tools: ["file_read", "file_write", "ai_memory"]
-
-  # FASE 2: Design, UX, Layouts Responsivos e Rotas
-  ui_ux_designer:
-    profile: "multimodal_design"
-    phase: "Fase 2 - UI/UX, Tokens, Responsividade & Rotas"
-    role: "Extrai tokens de _references/screens/ via Stitch MCP, projeta layouts responsivos e implementa navegação declarativa respeitando os 4 estados de tela."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/mobile-ux/SKILL.md"
-      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
-      - ".agents/skills/flutter-setup-localization/SKILL.md"
-    tools: ["google_stitch_mcp", "dart", "file_read", "file_write"]
-
-  # FASE 3: TDD Fase Vermelha (Testes Antes do Código)
-  tdd_tester:
-    profile: "coding"
-    phase: "Fase 3 - TDD Fase Vermelha (RED)"
-    role: "Cria testes unitários (com sqflite_common_ffi isolado em memória), widget tests e integration tests que obrigatoriamente falham antes da implementação."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/code-quality-tests/SKILL.md"
-      - ".agents/skills/flutter-add-widget-test/SKILL.md"
-      - ".agents/skills/flutter-add-integration-test/SKILL.md"
-      - ".agents/skills/dart-collect-coverage/SKILL.md"
-    tools: ["dart", "file_read", "file_write", "bash", "graft"]
-
-  # FASE 4A: Implementação de Domínio, Estado e UI Flutter (GREEN)
-  mobile_builder:
-    profile: "coding"
-    phase: "Fase 4A - Construção Flutter & Gerenciamento de Estado (GREEN)"
-    role: "Escreve código Dart 3 e Flutter estritamente tipado, desacoplado em Clean Architecture para fazer os testes da Fase RED passarem."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/clean-architecture/SKILL.md"
-      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
-      - ".agents/skills/flutter-state-riverpod/SKILL.md"
-      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
-    tools: ["dart", "file_read", "file_write", "graft"]
-
-  # FASE 4B: Persistência Local SQLite, Performance de Busca e APIs
-  data_offline_specialist:
-    profile: "coding"
-    phase: "Fase 4B - Banco Local SQLite, Índices, Sincronização & APIs"
-    role: "Implementa DAOs, repositórios offline-first, índices de performance SQLite, pacotes .pac/FTP e integrações REST/Supabase."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/local-first-data/SKILL.md"
-      - ".agents/skills/flutter-use-http-package/SKILL.md"
-      - ".agents/skills/supabase-flutter/SKILL.md"
-      - ".agents/skills/clean-architecture/SKILL.md"
-    tools: ["dart", "file_read", "file_write", "graft"]
-
-  # FASE 5: Loop de Autorreparo e Validação (QA)
-  qa_validator:
-    profile: "coding"
-    phase: "Fase 5 - Validação, Linter & Loop de Autorreparo (REFACTOR)"
-    role: "Executa dart analyze e flutter test via Dart MCP Server, conduzindo até 3 ciclos autônomos de autorreparo."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/code-quality-tests/SKILL.md"
-      - ".agents/skills/dart-collect-coverage/SKILL.md"
-    tools: ["dart", "bash", "file_read", "file_write"]
-
-  # FASE 6: Acessibilidade Oficial Flutter (a11y)
-  flutter_a11y_auditor:
-    profile: "coding"
-    phase: "Fase 6 - Auditoria de Acessibilidade (a11y) & Ergonomia"
-    role: "Persona oficial recomendada pelo Flutter AI para auditar Semantics, leitores de tela, contraste WCAG AA e touch targets mínimos de 48x48dp."
-    rules:
-      - ".agents/rules/global.md"
-      - ".agents/rules/mobile.md"
-    skills:
-      - ".agents/skills/mobile-ux/SKILL.md"
-      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-add-widget-test/SKILL.md"
-    tools: ["dart", "file_read", "file_write"]
-
-  # FASE 7: Auto-Aperfeiçoamento Recursivo (Harness²)
+skills_registry:
+  spec_discovery:
+    name: "Spec-Driven Discovery & PRD"
+    category: "Arquitetura & Produto"
+    file: ".agents/skills/spec-discovery/SKILL.md"
+    description: "Transforma requisitos vagos em contratos técnicos estritos, mapeando casos de borda e os 4 estados de tela (Loading, Empty, Error, Success)."
+  clean_architecture:
+    name: "Clean Architecture & Domain Purity"
+    category: "Engenharia de Software"
+    file: ".agents/skills/clean-architecture/SKILL.md"
+    description: "Separação estrita entre Presentation, Domain (Services/Entities puros) e Data (Repositories/DTOs). Centralização de regras críticas."
+  mobile_ux_design_system:
+    name: "Mobile UX & Design Systems"
+    category: "UI/UX & Frontend"
+    file: ".agents/skills/mobile-ux/SKILL.md"
+    description: "Design Tokens semânticos, alvos de toque mínimos de 48x48dp, micro-interações fluidas 60/120fps, Material 3 e responsividade adaptativa."
+  stitch_visual_ingest:
+    name: "Google Stitch Visual Ingestion"
+    category: "UI/UX & Frontend"
+    file: ".agents/skills/flutter-build-responsive-layout/SKILL.md"
+    description: "Leitura de protótipos e imagens em _references/screens/ via Stitch MCP para extração de espaçamentos, tipografia e componentes."
+  supabase_fullstack:
+    name: "Supabase Auth, RLS & Edge"
+    category: "Backend & Cloud"
+    file: ".agents/skills/supabase-flutter/SKILL.md"
+    description: "Integração segura com Supabase, políticas Row Level Security (RLS), sincronização incremental e funções serverless."
+  local_first_sqlite:
+    name: "Local-First SQLite & Performance"
+    category: "Dados & Offline"
+    file: ".agents/skills/local-first-data/SKILL.md"
+    description: "Modelagem SQLite local de alta performance, índices compostos (CREATE INDEX), paginação (LIMIT/OFFSET), debounce de busca e fila offline."
+  tdd_red_green:
+    name: "Strict TDD (Red-Green-Refactor)"
+    category: "Qualidade & Testes"
+    file: ".agents/skills/code-quality-tests/SKILL.md"
+    description: "Desenvolvimento guiado por testes determinísticos: criação do teste que falha (RED) antes da implementação mínima (GREEN)."
+  flutter_riverpod_state:
+    name: "Reactive State Management (Riverpod)"
+    category: "Engenharia Mobile"
+    file: ".agents/skills/flutter-state-riverpod/SKILL.md"
+    description: "Gerenciamento de estado previsível, imutável e reativo usando Notifiers/AsyncNotifiers com descarte seguro de recursos."
   harness_evolver:
-    profile: "reasoning"
-    phase: "Fase 7 - Evolução Propose-Probe-Compose"
-    role: "Analisa falhas que exigiram autorreparo e atualiza as SKILL.md ou PROJECT_BRAIN.md para evitar reincidência."
-    rules:
-      - ".agents/rules/global.md"
-    skills:
-      - ".agents/skills/harness-evolver/SKILL.md"
-      - ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
-    tools: ["file_read", "file_write"]
+    name: "Google Harness² Recursive Evolver"
+    category: "Meta-Otimização"
+    file: ".agents/skills/harness-evolver/SKILL.md"
+    description: "Ciclo Propose–Probe–Compose do Google Research Harness²: analisa falhas de QA ou reprovações no Kanban e atualiza as Skills automaticamente."
 
-  # FASE 8: Fechamento Git, Build e Publicação nas Lojas
-  git_committer:
-    profile: "fast_ops"
-    phase: "Fase 8 - Commit Atômico, CI/CD & Publicação"
-    role: "Inspeciona o git diff, atualiza o Kanban para Concluído, executa commit semântico e prepara releases."
-    rules:
-      - ".agents/rules/global.md"
+subagents:
+  master_orchestrator:
+    model: "inherit"
+    role: "Master Orchestrator & Principal Architect"
+    seniority: "Principal / Staff Engineer (15+ anos)"
+    persona: "Conhece profundamente todo o PROJECT_BRAIN.md, a arquitetura do repositório, os contratos de domínio e o status dos servidores MCP conectados. Decompõe épicos em tarefas menores por complexidade e escala o especialista exato."
+    mcps:
+      - "dart_mcp"
+      - "supabase_mcp"
+      - "google_stitch"
+      - "graft_ast"
+      - "ai_memory"
     skills:
-      - ".agents/skills/flutter-release/SKILL.md"
-      - ".agents/skills/mobile-cicd/SKILL.md"
-      - ".agents/skills/store-publishing/SKILL.md"
-    tools: ["git", "bash", "file_read", "file_write"]
-
-workflows:
-  dev_cycle:
-    file: ".agents/workflows/dev-cycle.yaml"
-    description: "Ciclo completo: Descoberta/Kanban -> Design -> TDD Red -> Green -> Repair Loop (3x) -> A11y -> Evolver -> Commit."
+      - "spec_discovery"
+      - "clean_architecture"
+      - "harness_evolver"
+  ui_ux_specialist:
+    model: "inherit"
+    role: "Senior UI/UX & Design System Engineer"
+    seniority: "Senior Product Designer & Frontend Architect (10+ anos)"
+    persona: "Especialista em Design Systems escaláveis, Material 3, acessibilidade WCAG, micro-interações e conversão de layouts do Google Stitch em componentes Flutter responsivos."
+    mcps:
+      - "google_stitch"
+      - "dart_mcp"
+    skills:
+      - "mobile_ux_design_system"
+      - "stitch_visual_ingest"
+      - "flutter_riverpod_state"
+  tdd_specialist:
+    model: "inherit"
+    role: "Lead TDD & Contract Verification Engineer"
+    seniority: "Senior QA & Test Architect (10+ anos)"
+    persona: "Guardião da Fase RED. Escreve testes unitários, de widget e de contrato de performance antes que qualquer código de produção exista."
+    mcps:
+      - "dart_mcp"
+      - "graft_ast"
+    skills:
+      - "tdd_red_green"
+      - "clean_architecture"
+  mobile_domain_builder:
+    model: "inherit"
+    role: "Senior Flutter & Domain Engineer"
+    seniority: "Senior Mobile Software Engineer (12+ anos)"
+    persona: "Implementa a Fase GREEN com código limpo, serviços de domínio desacoplados (ex: PrecoService) e gerenciamento de estado reativo."
+    mcps:
+      - "dart_mcp"
+      - "graft_ast"
+      - "ai_memory"
+    skills:
+      - "clean_architecture"
+      - "flutter_riverpod_state"
+      - "mobile_ux_design_system"
+  data_supabase_specialist:
+    model: "inherit"
+    role: "Offline-First SQLite & Supabase Architect"
+    seniority: "Senior Data & Cloud Engineer (12+ anos)"
+    persona: "Especialista em motores de busca SQLite ultrarrápidos (índices, paginação, sincronização FTP/REST) e backends Supabase com RLS e Edge Functions."
+    mcps:
+      - "supabase_mcp"
+      - "dart_mcp"
+      - "graft_ast"
+    skills:
+      - "local_first_sqlite"
+      - "supabase_fullstack"
+      - "clean_architecture"
+  qa_self_healer:
+    model: "inherit"
+    role: "Autonomous QA Validator & Self-Healing Agent"
+    seniority: "Staff Quality & Reliability Engineer"
+    persona: "Executa linters, testes automatizados e auditoria de regressão em loop fechado (até 3 tentativas) e aciona o Harness Evolver para registrar aprendizados."
+    mcps:
+      - "dart_mcp"
+      - "graft_ast"
+      - "ai_memory"
+    skills:
+      - "tdd_red_green"
+      - "harness_evolver"
+      - "clean_architecture"
 EOF
 
 # ------------------------------------------------------------------------------
@@ -428,12 +373,22 @@ EOF
 cat << 'EOF' > .agents/mcp.json
 {
   "mcpServers": {
-    "dart": {
+    "dart_mcp": {
       "command": "dart",
-      "args": ["mcp-server"],
-      "description": "Servidor MCP oficial do Dart e Flutter SDK (analyzer, symbol resolution, test runner e runtime inspection)."
+      "args": [
+        "mcp-server"
+      ],
+      "description": "Inspeção da árvore de widgets em runtime, resolução de símbolos, pubspec e execução assistida de testes Flutter."
     },
-    "google-stitch": {
+    "supabase_mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest"
+      ],
+      "description": "Inspeção de schema Postgres, criação de migrations, políticas RLS, Edge Functions e geração de tipos."
+    },
+    "google_stitch": {
       "command": "npx",
       "args": [
         "-y",
@@ -443,25 +398,25 @@ cat << 'EOF' > .agents/mcp.json
         "STITCH_REFERENCES_DIR": "./_references/screens",
         "STITCH_OUTPUT_DIR": "./_specs"
       },
-      "description": "Servidor MCP do Google Stitch para extrair o Design DNA de referências em _references/screens/."
+      "description": "Extração de Design Tokens, hierarquia de componentes e fidelidade visual a partir de telas em _references/screens/."
     },
-    "graft-ast": {
+    "graft_ast": {
       "command": "graft",
       "args": [
         "mcp",
         "--watch"
       ],
-      "description": "Grafo estático do código com Tree-sitter para consulta determinística de símbolos."
+      "description": "Navegação cirúrgica em árvore sintática (AST) para localizar chamadas e impactos sem estourar janela de contexto."
     },
-    "ai-memory": {
+    "ai_memory": {
       "command": "ai-memory",
       "args": [
-        "server"
+        "mcp"
       ],
       "env": {
         "AI_MEMORY_DB_PATH": "./.agents/memory/context.db"
       },
-      "description": "Servidor de memória local para persistência de tickets de handoff entre subagentes."
+      "description": "Memória episódica de decisões arquiteturais e passagem de tickets atômicos entre subagentes."
     }
   }
 }
@@ -1808,1201 +1763,1352 @@ cat << 'EOF' > harness-studio.html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flutter Mobile Harness Studio v2.1</title>
-<style>
-  :root {
-    --bg: #0b1020;
-    --bg-2: #10182f;
-    --panel: #151f3a;
-    --panel-2: #1b2747;
-    --line: #2a3a63;
-    --text: #e8eefc;
-    --muted: #9fb0d0;
-    --brand: #4dd4ff;
-    --brand-2: #7c5cff;
-    --green: #35d07f;
-    --red: #ff5c7a;
-    --amber: #ffb84d;
-    --violet: #b388ff;
-    --shadow: 0 18px 45px rgba(0, 0, 0, .35);
-    --radius: 16px;
-    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    background:
-      radial-gradient(1100px 600px at 8% -10%, rgba(124, 92, 255, .22), transparent 60%),
-      radial-gradient(900px 500px at 95% 0%, rgba(77, 212, 255, .16), transparent 55%),
-      linear-gradient(180deg, #0a0f1e 0%, var(--bg) 45%, #080c18 100%);
-    color: var(--text);
-    font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
-    line-height: 1.5;
-  }
-  a { color: var(--brand); }
-  button, input, select, textarea { font: inherit; color: inherit; }
-  button { cursor: pointer; }
-  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-  .app { max-width: 1500px; margin: 0 auto; padding: 22px 20px 60px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity Studio v3.0 — AI Software Engineering OS</title>
+  <style>
+    :root {
+      --bg-base: #07090e;
+      --bg-surface: #0f131d;
+      --bg-elevated: #161c2a;
+      --bg-glass: rgba(22, 28, 42, 0.78);
+      --border: #222b3d;
+      --border-hover: #384866;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.16);
+      --indigo: #818cf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #c084fc;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
+    }
 
-  /* ---------- Header ---------- */
-  header.hero {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(77, 212, 255, .22);
-    border-radius: 22px;
-    background: linear-gradient(120deg, rgba(21, 31, 58, .95), rgba(13, 20, 40, .95));
-    box-shadow: var(--shadow);
-    padding: 26px 28px;
-  }
-  header.hero::after {
-    content: "";
-    position: absolute;
-    inset: -60% -20% auto auto;
-    width: 520px; height: 520px;
-    background: conic-gradient(from 90deg, rgba(77,212,255,.35), rgba(124,92,255,.35), transparent 60%);
-    filter: blur(50px);
-    opacity: .55;
-    pointer-events: none;
-  }
-  .hero-top { display: flex; gap: 18px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; position: relative; z-index: 1; }
-  .brand { display: flex; gap: 14px; align-items: center; }
-  .logo {
-    width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center;
-    background: linear-gradient(135deg, var(--brand), var(--brand-2));
-    color: #061021; font-weight: 900; font-size: 22px;
-    box-shadow: 0 10px 30px rgba(77, 212, 255, .28);
-  }
-  h1 { margin: 0; font-size: clamp(1.35rem, 2.6vw, 2rem); letter-spacing: -.02em; }
-  .subtitle { margin: 4px 0 0; color: var(--muted); font-size: .92rem; }
-  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; position: relative; z-index: 1; }
-  .pill {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 6px 11px; border-radius: 999px; font-size: .78rem; font-weight: 600;
-    border: 1px solid var(--line); background: rgba(11, 16, 32, .55); color: var(--muted);
-  }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px currentColor; }
-  .dot.blue { background: var(--brand); }
-  .dot.violet { background: var(--violet); }
-  .dot.amber { background: var(--amber); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-base); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-  /* ---------- Buttons ---------- */
-  .btn {
-    border: 1px solid var(--line); background: var(--panel-2); color: var(--text);
-    border-radius: 11px; padding: 9px 14px; font-weight: 650; font-size: .86rem;
-    transition: transform .15s ease, border-color .15s ease, background .15s ease;
-  }
-  .btn:hover { transform: translateY(-1px); border-color: var(--brand); }
-  .btn.primary { background: linear-gradient(135deg, var(--brand), #3aa8ff); border-color: transparent; color: #05101f; }
-  .btn.violet { background: linear-gradient(135deg, var(--brand-2), #a06bff); border-color: transparent; color: #fff; }
-  .btn.ghost { background: transparent; }
-  .btn.danger { border-color: rgba(255, 92, 122, .45); color: #ffb3c1; }
-  .btn.small { padding: 5px 9px; font-size: .76rem; border-radius: 8px; }
-  .icon-btn {
-    width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px;
-    border: 1px solid var(--line); background: rgba(11, 16, 32, .5); color: var(--muted);
-    font-size: .9rem; transition: .15s ease;
-  }
-  .icon-btn:hover { color: var(--text); border-color: var(--brand); }
+    /* SIDEBAR */
+    .sidebar {
+      width: 270px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 14px;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 10px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .brand-logo {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #050811; font-size: 1.1rem;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    }
+    .brand-text h1 { font-size: 0.98rem; font-weight: 700; letter-spacing: -0.02em; }
+    .brand-text span { font-size: 0.72rem; color: var(--primary); font-family: monospace; }
 
-  /* ---------- Tabs ---------- */
-  nav.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 18px; }
-  .tab {
-    border: 1px solid var(--line); background: rgba(21, 31, 58, .6); color: var(--muted);
-    padding: 10px 15px; border-radius: 12px; font-weight: 700; font-size: .88rem;
-    display: inline-flex; align-items: center; gap: 8px; transition: .15s ease;
-  }
-  .tab:hover { color: var(--text); border-color: var(--brand); }
-  .tab.active { color: #061021; background: linear-gradient(135deg, var(--brand), #7ee3ff); border-color: transparent; }
-  .tab .badge { background: rgba(0,0,0,.18); padding: 1px 7px; border-radius: 999px; font-size: .72rem; }
+    .nav-group-label {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-dim); font-weight: 700; padding: 10px 10px 6px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; background: transparent; border: 1px solid transparent;
+      color: var(--text-muted); padding: 10px 12px; border-radius: var(--radius-md);
+      font-size: 0.86rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
+      margin-bottom: 4px; text-align: left;
+    }
+    .nav-btn:hover { background: var(--bg-elevated); color: var(--text-main); }
+    .nav-btn.active {
+      background: var(--primary-glow); border-color: rgba(56, 189, 248, 0.35);
+      color: var(--primary); font-weight: 600;
+    }
+    .nav-pill {
+      font-size: 0.7rem; background: var(--bg-base); color: var(--text-muted);
+      padding: 2px 7px; border-radius: 999px; border: 1px solid var(--border);
+    }
 
-  .view { display: none; animation: fade .22s ease; }
-  .view.active { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .sidebar-footer {
+      margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .fs-status {
+      font-size: 0.75rem; padding: 10px; border-radius: var(--radius-md);
+      background: var(--bg-base); border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px; color: var(--text-muted);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
+    .dot.online { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
 
-  /* ---------- Panels ---------- */
-  .panel {
-    background: linear-gradient(180deg, rgba(21, 31, 58, .92), rgba(16, 24, 47, .92));
-    border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
-    padding: 18px;
-  }
-  .panel + .panel { margin-top: 16px; }
-  .panel-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-  .panel-title h2 { margin: 0; font-size: 1.05rem; letter-spacing: -.01em; }
-  .hint { color: var(--muted); font-size: .82rem; margin: 0; }
-  .grid-2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 16px; }
-  @media (max-width: 980px) { .grid-2 { grid-template-columns: 1fr; } }
+    /* MAIN AREA */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar {
+      height: 64px; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 28px;
+      flex-shrink: 0;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+    .topbar-title { font-size: 1.1rem; font-weight: 700; }
+    .mcp-strip { display: flex; align-items: center; gap: 6px; }
+    .mcp-chip {
+      font-size: 0.72rem; padding: 4px 9px; border-radius: 999px;
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      color: var(--text-muted); display: flex; align-items: center; gap: 5px; cursor: pointer;
+    }
+    .mcp-chip.active { border-color: rgba(16, 185, 129, 0.4); color: #a7f3d0; background: rgba(16, 185, 129, 0.1); }
 
-  /* ---------- Kanban ---------- */
-  .kanban { display: grid; grid-template-columns: repeat(5, minmax(230px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
-  @media (max-width: 1180px) { .kanban { grid-template-columns: repeat(5, 250px); } }
-  .column {
-    background: rgba(9, 14, 28, .55); border: 1px solid var(--line); border-radius: 14px;
-    display: flex; flex-direction: column; min-height: 420px; overflow: hidden;
-  }
-  .column-head { padding: 12px 12px 10px; border-bottom: 1px solid var(--line); background: rgba(21, 31, 58, .6); }
-  .column-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .column-title strong { font-size: .86rem; letter-spacing: .01em; }
-  .column-title .count { font-size: .72rem; color: var(--muted); background: rgba(255,255,255,.06); border-radius: 999px; padding: 2px 8px; }
-  .column-agent { display: block; margin-top: 4px; font-size: .7rem; color: var(--muted); }
-  .column-body { padding: 10px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
-  .column.drag-over { border-color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand); }
-  .col-backlog { border-top: 3px solid #5b8cff; }
-  .col-red { border-top: 3px solid var(--red); }
-  .col-green { border-top: 3px solid var(--green); }
-  .col-qa { border-top: 3px solid var(--amber); }
-  .col-done { border-top: 3px solid var(--violet); }
-  .card {
-    background: linear-gradient(180deg, var(--panel-2), #18233f);
-    border: 1px solid var(--line); border-radius: 12px; padding: 11px;
-    cursor: grab; transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
-  }
-  .card:hover { transform: translateY(-1px); border-color: rgba(77,212,255,.5); box-shadow: 0 8px 20px rgba(0,0,0,.25); }
-  .card.dragging { opacity: .45; }
-  .card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .card-id { font-family: var(--mono); font-size: .72rem; color: var(--brand); font-weight: 700; }
-  .priority { font-size: .66rem; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
-  .p0 { background: rgba(255,92,122,.16); color: #ff9fb2; }
-  .p1 { background: rgba(255,184,77,.16); color: #ffd18a; }
-  .p2 { background: rgba(77,212,255,.14); color: #9fe9ff; }
-  .card-title { margin: 7px 0 5px; font-size: .84rem; font-weight: 700; line-height: 1.3; }
-  .card-desc { margin: 0; color: var(--muted); font-size: .73rem; line-height: 1.4; }
-  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-  .chip { font-size: .64rem; color: #b9c7e6; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.06); padding: 2px 6px; border-radius: 999px; }
-  .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 9px; }
-  .card-agent { font-size: .66rem; color: var(--muted); }
-  .card-actions { display: flex; gap: 4px; }
-  .empty-col { border: 1px dashed var(--line); border-radius: 10px; padding: 14px 10px; text-align: center; color: var(--muted); font-size: .74rem; }
-  .wip-alert { color: #ffb3c1; font-size: .68rem; margin-top: 5px; display: none; }
-  .wip-alert.show { display: block; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .btn {
+      padding: 8px 14px; border-radius: var(--radius-sm); font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+      background: var(--bg-elevated); color: var(--text-main); transition: all 0.15s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { border-color: var(--border-hover); background: #1e2638; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #0284c7);
+      color: #04101c; border-color: transparent; font-weight: 700;
+    }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.35); }
+    .btn-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.35); }
 
-  /* ---------- Forms ---------- */
-  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  @media (max-width: 760px) { .form-grid { grid-template-columns: 1fr; } }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-  .field input, .field select, .field textarea {
-    background: #0b1225; border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px;
-    color: var(--text); outline: none; transition: border-color .15s ease;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--brand); }
-  .field textarea { resize: vertical; min-height: 90px; }
-  .field select[multiple] { min-height: 110px; }
-  .form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-  .inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    /* VIEWPORT CONTENT */
+    .viewport { flex: 1; overflow-y: auto; padding: 24px 28px; }
+    .view-pane { display: none; }
+    .view-pane.active { display: block; }
 
-  /* ---------- Agents ---------- */
-  .agents-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  @media (max-width: 980px) { .agents-grid { grid-template-columns: 1fr; } }
-  .agent-card { background: rgba(9, 14, 28, .55); border: 1px solid var(--line); border-radius: 13px; padding: 13px; }
-  .agent-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .agent-name { margin: 0; font-size: .92rem; }
-  .agent-phase { margin: 2px 0 0; font-size: .7rem; color: var(--muted); }
-  .profile { font-size: .64rem; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: rgba(124,92,255,.16); color: #c9b6ff; white-space: nowrap; }
-  .skill-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; max-height: 190px; overflow: auto; padding-right: 3px; }
-  .skill-check {
-    display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 999px;
-    border: 1px solid var(--line); background: rgba(255,255,255,.03); font-size: .68rem; color: var(--muted);
-    cursor: pointer; user-select: none;
-  }
-  .skill-check input { accent-color: var(--brand); width: 13px; height: 13px; }
-  .skill-check.on { color: var(--text); border-color: rgba(77,212,255,.55); background: rgba(77,212,255,.1); }
-  .agent-foot { display: flex; gap: 6px; margin-top: 10px; align-items: center; }
-  .agent-foot input { flex: 1; min-width: 0; background: #0b1225; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: .74rem; }
-  .count-badge { font-size: .68rem; color: var(--brand); font-weight: 800; }
-  .yaml-preview { width: 100%; min-height: 280px; background: #070d1c; border: 1px solid var(--line); border-radius: 11px; padding: 12px; font-family: var(--mono); font-size: .72rem; color: #b9d7ff; resize: vertical; }
+    /* KANBAN */
+    .kanban-grid {
+      display: grid; grid-template-columns: repeat(5, minmax(260px, 1fr));
+      gap: 16px; align-items: start; overflow-x: auto; padding-bottom: 16px;
+    }
+    .kanban-col {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px; min-height: 72vh;
+      display: flex; flex-direction: column;
+    }
+    .col-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
+    }
+    .col-header h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: flex; align-items: center; gap: 7px; }
+    .task-card {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px;
+      cursor: pointer; transition: all 0.16s; position: relative;
+    }
+    .task-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .task-id { font-family: monospace; font-size: 0.7rem; color: var(--primary); font-weight: 700; }
+    .task-title { font-size: 0.9rem; font-weight: 600; margin: 5px 0 6px; color: var(--text-main); line-height: 1.35; }
+    .task-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
+    .task-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .chip { font-size: 0.68rem; padding: 2px 7px; border-radius: 4px; background: var(--bg-base); border: 1px solid var(--border); color: var(--text-muted); }
+    .chip-agent { color: var(--indigo); border-color: rgba(129, 140, 248, 0.3); background: rgba(129, 140, 248, 0.1); }
+    .chip-skill { color: var(--primary); border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.08); }
+    .gate-box {
+      margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border);
+      display: flex; gap: 6px;
+    }
+    .gate-box button { flex: 1; padding: 6px; font-size: 0.74rem; border-radius: 5px; cursor: pointer; font-weight: 700; border: none; }
 
-  /* ---------- TDD ---------- */
-  .tdd-flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  @media (max-width: 860px) { .tdd-flow { grid-template-columns: 1fr; } }
-  .tdd-step {
-    position: relative; border: 1px solid var(--line); border-radius: 14px; padding: 16px;
-    background: rgba(9, 14, 28, .55); transition: .2s ease; overflow: hidden;
-  }
-  .tdd-step::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--line); }
-  .tdd-step.active { border-color: rgba(77,212,255,.65); box-shadow: 0 0 0 1px rgba(77,212,255,.18), 0 14px 30px rgba(0,0,0,.22); transform: translateY(-2px); }
-  .tdd-step.active::before { background: var(--brand); }
-  .tdd-step.red.active { border-color: rgba(255,92,122,.65); }
-  .tdd-step.red.active::before { background: var(--red); }
-  .tdd-step.green.active { border-color: rgba(53,208,127,.65); }
-  .tdd-step.green.active::before { background: var(--green); }
-  .tdd-step.refactor.active { border-color: rgba(255,184,77,.65); }
-  .tdd-step.refactor.active::before { background: var(--amber); }
-  .tdd-kicker { font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  .tdd-step h3 { margin: 4px 0 6px; font-size: 1.05rem; }
-  .tdd-step p { margin: 0; color: var(--muted); font-size: .8rem; }
-  .tdd-cmd { display: block; margin-top: 10px; font-family: var(--mono); font-size: .72rem; color: #9fe9ff; background: #071022; border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; }
-  .tdd-status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
-  .progress { flex: 1; min-width: 180px; height: 9px; border-radius: 999px; background: #0a1122; border: 1px solid var(--line); overflow: hidden; }
-  .progress > span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--red), var(--green), var(--amber)); transition: width .3s ease; }
-  .log { margin: 12px 0 0; padding: 0; list-style: none; max-height: 210px; overflow: auto; display: flex; flex-direction: column; gap: 6px; }
-  .log li { font-family: var(--mono); font-size: .72rem; color: var(--muted); border-left: 2px solid var(--line); padding: 3px 0 3px 9px; }
-  .log li strong { color: var(--text); }
+    /* CARDS GRID (AGENTS, SKILLS, MCPS) */
+    .section-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
+    .entity-card {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px; cursor: pointer;
+      transition: all 0.16s; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .entity-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .entity-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .entity-title { font-size: 1.02rem; font-weight: 700; color: var(--text-main); }
+    .entity-sub { font-size: 0.76rem; color: var(--primary); font-family: monospace; margin-bottom: 8px; }
+    .entity-body { font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; }
 
-  /* ---------- Spec analyzer ---------- */
-  .analyzer-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr); gap: 14px; }
-  @media (max-width: 980px) { .analyzer-grid { grid-template-columns: 1fr; } }
-  .score-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .score-ring {
-    --p: 0; width: 118px; height: 118px; border-radius: 50%; display: grid; place-items: center;
-    background: conic-gradient(var(--brand) calc(var(--p) * 1%), #1a2544 0);
-    position: relative; flex: 0 0 auto;
-  }
-  .score-ring::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: #0c1428; }
-  .score-ring strong { position: relative; font-size: 1.6rem; }
-  .score-meta h3 { margin: 0 0 3px; font-size: 1rem; }
-  .score-meta p { margin: 0; color: var(--muted); font-size: .8rem; }
-  .check-list { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
-  .check-item { display: flex; gap: 8px; align-items: flex-start; font-size: .78rem; padding: 7px 9px; border-radius: 9px; border: 1px solid var(--line); background: rgba(255,255,255,.02); }
-  .check-item.ok { border-color: rgba(53,208,127,.28); background: rgba(53,208,127,.06); }
-  .check-item.miss { border-color: rgba(255,184,77,.28); background: rgba(255,184,77,.06); }
-  .check-icon { flex: 0 0 auto; }
-  .questions { margin: 12px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 7px; color: #dbe6ff; font-size: .8rem; }
-  .questions li::marker { color: var(--amber); }
-  .vague { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
-  .vague span { font-size: .68rem; border: 1px dashed rgba(255,184,77,.45); color: #ffd18a; padding: 3px 7px; border-radius: 999px; }
-  .score-note { margin-top: 10px; font-size: .74rem; color: var(--muted); }
+    /* ORCHESTRATOR CONSOLE */
+    .orch-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
+    .panel { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; }
+    .panel h3 { font-size: 1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .panel p.sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; }
+    .form-field { margin-bottom: 14px; }
+    .form-field label { display: block; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
+    .form-field input, .form-field textarea, .form-field select {
+      width: 100%; background: var(--bg-base); border: 1px solid var(--border);
+      color: var(--text-main); padding: 10px 12px; border-radius: var(--radius-sm); font-size: 0.86rem;
+    }
+    .form-field input:focus, .form-field textarea:focus { outline: none; border-color: var(--primary); }
 
-  /* ---------- Toast ---------- */
-  .toast {
-    position: fixed; right: 18px; bottom: 18px; z-index: 50; max-width: 360px;
-    background: #101a33; border: 1px solid var(--brand); border-radius: 12px; padding: 11px 14px;
-    box-shadow: var(--shadow); font-size: .82rem; transform: translateY(20px); opacity: 0; pointer-events: none;
-    transition: .2s ease;
-  }
-  .toast.show { transform: none; opacity: 1; }
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
-  .footer { margin-top: 26px; color: var(--muted); font-size: .74rem; text-align: center; }
-  .footer code { font-family: var(--mono); color: #b9d7ff; }
-  ::-webkit-scrollbar { width: 9px; height: 9px; }
-  ::-webkit-scrollbar-thumb { background: #2a3a63; border-radius: 999px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-</style>
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(3, 6, 12, 0.82);
+      backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center;
+      z-index: 1000; padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg-surface); border: 1px solid var(--border-hover);
+      border-radius: var(--radius-lg); width: 100%; max-width: 720px;
+      max-height: 90vh; overflow-y: auto; padding: 26px; box-shadow: var(--shadow);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 18px; }
+    .checkbox-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 8px; background: var(--bg-base); padding: 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); max-height: 210px; overflow-y: auto;
+    }
+    .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-main); cursor: pointer; padding: 4px; border-radius: 4px; }
+    .check-item:hover { background: var(--bg-elevated); }
+
+    /* TOAST */
+    #toast {
+      position: fixed; bottom: 22px; right: 22px; background: var(--bg-elevated);
+      border: 1px solid var(--primary); color: var(--text-main); padding: 12px 18px;
+      border-radius: var(--radius-md); font-size: 0.84rem; font-weight: 600;
+      box-shadow: var(--shadow); transform: translateY(120%); opacity: 0;
+      transition: all 0.25s; z-index: 2000;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+  </style>
 </head>
 <body>
-<div class="app">
-  <header class="hero">
-    <div class="hero-top">
-      <div class="brand">
-        <div class="logo" aria-hidden="true">F</div>
-        <div>
-          <h1>Flutter Mobile Harness Studio <span style="color:var(--brand)">v2.1</span></h1>
-          <p class="subtitle">Kanban do ciclo Flutter, matriz 1:N de Agentes × Skills, visualizador TDD e analisador de especificação.</p>
-        </div>
-      </div>
-      <div class="hero-actions">
-        <button class="btn" id="btn-export" type="button">⬇ Exportar Kanban</button>
-        <button class="btn ghost danger" id="btn-reset" type="button">↺ Resetar</button>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">A²</div>
+      <div class="brand-text">
+        <h1>Antigravity Studio</h1>
+        <span>v3.0 • Harness² OS</span>
       </div>
     </div>
-    <div class="pill-row" aria-label="Status do harness">
-      <span class="pill"><span class="dot"></span> Dart MCP Server</span>
-      <span class="pill"><span class="dot blue"></span> 9 subagentes</span>
-      <span class="pill"><span class="dot violet"></span> 22 skills</span>
-      <span class="pill"><span class="dot amber"></span> TDD Red → Green → Refactor</span>
-      <span class="pill">model_profiles: <strong>inherit</strong></span>
+
+    <div class="nav-group-label">Engenharia & Fluxo</div>
+    <button class="nav-btn active" onclick="switchView('orchestrator', this)">
+      <span>🧠 Master Orchestrator</span>
+      <span class="nav-pill">IA</span>
+    </button>
+    <button class="nav-btn" onclick="switchView('kanban', this)">
+      <span>📋 Kanban & Gates</span>
+      <span class="nav-pill" id="nav-count-tasks">0</span>
+    </button>
+
+    <div class="nav-group-label">Arquitetura Modular (1:N)</div>
+    <button class="nav-btn" onclick="switchView('agents', this)">
+      <span>🤖 Especialistas (Agentes)</span>
+      <span class="nav-pill" id="nav-count-agents">0</span>
+    </button>
+    <button class="nav-btn" onclick="switchView('skills', this)">
+      <span>⚡ Catálogo de Skills</span>
+      <span class="nav-pill" id="nav-count-skills">0</span>
+    </button>
+    <button class="nav-btn" onclick="switchView('mcps', this)">
+      <span>🔌 Servidores MCP</span>
+      <span class="nav-pill" id="nav-count-mcps">0</span>
+    </button>
+
+    <div class="sidebar-footer">
+      <div class="fs-status" id="fs-indicator">
+        <span class="dot" id="fs-dot"></span>
+        <span id="fs-text">Modo Memória Local (Conecte a pasta p/ Auto-Save real)</span>
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="connectRepositoryFolder()">
+        🔗 Conectar Pasta do Projeto
+      </button>
+      <button class="btn" style="width:100%; justify-content:center;" onclick="downloadHarnessBundle()">
+        ⬇ Baixar harness.yaml
+      </button>
     </div>
-  </header>
+  </aside>
 
-  <nav class="tabs" role="tablist" aria-label="Seções do studio">
-    <button class="tab active" data-tab="kanban" role="tab" aria-selected="true">🗂️ Kanban <span class="badge" id="tab-kanban-count">0</span></button>
-    <button class="tab" data-tab="agents" role="tab" aria-selected="false">🧩 Agentes &amp; Skills <span class="badge">1:N</span></button>
-    <button class="tab" data-tab="tdd" role="tab" aria-selected="false">🔁 Ciclo TDD</button>
-    <button class="tab" data-tab="spec" role="tab" aria-selected="false">🔎 Analisador de Spec</button>
-  </nav>
-
-  <!-- ============================= KANBAN ============================= -->
-  <section class="view active" id="view-kanban" role="tabpanel" aria-label="Kanban">
-    <div class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Kanban do ciclo Flutter</h2>
-          <p class="hint">Arraste os cards entre as colunas ou use os botões de ação. Tudo é salvo no <code>localStorage</code>.</p>
-        </div>
-        <div class="inline">
-          <button class="btn small" id="btn-add-card" type="button">＋ Novo card</button>
-        </div>
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="topbar-title" id="view-title">🧠 Master Orchestrator & Planejamento</h2>
+        <div class="mcp-strip" id="topbar-mcps"></div>
       </div>
-
-      <form id="card-form" class="panel" style="display:none; margin-bottom:14px; box-shadow:none; background:rgba(9,14,28,.55)">
-        <input type="hidden" id="card-edit-id" />
-        <div class="form-grid">
-          <div class="field">
-            <label for="card-title">Título</label>
-            <input id="card-title" required maxlength="90" placeholder="Ex.: Recuperação de senha com deep link" />
-          </div>
-          <div class="field">
-            <label for="card-agent">Agente responsável</label>
-            <select id="card-agent"></select>
-          </div>
-          <div class="field">
-            <label for="card-priority">Prioridade</label>
-            <select id="card-priority">
-              <option value="P0">P0 — crítico</option>
-              <option value="P1" selected>P1 — alto</option>
-              <option value="P2">P2 — normal</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="card-status">Coluna</label>
-            <select id="card-status"></select>
-          </div>
-          <div class="field" style="grid-column:1/-1">
-            <label for="card-skills">Skills (Ctrl/Cmd para múltiplas)</label>
-            <select id="card-skills" multiple></select>
-          </div>
-          <div class="field" style="grid-column:1/-1">
-            <label for="card-desc">Descrição / critério de aceitação</label>
-            <textarea id="card-desc" maxlength="240" placeholder="O que precisa estar verdadeiro para o card avançar?"></textarea>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button class="btn primary" type="submit" id="card-submit">Salvar card</button>
-          <button class="btn ghost" type="button" id="card-cancel">Cancelar</button>
-        </div>
-      </form>
-
-      <div class="kanban" id="kanban" aria-live="polite"></div>
-    </div>
-  </section>
-
-  <!-- ============================= AGENTS ============================= -->
-  <section class="view" id="view-agents" role="tabpanel" aria-label="Agentes e Skills">
-    <div class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Matriz 1:N — Agentes × Skills</h2>
-          <p class="hint">Cada subagente pode ativar 1 ou mais skills. As alterações são refletidas no preview YAML abaixo.</p>
-        </div>
-        <div class="inline">
-          <button class="btn small" id="btn-copy-yaml" type="button">📋 Copiar YAML</button>
-          <button class="btn small ghost" id="btn-reset-agents" type="button">Restaurar padrão</button>
-        </div>
+      <div class="topbar-actions">
+        <button class="btn" onclick="openSkillModal()">+ Nova Skill</button>
+        <button class="btn" onclick="openAgentModal()">+ Novo Agente</button>
+        <button class="btn btn-primary" onclick="openTaskModal()">+ Nova Tarefa</button>
       </div>
-      <div class="agents-grid" id="agents-grid"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Preview editável — <code>subagents</code></h2>
-          <p class="hint">Bloco pronto para colar em <code>.agents/harness.yaml</code>. Perfis permanecem <code>inherit</code>.</p>
-        </div>
-      </div>
-      <textarea class="yaml-preview" id="yaml-preview" spellcheck="false" aria-label="Preview YAML dos subagentes"></textarea>
-    </div>
-  </section>
+    </header>
 
-  <!-- ============================= TDD ============================= -->
-  <section class="view" id="view-tdd" role="tabpanel" aria-label="Ciclo TDD">
-    <div class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Visualizador do ciclo TDD</h2>
-          <p class="hint">Avança somente quando o gate da fase atual estiver comprovado. O log registra cada transição.</p>
-        </div>
-        <div class="inline">
-          <button class="btn primary" id="btn-tdd-next" type="button">Avançar fase →</button>
-          <button class="btn ghost" id="btn-tdd-reset" type="button">Resetar ciclo</button>
-        </div>
-      </div>
-      <div class="tdd-flow" id="tdd-flow"></div>
-      <div class="tdd-status">
-        <div class="progress" aria-hidden="true"><span id="tdd-progress"></span></div>
-        <span class="pill" id="tdd-phase-label">Fase: RED</span>
-        <span class="pill" id="tdd-cycle-label">Ciclo: 1</span>
-      </div>
-      <ul class="log" id="tdd-log" aria-live="polite"></ul>
-    </div>
-  </section>
+    <main class="viewport">
 
-  <!-- ============================= SPEC ============================= -->
-  <section class="view" id="view-spec" role="tabpanel" aria-label="Analisador de especificação">
-    <div class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Analisador de perguntas de especificação</h2>
-          <p class="hint">Cole a spec/PRD. O analisador aponta lacunas e gera perguntas objetivas em pt-BR antes do código.</p>
-        </div>
-        <div class="inline">
-          <button class="btn small" id="btn-sample-spec" type="button">Carregar exemplo</button>
-          <button class="btn primary" id="btn-analyze" type="button">Analisar spec</button>
-        </div>
-      </div>
-      <div class="analyzer-grid">
-        <div class="field">
-          <label for="spec-input">Spec / PRD / descrição da feature</label>
-          <textarea id="spec-input" style="min-height:340px" placeholder="Cole aqui o PRD, a spec da feature ou a descrição do pedido. Ex.: 'Quero uma tela de recuperação de senha com e-mail e código.'"></textarea>
-          <div class="form-actions">
-            <button class="btn small" id="btn-copy-questions" type="button">Copiar perguntas</button>
-            <span class="hint" id="spec-char-count">0 caracteres</span>
-          </div>
-        </div>
-        <div>
-          <div class="score-wrap">
-            <div class="score-ring" id="score-ring" aria-hidden="true"><strong id="score-value">0%</strong></div>
-            <div class="score-meta">
-              <h3 id="score-title" aria-live="polite">Aguardando análise</h3>
-              <p id="score-subtitle">Cole uma spec e clique em “Analisar spec”.</p>
+      <!-- VIEW 1: MASTER ORCHESTRATOR -->
+      <section id="view-orchestrator" class="view-pane active">
+        <div class="orch-layout">
+          <div class="panel">
+            <h3>🎯 Despacho Inteligente de Feature / Bugfix</h3>
+            <p class="sub">O Master Orchestrator analisa o <code>PROJECT_BRAIN.md</code>, detecta os MCPs ativos (Supabase, Stitch, Dart, Graft) e decompõe a demanda atribuindo o melhor Agente e suas Skills.</p>
+            
+            <div class="form-field">
+              <label>Título da Demanda / Épico</label>
+              <input type="text" id="orch-title" placeholder="Ex: Implementar Checkout Offline com Sincronização Supabase e UI Material 3">
+            </div>
+            <div class="form-field">
+              <label>Descrição Técnica, Regras de Negócio e Restrições</label>
+              <textarea id="orch-desc" rows="5" placeholder="Descreva o que precisa ser feito. Ex: O preço deve ser centralizado no domínio (PrecoService), tela com 4 estados obrigatórios, persistência SQLite com índices e sincronização Supabase RLS..."></textarea>
+            </div>
+            <div class="form-field">
+              <label>Complexidade Estimada</label>
+              <select id="orch-complexity">
+                <option value="Alta (Decompor em Múltiplas Tarefas TDD)">Alta — Decompor em Spec + UI + TDD RED + GREEN + Auditoria</option>
+                <option value="Média (Fluxo Padrão TDD)">Média — Fluxo Padrão TDD</option>
+                <option value="Baixa (Correção Cirúrgica)">Baixa — Correção Cirúrgica Direta</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" onclick="orchestrateDemand()">⚡ Analisar, Decompor no Kanban & Gerar Prompt</button>
             </div>
           </div>
-          <div class="check-list" id="check-list"></div>
-          <div class="vague" id="vague-list"></div>
-          <ol class="questions" id="questions-list"></ol>
-          <p class="score-note" id="score-note"></p>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <p class="footer">
-    Gerado pelo <strong>Flutter Mobile Harness v2.1</strong> · Arquivos relacionados:
-    <code>.agents/harness.yaml</code> · <code>.agents/mcp.json</code> · <code>_specs/task-board.md</code>
-  </p>
-</div>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-<script>
-(function () {
-  "use strict";
-
-  /* ============================================================
-     Catálogo canônico
-     ============================================================ */
-  const SKILLS = [
-    { id: "spec-discovery", label: "Spec Discovery", group: "Produto" },
-    { id: "antigravity-skill-orchestrator", label: "Skill Orchestrator", group: "Produto" },
-    { id: "mobile-ux", label: "Mobile UX / Stitch", group: "Design" },
-    { id: "flutter-build-responsive-layout", label: "Responsive Layout", group: "Design" },
-    { id: "flutter-setup-declarative-routing", label: "Declarative Routing", group: "Design" },
-    { id: "flutter-setup-localization", label: "Localization", group: "Design" },
-    { id: "flutter-apply-architecture-best-practices", label: "Flutter Architecture", group: "Build" },
-    { id: "clean-architecture", label: "Clean Architecture", group: "Build" },
-    { id: "flutter-state-riverpod", label: "Riverpod State", group: "Build" },
-    { id: "dart-use-pattern-matching", label: "Pattern Matching", group: "Build" },
-    { id: "flutter-use-http-package", label: "HTTP Package", group: "Data" },
-    { id: "local-first-data", label: "Local-First / Drift", group: "Data" },
-    { id: "supabase-flutter", label: "Supabase Flutter", group: "Data" },
-    { id: "code-quality-tests", label: "Code Quality & Tests", group: "Qualidade" },
-    { id: "flutter-add-widget-test", label: "Widget Tests", group: "Qualidade" },
-    { id: "flutter-add-integration-test", label: "Integration Tests", group: "Qualidade" },
-    { id: "dart-collect-coverage", label: "Coverage / LCOV", group: "Qualidade" },
-    { id: "flutter-release", label: "Flutter Release", group: "Entrega" },
-    { id: "mobile-cicd", label: "Mobile CI/CD", group: "Entrega" },
-    { id: "store-publishing", label: "Store Publishing", group: "Entrega" },
-    { id: "harness-evolver", label: "Harness Evolver", group: "Evolução" },
-    { id: "web-performance-seo", label: "Web Performance/SEO", group: "Web" }
-  ];
-
-  const AGENTS = [
-    {
-      id: "product_architect", name: "Product Architect", phase: "Fase 1 — Descoberta, Specs & Kanban",
-      profile: "reasoning", color: "#5b8cff",
-      role: "Entrevista o desenvolvedor, formula perguntas, cria specs e organiza o Kanban.",
-      skills: ["spec-discovery", "antigravity-skill-orchestrator", "flutter-apply-architecture-best-practices"]
-    },
-    {
-      id: "ui_ux_designer", name: "UI/UX Designer", phase: "Fase 2 — UI/UX, Tokens, Responsividade & Rotas",
-      profile: "multimodal_design", color: "#b388ff",
-      role: "Extrai Design DNA via Stitch MCP, projeta layouts e navegação declarativa.",
-      skills: ["mobile-ux", "flutter-build-responsive-layout", "flutter-setup-declarative-routing", "flutter-setup-localization"]
-    },
-    {
-      id: "tdd_tester", name: "TDD Tester", phase: "Fase 3 — TDD Vermelho (RED)",
-      profile: "coding", color: "#ff5c7a",
-      role: "Cria testes unitários, widget e integration que falham antes do código.",
-      skills: ["code-quality-tests", "flutter-add-widget-test", "flutter-add-integration-test", "dart-collect-coverage"]
-    },
-    {
-      id: "mobile_builder", name: "Mobile Builder", phase: "Fase 4A — Construção Flutter (GREEN)",
-      profile: "coding", color: "#35d07f",
-      role: "Escreve Dart 3/Flutter tipado e desacoplado para os testes ficarem verdes.",
-      skills: ["clean-architecture", "flutter-apply-architecture-best-practices", "flutter-state-riverpod", "dart-use-pattern-matching"]
-    },
-    {
-      id: "data_offline_specialist", name: "Data & Offline Specialist", phase: "Fase 4B — SQLite, Sync & APIs",
-      profile: "coding", color: "#2fb6c9",
-      role: "Implementa DAOs, repositórios offline-first, índices SQLite, REST/Supabase.",
-      skills: ["local-first-data", "flutter-use-http-package", "supabase-flutter", "clean-architecture"]
-    },
-    {
-      id: "qa_validator", name: "QA Validator", phase: "Fase 5 — Validação & Autorreparo (REFACTOR)",
-      profile: "coding", color: "#ffb84d",
-      role: "Executa dart analyze/flutter test via Dart MCP e conduz até 3 ciclos de reparo.",
-      skills: ["code-quality-tests", "dart-collect-coverage"]
-    },
-    {
-      id: "flutter_a11y_auditor", name: "Flutter A11y Auditor", phase: "Fase 6 — Acessibilidade & Ergonomia",
-      profile: "coding", color: "#ff8a65",
-      role: "Audita Semantics, leitores de tela, contraste WCAG AA e touch targets 48x48dp.",
-      skills: ["mobile-ux", "flutter-build-responsive-layout", "flutter-add-widget-test"]
-    },
-    {
-      id: "harness_evolver", name: "Harness Evolver", phase: "Fase 7 — Evolução Propose-Probe-Compose",
-      profile: "reasoning", color: "#7c5cff",
-      role: "Analisa falhas recorrentes e atualiza SKILL.md/PROJECT_BRAIN.md.",
-      skills: ["harness-evolver", "antigravity-skill-orchestrator"]
-    },
-    {
-      id: "git_committer", name: "Git Committer", phase: "Fase 8 — Commit, CI/CD & Publicação",
-      profile: "fast_ops", color: "#9fb0d0",
-      role: "Inspeciona o diff, atualiza o Kanban e cria o commit semântico atômico.",
-      skills: ["flutter-release", "mobile-cicd", "store-publishing"]
-    }
-  ];
-
-  const COLUMNS = [
-    { id: "backlog", title: "Backlog", icon: "🗂️", agent: "@product_architect", cls: "col-backlog", wip: 99, desc: "Spec & critérios" },
-    { id: "red", title: "TDD RED", icon: "🔴", agent: "@tdd_tester", cls: "col-red", wip: 2, desc: "Teste falha" },
-    { id: "green", title: "TDD GREEN", icon: "🟢", agent: "@mobile_builder", cls: "col-green", wip: 2, desc: "Código mínimo" },
-    { id: "qa", title: "Loop QA/A11y", icon: "🔁", agent: "@qa_validator", cls: "col-qa", wip: 1, desc: "Reparo & a11y" },
-    { id: "done", title: "Concluído", icon: "✅", agent: "@git_committer", cls: "col-done", wip: 99, desc: "Commit atômico" }
-  ];
-
-  const TDD_PHASES = [
-    { id: "red", title: "RED", kicker: "1. Falha primeiro", desc: "Escreva o teste que representa o critério de aceitação e prove que ele falha pelo motivo correto.", cmd: "flutter test test/feature_test.dart", color: "#ff5c7a" },
-    { id: "green", title: "GREEN", kicker: "2. Código mínimo", desc: "Implemente apenas o necessário para a suíte ficar verde. Sem scope creep, sem otimização prematura.", cmd: "flutter test", color: "#35d07f" },
-    { id: "refactor", title: "REFACTOR", kicker: "3. Limpeza segura", desc: "Remova duplicação, melhore nomes e mantenha a suíte verde. QA roda analyze + cobertura + a11y.", cmd: "dart analyze && flutter test --coverage", color: "#ffb84d" }
-  ];
-
-  const DEFAULT_CARDS = [
-    { id: "T01", title: "Recuperação de Senha", status: "backlog", agent: "product_architect", priority: "P1", skills: ["spec-discovery", "clean-architecture"], desc: "Fluxo de e-mail + código com deep link e expiração." },
-    { id: "T02", title: "Dashboard Gerencial", status: "backlog", agent: "ui_ux_designer", priority: "P1", skills: ["mobile-ux", "flutter-build-responsive-layout"], desc: "Cards responsivos com os 4 estados de tela." },
-    { id: "T03", title: "Push Notifications", status: "backlog", agent: "data_offline_specialist", priority: "P2", skills: ["local-first-data"], desc: "Permissão, token e fila offline de notificações." },
-    { id: "T04", title: "In-App Purchases", status: "backlog", agent: "git_committer", priority: "P2", skills: ["store-publishing"], desc: "Produtos, restore e validação de recibos." },
-    { id: "T05", title: "Backend Alternativo / Sync", status: "backlog", agent: "data_offline_specialist", priority: "P1", skills: ["supabase-flutter", "local-first-data"], desc: "Sync incremental com RLS e resolução de conflitos." },
-    { id: "T00", title: "Unificação do Harness v2.1", status: "done", agent: "harness_evolver", priority: "P0", skills: ["harness-evolver", "antigravity-skill-orchestrator"], desc: "Dart MCP Server, 9 agentes, matriz 1:N e studio HTML." }
-  ];
-
-  const STORAGE_KEY = "flutter-mobile-harness-studio-v2.1";
-  const DEFAULT_STATE = {
-    cards: DEFAULT_CARDS,
-    agentSkills: Object.fromEntries(AGENTS.map(a => [a.id, a.skills.slice()])),
-    tdd: { phase: 0, cycle: 1, log: [] },
-    specText: ""
-  };
-
-  let state = loadState();
-  let toastTimer = null;
-
-  /* ============================================================
-     Persistência
-     ============================================================ */
-  function clone(value) { return JSON.parse(JSON.stringify(value)); }
-
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return clone(DEFAULT_STATE);
-      const parsed = JSON.parse(raw);
-      return {
-        cards: Array.isArray(parsed.cards) ? parsed.cards : clone(DEFAULT_CARDS),
-        agentSkills: Object.assign(
-          Object.fromEntries(AGENTS.map(a => [a.id, a.skills.slice()])),
-          parsed.agentSkills || {}
-        ),
-        tdd: Object.assign({ phase: 0, cycle: 1, log: [] }, parsed.tdd || {}),
-        specText: typeof parsed.specText === "string" ? parsed.specText : ""
-      };
-    } catch (error) {
-      return clone(DEFAULT_STATE);
-    }
-  }
-
-  function saveState() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (error) {
-      toast("Não foi possível salvar no localStorage.");
-    }
-  }
-
-  function toast(message) {
-    const el = document.getElementById("toast");
-    el.textContent = message;
-    el.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
-  }
-
-  function escapeHtml(value) {
-    return String(value == null ? "" : value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  function agentById(id) { return AGENTS.find(a => a.id === id) || AGENTS[0]; }
-  function skillLabel(id) { const s = SKILLS.find(x => x.id === id); return s ? s.label : id; }
-
-  /* ============================================================
-     Tabs
-     ============================================================ */
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach(t => {
-        t.classList.toggle("active", t === tab);
-        t.setAttribute("aria-selected", String(t === tab));
-      });
-      document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
-      document.getElementById("view-" + tab.dataset.tab).classList.add("active");
-    });
-  });
-
-  /* ============================================================
-     Kanban
-     ============================================================ */
-  const kanbanEl = document.getElementById("kanban");
-  const cardForm = document.getElementById("card-form");
-  const cardEditId = document.getElementById("card-edit-id");
-  const cardTitle = document.getElementById("card-title");
-  const cardAgent = document.getElementById("card-agent");
-  const cardPriority = document.getElementById("card-priority");
-  const cardStatus = document.getElementById("card-status");
-  const cardSkills = document.getElementById("card-skills");
-  const cardDesc = document.getElementById("card-desc");
-  const cardSubmit = document.getElementById("card-submit");
-
-  function fillSelect(select, options, value) {
-    select.innerHTML = options.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`).join("");
-    if (value != null) select.value = value;
-  }
-
-  fillSelect(cardAgent, AGENTS.map(a => ({ value: a.id, label: a.name + " — " + a.phase })));
-  fillSelect(cardStatus, COLUMNS.map(c => ({ value: c.id, label: c.icon + " " + c.title })));
-  cardSkills.innerHTML = SKILLS.map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.label)} (${escapeHtml(s.group)})</option>`).join("");
-
-  function openCardForm(status, card) {
-    cardForm.style.display = "block";
-    cardEditId.value = card ? card.id : "";
-    cardTitle.value = card ? card.title : "";
-    cardAgent.value = card ? card.agent : "product_architect";
-    cardPriority.value = card ? card.priority : "P1";
-    cardStatus.value = card ? card.status : (status || "backlog");
-    cardDesc.value = card ? card.desc : "";
-    Array.from(cardSkills.options).forEach(o => { o.selected = card ? card.skills.includes(o.value) : false; });
-    cardSubmit.textContent = card ? "Atualizar card" : "Salvar card";
-    cardTitle.focus();
-  }
-
-  function closeCardForm() {
-    cardForm.style.display = "none";
-    cardForm.reset();
-    cardEditId.value = "";
-    cardSubmit.textContent = "Salvar card";
-  }
-
-  document.getElementById("btn-add-card").addEventListener("click", () => openCardForm("backlog", null));
-  document.getElementById("card-cancel").addEventListener("click", closeCardForm);
-
-  cardForm.addEventListener("submit", event => {
-    event.preventDefault();
-    const editing = cardEditId.value;
-    const selectedSkills = Array.from(cardSkills.selectedOptions).map(o => o.value);
-    const payload = {
-      title: cardTitle.value.trim(),
-      agent: cardAgent.value,
-      priority: cardPriority.value,
-      status: cardStatus.value,
-      desc: cardDesc.value.trim(),
-      skills: selectedSkills.length ? selectedSkills : ["spec-discovery"]
-    };
-    if (!payload.title) return;
-
-    if (editing) {
-      const card = state.cards.find(c => c.id === editing);
-      if (card) Object.assign(card, payload);
-      toast("Card " + editing + " atualizado.");
-    } else {
-      const nextNumber = state.cards.reduce((max, c) => {
-        const n = parseInt(String(c.id).replace(/\D/g, ""), 10);
-        return Number.isFinite(n) ? Math.max(max, n) : max;
-      }, 0) + 1;
-      state.cards.push(Object.assign({ id: "T" + String(nextNumber).padStart(2, "0") }, payload));
-      toast("Card criado no backlog do ciclo.");
-    }
-    saveState();
-    renderKanban();
-    closeCardForm();
-  });
-
-  function renderKanban() {
-    kanbanEl.innerHTML = "";
-    COLUMNS.forEach(column => {
-      const cards = state.cards.filter(c => c.status === column.id);
-      const col = document.createElement("section");
-      col.className = "column " + column.cls;
-      col.dataset.status = column.id;
-      col.innerHTML = `
-        <div class="column-head">
-          <div class="column-title">
-            <strong>${column.icon} ${escapeHtml(column.title)}</strong>
-            <span class="count">${cards.length}${column.wip < 99 ? "/" + column.wip : ""}</span>
+          <div class="panel">
+            <h3>📋 Prompt Canônico Gerado para o Chat da IDE</h3>
+            <p class="sub">Copie e cole no Antigravity, Claude Code, Cursor ou Codex após decompor a demanda:</p>
+            <div class="form-field">
+              <textarea id="orch-output" rows="13" readonly style="font-family:monospace; font-size:0.79rem; color:#a5f3fc;"></textarea>
+            </div>
+            <button class="btn" onclick="copyOrchestratorPrompt()">📋 Copiar Prompt para o Agente</button>
           </div>
-          <span class="column-agent">${escapeHtml(column.agent)} · ${escapeHtml(column.desc)}</span>
-          <span class="wip-alert ${cards.length > column.wip ? "show" : ""}">WIP excedido: reduza o trabalho em progresso.</span>
         </div>
-        <div class="column-body" data-drop="${column.id}"></div>
-      `;
-      const body = col.querySelector(".column-body");
-      if (!cards.length) {
-        body.innerHTML = `<div class="empty-col">Nenhuma tarefa ativa.<br>Arraste um card ou clique em ＋.</div>`;
-      } else {
-        cards.forEach(card => body.appendChild(renderCard(card)));
+      </section>
+
+      <!-- VIEW 2: KANBAN -->
+      <section id="view-kanban" class="view-pane">
+        <div class="section-bar">
+          <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer card para inspecionar, editar agente/skills, mudar coluna ou aprovar no Gate Humano.</p>
+        </div>
+        <div class="kanban-grid" id="kanban-container"></div>
+      </section>
+
+      <!-- VIEW 3: AGENTES -->
+      <section id="view-agents" class="view-pane">
+        <div class="section-bar">
+          <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer Agente para editar sua persona, senioridade, MCPs permitidos e selecionar suas Skills (1:N).</p>
+          <button class="btn btn-primary" onclick="openAgentModal()">+ Criar Novo Agente</button>
+        </div>
+        <div class="cards-grid" id="agents-grid"></div>
+      </section>
+
+      <!-- VIEW 4: SKILLS -->
+      <section id="view-skills" class="view-pane">
+        <div class="section-bar">
+          <p style="font-size:0.85rem; color:var(--text-muted);">Catálogo global desacoplado. Ao criar ou editar uma Skill, ela é gravada em <code>.agents/skills/&lt;id&gt;/SKILL.md</code> e fica disponível para qualquer Agente.</p>
+          <button class="btn btn-primary" onclick="openSkillModal()">+ Criar Nova Skill</button>
+        </div>
+        <div class="cards-grid" id="skills-grid"></div>
+      </section>
+
+      <!-- VIEW 5: MCPS -->
+      <section id="view-mcps" class="view-pane">
+        <div class="section-bar">
+          <p style="font-size:0.85rem; color:var(--text-muted);">Servidores Model Context Protocol reconhecidos pelo Orquestrador e pelos Especialistas (sincronizado com <code>.agents/mcp.json</code>).</p>
+        </div>
+        <div class="cards-grid" id="mcps-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL GENÉRICO DE INSPEÇÃO E EDIÇÃO -->
+  <div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this) closeModal()">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+  <div id="toast">Salvo automaticamente no Harness!</div>
+
+  <script>
+    // =========================================================================
+    // ESTADO PADRÃO COMPLETO (COM AGENTES, SKILLS E MCPS PRÉ-CARREGADOS)
+    // =========================================================================
+    const DEFAULT_STATE = {
+      version: "3.0-google-harness2-modular",
+      mcps: {
+        dart_mcp: {
+          name: "Official Dart & Flutter MCP",
+          command: "dart",
+          args: ["mcp-server"],
+          active: true,
+          desc: "Inspeção da árvore de widgets em runtime, resolução de símbolos, pubspec e execução assistida de testes Flutter."
+        },
+        supabase_mcp: {
+          name: "Supabase MCP Server",
+          command: "npx",
+          args: ["-y", "@supabase/mcp-server-supabase@latest"],
+          active: true,
+          desc: "Inspeção de schema Postgres, criação de migrations, políticas RLS, Edge Functions e geração de tipos."
+        },
+        google_stitch: {
+          name: "Google Stitch Visual MCP",
+          command: "npx",
+          args: ["-y", "@google/stitch-mcp-server"],
+          active: true,
+          env: {
+            STITCH_REFERENCES_DIR: "./_references/screens",
+            STITCH_OUTPUT_DIR: "./_specs"
+          },
+          desc: "Extração de Design Tokens, hierarquia de componentes e fidelidade visual a partir de telas em _references/screens/."
+        },
+        graft_ast: {
+          name: "Graft AST Code Indexer",
+          command: "graft",
+          args: ["mcp", "--watch"],
+          active: true,
+          desc: "Navegação cirúrgica em árvore sintática (AST) para localizar chamadas e impactos sem estourar janela de contexto."
+        },
+        ai_memory: {
+          name: "AI Memory & Handoff DB",
+          command: "ai-memory",
+          args: ["mcp"],
+          active: true,
+          env: {
+            AI_MEMORY_DB_PATH: "./.agents/memory/context.db"
+          },
+          desc: "Memória episódica de decisões arquiteturais e passagem de tickets atômicos entre subagentes."
+        }
+      },
+      skills: {
+        spec_discovery: {
+          name: "Spec-Driven Discovery & PRD",
+          category: "Arquitetura & Produto",
+          file: ".agents/skills/spec-discovery/SKILL.md",
+          desc: "Transforma requisitos vagos em contratos técnicos estritos, mapeando casos de borda e os 4 estados de tela (Loading, Empty, Error, Success).",
+          rules: "Nunca autorize codificação sem critérios de aceitação verificáveis e contratos de entrada/saída documentados."
+        },
+        clean_architecture: {
+          name: "Clean Architecture & Domain Purity",
+          category: "Engenharia de Software",
+          file: ".agents/skills/clean-architecture/SKILL.md",
+          desc: "Separação estrita entre Presentation, Domain (Services/Entities puros) e Data (Repositories/DTOs). Centralização de regras críticas.",
+          rules: "Proibido colocar SQL, chamadas HTTP ou regras de negócio dentro de Widgets ou Controllers de UI."
+        },
+        mobile_ux_design_system: {
+          name: "Mobile UX & Design Systems",
+          category: "UI/UX & Frontend",
+          file: ".agents/skills/mobile-ux/SKILL.md",
+          desc: "Design Tokens semânticos, alvos de toque mínimos de 48x48dp, micro-interações fluidas 60/120fps, Material 3 e responsividade adaptativa.",
+          rules: "Consuma tokens via Theme.of(context). Garanta feedback visual imediato e estados vazios informativos."
+        },
+        stitch_visual_ingest: {
+          name: "Google Stitch Visual Ingestion",
+          category: "UI/UX & Frontend",
+          file: ".agents/skills/flutter-build-responsive-layout/SKILL.md",
+          desc: "Leitura de protótipos e imagens em _references/screens/ via Stitch MCP para extração de espaçamentos, tipografia e componentes.",
+          rules: "Sempre cruze os prints de referência com o Design System antes de construir novos Widgets."
+        },
+        supabase_fullstack: {
+          name: "Supabase Auth, RLS & Edge",
+          category: "Backend & Cloud",
+          file: ".agents/skills/supabase-flutter/SKILL.md",
+          desc: "Integração segura com Supabase, políticas Row Level Security (RLS), sincronização incremental e funções serverless.",
+          rules: "Toda tabela exposta deve possuir política RLS explícita e tipagem forte validada."
+        },
+        local_first_sqlite: {
+          name: "Local-First SQLite & Performance",
+          category: "Dados & Offline",
+          file: ".agents/skills/local-first-data/SKILL.md",
+          desc: "Modelagem SQLite local de alta performance, índices compostos (CREATE INDEX), paginação (LIMIT/OFFSET), debounce de busca e fila offline.",
+          rules: "Evite Full Table Scans em catálogos grandes; exija paginação e índices em colunas de filtro textual."
+        },
+        tdd_red_green: {
+          name: "Strict TDD (Red-Green-Refactor)",
+          category: "Qualidade & Testes",
+          file: ".agents/skills/code-quality-tests/SKILL.md",
+          desc: "Desenvolvimento guiado por testes determinísticos: criação do teste que falha (RED) antes da implementação mínima (GREEN).",
+          rules: "Em testes concorrentes de banco local, isole instâncias em memória para evitar locks."
+        },
+        flutter_riverpod_state: {
+          name: "Reactive State Management (Riverpod)",
+          category: "Engenharia Mobile",
+          file: ".agents/skills/flutter-state-riverpod/SKILL.md",
+          desc: "Gerenciamento de estado previsível, imutável e reativo usando Notifiers/AsyncNotifiers com descarte seguro de recursos.",
+          rules: "Evite mutações diretas de estado durante o ciclo de build; use estados assíncronos tipados."
+        },
+        harness_evolver: {
+          name: "Google Harness² Recursive Evolver",
+          category: "Meta-Otimização",
+          file: ".agents/skills/harness-evolver/SKILL.md",
+          desc: "Ciclo Propose–Probe–Compose do Google Research Harness²: analisa falhas de QA ou reprovações no Kanban e atualiza as Skills automaticamente.",
+          rules: "Quando uma tarefa exigir mais de 1 tentativa de reparo, sintetize a causa raiz na respectiva SKILL.md."
+        }
+      },
+      agents: {
+        master_orchestrator: {
+          role: "Master Orchestrator & Principal Architect",
+          seniority: "Principal / Staff Engineer (15+ anos)",
+          persona: "Conhece profundamente todo o PROJECT_BRAIN.md, a arquitetura do repositório, os contratos de domínio e o status dos servidores MCP conectados. Decompõe épicos em tarefas menores por complexidade e escala o especialista exato.",
+          skills: ["spec_discovery", "clean_architecture", "harness_evolver"],
+          mcps: ["dart_mcp", "supabase_mcp", "google_stitch", "graft_ast", "ai_memory"]
+        },
+        ui_ux_specialist: {
+          role: "Senior UI/UX & Design System Engineer",
+          seniority: "Senior Product Designer & Frontend Architect (10+ anos)",
+          persona: "Especialista em Design Systems escaláveis, Material 3, acessibilidade WCAG, micro-interações e conversão de layouts do Google Stitch em componentes Flutter responsivos.",
+          skills: ["mobile_ux_design_system", "stitch_visual_ingest", "flutter_riverpod_state"],
+          mcps: ["google_stitch", "dart_mcp"]
+        },
+        tdd_specialist: {
+          role: "Lead TDD & Contract Verification Engineer",
+          seniority: "Senior QA & Test Architect (10+ anos)",
+          persona: "Guardião da Fase RED. Escreve testes unitários, de widget e de contrato de performance antes que qualquer código de produção exista.",
+          skills: ["tdd_red_green", "clean_architecture"],
+          mcps: ["dart_mcp", "graft_ast"]
+        },
+        mobile_domain_builder: {
+          role: "Senior Flutter & Domain Engineer",
+          seniority: "Senior Mobile Software Engineer (12+ anos)",
+          persona: "Implementa a Fase GREEN com código limpo, serviços de domínio desacoplados (ex: PrecoService) e gerenciamento de estado reativo.",
+          skills: ["clean_architecture", "flutter_riverpod_state", "mobile_ux_design_system"],
+          mcps: ["dart_mcp", "graft_ast", "ai_memory"]
+        },
+        data_supabase_specialist: {
+          role: "Offline-First SQLite & Supabase Architect",
+          seniority: "Senior Data & Cloud Engineer (12+ anos)",
+          persona: "Especialista em motores de busca SQLite ultrarrápidos (índices, paginação, sincronização FTP/REST) e backends Supabase com RLS e Edge Functions.",
+          skills: ["local_first_sqlite", "supabase_fullstack", "clean_architecture"],
+          mcps: ["supabase_mcp", "dart_mcp", "graft_ast"]
+        },
+        qa_self_healer: {
+          role: "Autonomous QA Validator & Self-Healing Agent",
+          seniority: "Staff Quality & Reliability Engineer",
+          persona: "Executa linters, testes automatizados e auditoria de regressão em loop fechado (até 3 tentativas) e aciona o Harness Evolver para registrar aprendizados.",
+          skills: ["tdd_red_green", "harness_evolver", "clean_architecture"],
+          mcps: ["dart_mcp", "graft_ast", "ai_memory"]
+        }
+      },
+      tasks: [
+        {
+          id: "T01",
+          title: "Recuperação de Senha",
+          desc: "Fluxo completo de reset de senha com Supabase Auth, deep link e os 4 estados de tela. Spec: _specs/tasks/T01-recuperacao-senha.md",
+          column: "backlog",
+          agent: "mobile_domain_builder",
+          skills: ["spec_discovery", "clean_architecture"],
+          complexity: "Média",
+          feedback: ""
+        },
+        {
+          id: "T02",
+          title: "Dashboard Gerencial",
+          desc: "Painel responsivo com Design Tokens, gráficos e estados de carregamento. Spec: _specs/tasks/T02-dashboard-gerencial.md",
+          column: "backlog",
+          agent: "ui_ux_specialist",
+          skills: ["mobile_ux_design_system", "stitch_visual_ingest"],
+          complexity: "Alta",
+          feedback: ""
+        },
+        {
+          id: "T03",
+          title: "Push Notifications",
+          desc: "Notificações com fila offline, permissões e deep link para a tela de destino. Spec: _specs/tasks/T03-push-notifications.md",
+          column: "backlog",
+          agent: "mobile_domain_builder",
+          skills: ["flutter_riverpod_state", "clean_architecture"],
+          complexity: "Média",
+          feedback: ""
+        },
+        {
+          id: "T04",
+          title: "In-App Purchases",
+          desc: "Compra de assinatura com validação de recibo e restauração de compras. Spec: _specs/tasks/T04-in-app-purchases.md",
+          column: "backlog",
+          agent: "mobile_domain_builder",
+          skills: ["clean_architecture", "flutter_riverpod_state"],
+          complexity: "Alta",
+          feedback: ""
+        },
+        {
+          id: "T05",
+          title: "Backend Alternativo / Sync",
+          desc: "Sincronização incremental Supabase + cache local SQLite com políticas RLS. Spec: _specs/tasks/T05-firebase-alternativo.md",
+          column: "backlog",
+          agent: "data_supabase_specialist",
+          skills: ["supabase_fullstack", "local_first_sqlite"],
+          complexity: "Alta",
+          feedback: ""
+        },
+        {
+          id: "T00",
+          title: "Unificação do Harness v2.1 com Dart MCP Server e Matriz 1:N",
+          desc: "Base do Flutter Mobile Harness v2.1 consolidada, validada e commitada.",
+          column: "done",
+          agent: "master_orchestrator",
+          skills: ["spec_discovery", "clean_architecture"],
+          complexity: "Alta",
+          feedback: "Aprovado e commitado."
+        }
+      ]
+    };
+
+    const COLUMNS = [
+      {
+        id: "backlog",
+        title: "1. Backlog & Specs",
+        gate: "PRD/spec aprovada, critérios de aceitação objetivos e skills 1:N definidas.",
+        color: "#94a3b8"
+      },
+      {
+        id: "red",
+        title: "2. TDD Fase RED (Testes Falhos)",
+        gate: "Suíte criada e executada com falha comprovada pelo motivo correto (RED).",
+        color: "#f43f5e"
+      },
+      {
+        id: "green",
+        title: "3. TDD Fase GREEN (Implementação)",
+        gate: "Menor código possível para a suíte ficar verde; `dart analyze` sem erros.",
+        color: "#38bdf8"
+      },
+      {
+        id: "review",
+        title: "4. Loop QA/A11y & Gate Humano",
+        gate: "Até 3 ciclos de autorreparo, cobertura mínima, Semantics/contraste/touch targets validados.",
+        color: "#f59e0b"
+      },
+      {
+        id: "done",
+        title: "5. Concluído & Evoluído",
+        gate: "Commit semântico atômico, Kanban atualizado e PROJECT_BRAIN.md com o aprendizado.",
+        color: "#10b981"
       }
-
-      col.addEventListener("dragover", event => {
-        event.preventDefault();
-        col.classList.add("drag-over");
-      });
-      col.addEventListener("dragleave", () => col.classList.remove("drag-over"));
-      col.addEventListener("drop", event => {
-        event.preventDefault();
-        col.classList.remove("drag-over");
-        const id = event.dataTransfer.getData("text/plain");
-        moveCard(id, column.id);
-      });
-      kanbanEl.appendChild(col);
-    });
-    document.getElementById("tab-kanban-count").textContent = String(state.cards.length);
-  }
-
-  function renderCard(card) {
-    const el = document.createElement("article");
-    el.className = "card";
-    el.draggable = true;
-    el.dataset.id = card.id;
-    el.innerHTML = `
-      <div class="card-top">
-        <span class="card-id">${escapeHtml(card.id)}</span>
-        <span class="priority ${String(card.priority).toLowerCase()}">${escapeHtml(card.priority)}</span>
-      </div>
-      <h3 class="card-title">${escapeHtml(card.title)}</h3>
-      ${card.desc ? `<p class="card-desc">${escapeHtml(card.desc)}</p>` : ""}
-      <div class="chips">${(card.skills || []).map(s => `<span class="chip">${escapeHtml(skillLabel(s))}</span>`).join("")}</div>
-      <div class="card-foot">
-        <span class="card-agent">@${escapeHtml(agentById(card.agent).id)}</span>
-        <span class="card-actions">
-          <button class="icon-btn" data-action="edit" data-id="${escapeHtml(card.id)}" title="Editar" aria-label="Editar ${escapeHtml(card.id)}">✎</button>
-          <button class="icon-btn" data-action="advance" data-id="${escapeHtml(card.id)}" title="Avançar coluna" aria-label="Avançar ${escapeHtml(card.id)}">→</button>
-          <button class="icon-btn" data-action="delete" data-id="${escapeHtml(card.id)}" title="Excluir" aria-label="Excluir ${escapeHtml(card.id)}">×</button>
-        </span>
-      </div>
-    `;
-    el.addEventListener("dragstart", event => {
-      el.classList.add("dragging");
-      event.dataTransfer.setData("text/plain", card.id);
-      event.dataTransfer.effectAllowed = "move";
-    });
-    el.addEventListener("dragend", () => el.classList.remove("dragging"));
-    return el;
-  }
-
-  kanbanEl.addEventListener("click", event => {
-    const button = event.target.closest("[data-action]");
-    if (!button) return;
-    const card = state.cards.find(c => c.id === button.dataset.id);
-    if (!card) return;
-    if (button.dataset.action === "edit") openCardForm(card.status, card);
-    if (button.dataset.action === "advance") {
-      const index = COLUMNS.findIndex(c => c.id === card.status);
-      const next = COLUMNS[Math.min(index + 1, COLUMNS.length - 1)];
-      moveCard(card.id, next.id);
-    }
-    if (button.dataset.action === "delete") {
-      if (!confirm("Excluir o card " + card.id + "?")) return;
-      state.cards = state.cards.filter(c => c.id !== card.id);
-      saveState();
-      renderKanban();
-      toast("Card " + card.id + " excluído.");
-    }
-  });
-
-  function moveCard(id, status) {
-    const card = state.cards.find(c => c.id === id);
-    if (!card || card.status === status) return;
-    card.status = status;
-    saveState();
-    renderKanban();
-    toast(card.id + " movido para " + COLUMNS.find(c => c.id === status).title + ".");
-  }
-
-  function exportKanban() {
-    const lines = [
-      "# 📋 Kanban de Desenvolvimento do Projeto (`task-board.md`)",
-      "",
-      "> Exportado do `harness-studio.html` — Flutter Mobile Harness v2.1.",
-      ""
     ];
-    COLUMNS.forEach(column => {
-      const cards = state.cards.filter(c => c.status === column.id);
-      lines.push("## " + column.icon + " " + column.title + " (`" + column.agent + "`)");
-      if (!cards.length) {
-        lines.push("*(Nenhuma tarefa ativa nesta coluna)*", "");
+
+    let state = loadState();
+    let dirHandle = null;
+
+    function loadState() {
+      const saved = localStorage.getItem("antigravity_studio_v3");
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+
+    async function persistState(toastMsg = "Alterações salvas automaticamente no Harness!") {
+      localStorage.setItem("antigravity_studio_v3", JSON.stringify(state));
+      renderAll();
+      if (dirHandle) {
+        await writeFilesToDisk();
+        showToast("💾 " + toastMsg + " (Gravado no disco)");
+      } else {
+        showToast("⚡ " + toastMsg);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.innerText = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2600);
+    }
+
+    // =========================================================================
+    // AUTO-SAVE DIRETO NOS ARQUIVOS DO PROJETO (FILE SYSTEM ACCESS API)
+    // =========================================================================
+    async function connectRepositoryFolder() {
+      if (!window.showDirectoryPicker) {
+        alert("Seu navegador não suporta File System Access API direta. Use Chrome/Edge ou o botão 'Baixar harness.yaml'.");
         return;
       }
-      cards.forEach(card => {
-        const mark = column.id === "done" ? "x" : " ";
-        lines.push("- [" + mark + "] **" + card.id + "** — " + card.title +
-          " | Agente: `@" + card.agent + "` | Skills: " +
-          (card.skills || []).map(s => "`" + s + "`").join(", ") +
-          " | Prioridade: " + card.priority);
-        if (card.desc) lines.push("  - " + card.desc);
-      });
-      lines.push("");
-    });
-    lines.push("---", "", "Gerado por `harness-studio.html` em " + new Date().toLocaleString("pt-BR") + ".");
-    const blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "task-board.md";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast("Kanban exportado como task-board.md.");
-  }
-
-  document.getElementById("btn-export").addEventListener("click", exportKanban);
-
-  /* ============================================================
-     Agentes & Skills (1:N)
-     ============================================================ */
-  const agentsGrid = document.getElementById("agents-grid");
-  const yamlPreview = document.getElementById("yaml-preview");
-
-  function renderAgents() {
-    agentsGrid.innerHTML = "";
-    AGENTS.forEach(agent => {
-      const selected = state.agentSkills[agent.id] || [];
-      const card = document.createElement("article");
-      card.className = "agent-card";
-      card.style.borderTop = "3px solid " + agent.color;
-      card.innerHTML = `
-        <div class="agent-head">
-          <div>
-            <h3 class="agent-name">${escapeHtml(agent.name)}</h3>
-            <p class="agent-phase">${escapeHtml(agent.phase)}</p>
-          </div>
-          <span class="profile">${escapeHtml(agent.profile)}</span>
-        </div>
-        <p class="hint" style="margin-top:6px">${escapeHtml(agent.role)}</p>
-        <div class="skill-list">
-          ${SKILLS.map(skill => {
-            const on = selected.includes(skill.id);
-            return `<label class="skill-check ${on ? "on" : ""}" title="${escapeHtml(skill.group)}">
-              <input type="checkbox" data-agent="${escapeHtml(agent.id)}" value="${escapeHtml(skill.id)}" ${on ? "checked" : ""} />
-              ${escapeHtml(skill.label)}
-            </label>`;
-          }).join("")}
-          ${selected.filter(id => !SKILLS.some(skill => skill.id === id)).map(id => `
-            <label class="skill-check on" title="Skill customizada">
-              <input type="checkbox" data-agent="${escapeHtml(agent.id)}" value="${escapeHtml(id)}" checked />
-              ${escapeHtml(id)}
-            </label>
-          `).join("")}
-        </div>
-        <div class="agent-foot">
-          <input type="text" placeholder="Adicionar skill customizada…" data-custom-agent="${escapeHtml(agent.id)}" aria-label="Adicionar skill customizada para ${escapeHtml(agent.name)}" />
-          <button class="btn small" data-add-skill="${escapeHtml(agent.id)}" type="button">＋</button>
-          <span class="count-badge">${selected.length} skill(s)</span>
-        </div>
-      `;
-      agentsGrid.appendChild(card);
-    });
-    updateYamlPreview();
-  }
-
-  agentsGrid.addEventListener("change", event => {
-    const input = event.target.closest("input[type=checkbox][data-agent]");
-    if (!input) return;
-    const agentId = input.dataset.agent;
-    const set = new Set(state.agentSkills[agentId] || []);
-    if (input.checked) set.add(input.value);
-    else set.delete(input.value);
-    if (!set.size) {
-      input.checked = true;
-      toast("Cada agente precisa de pelo menos 1 skill (regra 1:N).");
-      return;
+      try {
+        dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+        document.getElementById("fs-dot").classList.add("online");
+        document.getElementById("fs-text").innerText = `Conectado: ${dirHandle.name} (Auto-Save Ativo)`;
+        await writeFilesToDisk();
+        showToast("Conectado! .agents/harness.yaml, skills e task-board.md sincronizados.");
+      } catch (err) {
+        console.warn("Conexão cancelada:", err);
+      }
     }
-    state.agentSkills[agentId] = Array.from(set);
-    saveState();
-    renderAgents();
-  });
 
-  agentsGrid.addEventListener("click", event => {
-    const button = event.target.closest("[data-add-skill]");
-    if (!button) return;
-    const agentId = button.dataset.addSkill;
-    const input = agentsGrid.querySelector('[data-custom-agent="' + agentId + '"]');
-    const value = input.value.trim();
-    if (!value) return;
-    const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    if (!slug) return;
-    if (!state.agentSkills[agentId].includes(slug)) {
-      state.agentSkills[agentId].push(slug);
-      saveState();
+    async function writeFileByPath(rootHandle, pathParts, content) {
+      let current = rootHandle;
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        current = await current.getDirectoryHandle(pathParts[i], { create: true });
+      }
+      const fileHandle = await current.getFileHandle(pathParts[pathParts.length - 1], { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(content);
+      await writable.close();
+    }
+
+    async function writeFilesToDisk() {
+      if (!dirHandle) return;
+      // 1. Gravar .agents/harness.yaml
+      await writeFileByPath(dirHandle, [".agents", "harness.yaml"], generateHarnessYAML());
+      // 2. Gravar .agents/mcp.json
+      await writeFileByPath(dirHandle, [".agents", "mcp.json"], generateMcpJSON());
+      // 3. Gravar cada Skill em .agents/skills/<id>/SKILL.md
+      for (const [id, sk] of Object.entries(state.skills)) {
+        const folderName = id.replace(/_/g, "-");
+        const skillMd = `---\nname: ${folderName}\ndescription: "${sk.desc.replace(/"/g, '\\"')}"\ncategory: "${sk.category}"\n---\n\n# Skill: ${sk.name}\n\n## Objetivo\n${sk.desc}\n\n## Regras e Guardrails\n${sk.rules || "Seguir os padrões de Clean Architecture e TDD do projeto."}\n`;
+        await writeFileByPath(dirHandle, [".agents", "skills", folderName, "SKILL.md"], skillMd);
+      }
+      // 4. Gravar _specs/task-board.md
+      await writeFileByPath(dirHandle, ["_specs", "task-board.md"], generateTaskBoardMarkdown());
+    }
+
+    function generateHarnessYAML() {
+      let y = `# Antigravity Harness v3.0 — Catálogo desacoplado de Agentes & Skills\n# Gerado automaticamente pelo Harness Studio (harness-studio.html)\nversion: "${state.version}"\n\nmodel_profiles:\n  reasoning: "inherit"\n  coding: "inherit"\n  design: "inherit"\n  fast_ops: "inherit"\n\nmcp_servers:\n`;
+      Object.entries(state.mcps).forEach(([id, m]) => {
+        y += `  ${id}:\n    enabled: ${m.active}\n    command: "${m.command}"\n    args: [${m.args.map(a => `"${a}"`).join(', ')}]\n`;
+        if (m.env && Object.keys(m.env).length) {
+          y += `    env:\n`;
+          Object.entries(m.env).forEach(([k, v]) => { y += `      ${k}: "${v}"\n`; });
+        }
+      });
+      y += `\nskills_registry:\n`;
+      Object.entries(state.skills).forEach(([id, s]) => {
+        y += `  ${id}:\n    name: "${s.name}"\n    category: "${s.category}"\n    file: "${s.file}"\n    description: "${s.desc.replace(/"/g, '\\"')}"\n`;
+      });
+      y += `\nsubagents:\n`;
+      Object.entries(state.agents).forEach(([id, a]) => {
+        y += `  ${id}:\n    model: "inherit"\n    role: "${a.role}"\n    seniority: "${a.seniority}"\n    persona: "${a.persona.replace(/"/g, '\\"')}"\n    mcps:\n`;
+        (a.mcps || []).forEach(m => { y += `      - "${m}"\n`; });
+        y += `    skills:\n`;
+        (a.skills || []).forEach(sk => { y += `      - "${sk}"\n`; });
+      });
+      return y;
+    }
+
+    function generateMcpJSON() {
+      const mcpServers = {};
+      Object.entries(state.mcps).forEach(([id, m]) => {
+        if (!m.active) return;
+        const entry = { command: m.command, args: m.args };
+        if (m.env && Object.keys(m.env).length) entry.env = m.env;
+        if (m.desc) entry.description = m.desc;
+        mcpServers[id] = entry;
+      });
+      return JSON.stringify({ mcpServers }, null, 2) + "\n";
+    }
+
+    function generateTaskBoardMarkdown() {
+      let md = `# 📋 Kanban de Desenvolvimento do Projeto (\`task-board.md\`)\n\n`;
+      md += `> Sincronizado via Antigravity Harness Studio v3.0 e gerenciado pelo \`master_orchestrator\`.\n`;
+      md += `> **Regra de ouro:** nenhum card avança de coluna sem cumprir o gate de saída da coluna atual.\n\n`;
+      md += "```text\nBacklog ──▶ TDD RED ──▶ TDD GREEN ──▶ Loop QA/A11y ──▶ Concluído\n```\n\n";
+      COLUMNS.forEach(col => {
+        md += `## ${col.title}\n`;
+        if (col.gate) md += `> **Gate de saída:** ${col.gate}\n\n`;
+        const list = state.tasks.filter(t => t.column === col.id);
+        if (list.length === 0) {
+          md += `- *(Nenhuma tarefa ativa nesta coluna)*\n\n`;
+        } else {
+          list.forEach(t => {
+            const agName = state.agents[t.agent] ? state.agents[t.agent].role : t.agent;
+            md += `- **[${t.id}] ${t.title}** — *Agente:* \`${t.agent}\` (${agName}) | *Skills:* \`${(t.skills || []).join(', ')}\`\n  - ${t.desc}\n`;
+            if (t.feedback) md += `  - ⚠️ **Feedback de Revisão**: ${t.feedback}\n`;
+          });
+          md += `\n`;
+        }
+      });
+      md += `---\n\n### Legenda de skills por card\n| Campo | Significado |\n|---|---|\n`;
+      md += `| \`Skills:\` | Lista 1:N de skills ativadas para o card (editável no \`harness-studio.html\`). |\n`;
+      md += `| \`WIP\` | Limite de trabalho em progresso da coluna; exceder exige justificativa no \`ai_memory\`. |\n`;
+      md += `| \`@agente\` | Subagente responsável pela coluna, conforme \`.agents/harness.yaml#subagents\`. |\n`;
+      return md;
+    }
+
+    // =========================================================================
+    // NAVEGAÇÃO E RENDERIZAÇÃO
+    // =========================================================================
+    function switchView(view, btn) {
+      document.querySelectorAll(".view-pane").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("view-" + view).classList.add("active");
+      if (btn) btn.classList.add("active");
+
+      const titles = {
+        orchestrator: "🧠 Master Orchestrator & Planejamento de Engenharia",
+        kanban: "📋 Kanban Interativo & Gate de Aprovação Humana",
+        agents: "🤖 Especialistas Configurados (Agentes 1:N Skills)",
+        skills: "⚡ Catálogo Global de Skills Reutilizáveis",
+        mcps: "🔌 Servidores MCP & Sensores do Ambiente"
+      };
+      document.getElementById("view-title").innerText = titles[view] || "Antigravity Studio";
+      renderAll();
+    }
+
+    function renderAll() {
+      document.getElementById("nav-count-tasks").innerText = state.tasks.length;
+      document.getElementById("nav-count-agents").innerText = Object.keys(state.agents).length;
+      document.getElementById("nav-count-skills").innerText = Object.keys(state.skills).length;
+      document.getElementById("nav-count-mcps").innerText = Object.values(state.mcps).filter(m => m.active).length;
+
+      // Topbar MCP strip
+      document.getElementById("topbar-mcps").innerHTML = Object.entries(state.mcps).map(([id, m]) => `
+        <div class="mcp-chip ${m.active ? 'active' : ''}" onclick="toggleMcp('${id}')" title="Clique para ativar/desativar ${m.name}">
+          <span>${m.active ? '●' : '○'}</span> ${m.name.replace(' MCP', '')}
+        </div>
+      `).join('');
+
+      renderKanban();
       renderAgents();
-      toast("Skill customizada '" + slug + "' adicionada.");
-    } else {
-      toast("Essa skill já está ativa neste agente.");
+      renderSkills();
+      renderMcps();
     }
-  });
 
-  function updateYamlPreview() {
-    const lines = ["subagents:"];
-    AGENTS.forEach(agent => {
-      lines.push("  " + agent.id + ":");
-      lines.push('    profile: "' + agent.profile + '"');
-      lines.push('    phase: "' + agent.phase + '"');
-      lines.push('    skills:');
-      (state.agentSkills[agent.id] || []).forEach(skill => {
-        lines.push('      - ".agents/skills/' + skill + '/SKILL.md"');
+    function renderKanban() {
+      const container = document.getElementById("kanban-container");
+      container.innerHTML = COLUMNS.map(col => {
+        const colTasks = state.tasks.filter(t => t.column === col.id);
+        return `
+          <div class="kanban-col">
+            <div class="col-header">
+              <h3><span style="color:${col.color}">●</span> ${col.title}</h3>
+              <span class="nav-pill">${colTasks.length}</span>
+            </div>
+            <div>
+              ${colTasks.map(t => {
+                const ag = state.agents[t.agent];
+                return `
+                  <div class="task-card" onclick="openTaskModal('${t.id}')">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span class="task-id">${t.id}</span>
+                      <span class="chip">${t.complexity || 'Média'}</span>
+                    </div>
+                    <div class="task-title">${t.title}</div>
+                    <div class="task-desc">${t.desc}</div>
+                    ${t.feedback ? `<div style="font-size:0.74rem; color:#fda4af; background:rgba(244,63,94,0.12); padding:6px; border-radius:4px; margin-bottom:8px;">⚠️ Feedback: ${t.feedback}</div>` : ''}
+                    <div class="task-meta">
+                      <span class="chip chip-agent">🤖 ${ag ? ag.role.split('&')[0] : t.agent}</span>
+                      <span class="chip chip-skill">⚡ ${(t.skills || []).length} skills</span>
+                    </div>
+                    ${col.id === 'review' ? `
+                      <div class="gate-box" onclick="event.stopPropagation()">
+                        <button class="btn-emerald" onclick="approveTask('${t.id}')">✔ Aprovar</button>
+                        <button class="btn-rose" onclick="rejectTask('${t.id}')">✖ Reprovar</button>
+                      </div>
+                    ` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAgents() {
+      document.getElementById("agents-grid").innerHTML = Object.entries(state.agents).map(([id, a]) => `
+        <div class="entity-card" onclick="openAgentModal('${id}')">
+          <div>
+            <div class="entity-head">
+              <div>
+                <div class="entity-title">🤖 ${a.role}</div>
+                <div class="entity-sub">ID: ${id} • ${a.seniority}</div>
+              </div>
+              <span class="chip">Editar ✎</span>
+            </div>
+            <div class="entity-body">${a.persona}</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:6px; font-weight:700;">SKILLS ATRIBUÍDAS (${(a.skills||[]).length}):</div>
+            <div class="tag-row" style="margin-bottom:10px;">
+              ${(a.skills || []).map(sk => `<span class="chip chip-skill">⚡ ${state.skills[sk] ? state.skills[sk].name : sk}</span>`).join('')}
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:6px; font-weight:700;">MCPS CONECTADOS:</div>
+            <div class="tag-row">
+              ${(a.mcps || []).map(m => `<span class="chip">${state.mcps[m] ? state.mcps[m].name : m}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSkills() {
+      document.getElementById("skills-grid").innerHTML = Object.entries(state.skills).map(([id, s]) => {
+        const usedBy = Object.entries(state.agents).filter(([_, a]) => (a.skills || []).includes(id)).map(([_, a]) => a.role.split(' ')[0]);
+        return `
+          <div class="entity-card" onclick="openSkillModal('${id}')">
+            <div>
+              <div class="entity-head">
+                <div>
+                  <div class="entity-title">⚡ ${s.name}</div>
+                  <div class="entity-sub">${s.file}</div>
+                </div>
+                <span class="chip">${s.category}</span>
+              </div>
+              <div class="entity-body">${s.desc}</div>
+            </div>
+            <div class="tag-row">
+              <span class="chip chip-agent">Usada por ${usedBy.length} agente(s)</span>
+              <span class="chip">Clique p/ editar SKILL.md ✎</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMcps() {
+      document.getElementById("mcps-grid").innerHTML = Object.entries(state.mcps).map(([id, m]) => `
+        <div class="entity-card" onclick="toggleMcp('${id}')">
+          <div>
+            <div class="entity-head">
+              <div>
+                <div class="entity-title">🔌 ${m.name}</div>
+                <div class="entity-sub">${m.command} ${m.args.join(' ')}</div>
+              </div>
+              <span class="chip" style="color:${m.active ? '#34d399' : '#94a3b8'}">${m.active ? 'ATIVO' : 'INATIVO'}</span>
+            </div>
+            <div class="entity-body">${m.desc}</div>
+          </div>
+          <div class="tag-row">
+            <span class="chip">Clique para alternar status no .agents/mcp.json</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // =========================================================================
+    // MODAIS DE INSPEÇÃO E EDIÇÃO (CLICAR NO CARD ABRE DETALHES COMPLETOS)
+    // =========================================================================
+    function openModal(html) {
+      document.getElementById("modal-content").innerHTML = html;
+      document.getElementById("modal-backdrop").classList.add("open");
+    }
+    function closeModal() {
+      document.getElementById("modal-backdrop").classList.remove("open");
+    }
+
+    // MODAL DE AGENTE (CRIAR / EDITAR + SELECIONAR MÚLTIPLAS SKILLS E MCPS)
+    function openAgentModal(agentId = null) {
+      const a = agentId ? state.agents[agentId] : { role: "", seniority: "Senior Engineer (10+ anos)", persona: "", skills: [], mcps: ["dart_mcp"] };
+      const skillsCheckboxes = Object.entries(state.skills).map(([sid, s]) => `
+        <label class="check-item">
+          <input type="checkbox" name="agent-skill" value="${sid}" ${(a.skills || []).includes(sid) ? 'checked' : ''}>
+          <span>${s.name}</span>
+        </label>
+      `).join('');
+
+      const mcpsCheckboxes = Object.entries(state.mcps).map(([mid, m]) => `
+        <label class="check-item">
+          <input type="checkbox" name="agent-mcp" value="${mid}" ${(a.mcps || []).includes(mid) ? 'checked' : ''}>
+          <span>${m.name}</span>
+        </label>
+      `).join('');
+
+      openModal(`
+        <div class="modal-header">
+          <h3>🤖 ${agentId ? 'Editar Agente Especialista' : 'Criar Novo Agente Especialista'}</h3>
+          <button class="btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="form-field">
+          <label>ID Técnico do Agente (ex: ui_ux_specialist)</label>
+          <input type="text" id="m-agent-id" value="${agentId || ''}" ${agentId ? 'readonly' : ''} placeholder="Ex: security_auditor">
+        </div>
+        <div class="form-field">
+          <label>Título / Papel Profissional</label>
+          <input type="text" id="m-agent-role" value="${a.role}" placeholder="Ex: Senior UI/UX & Design System Architect">
+        </div>
+        <div class="form-field">
+          <label>Senioridade & Experiência</label>
+          <input type="text" id="m-agent-seniority" value="${a.seniority}" placeholder="Ex: Staff Designer & Frontend Engineer (12+ anos)">
+        </div>
+        <div class="form-field">
+          <label>Persona, Diretrizes Comportamentais e Foco Técnico</label>
+          <textarea id="m-agent-persona" rows="3">${a.persona}</textarea>
+        </div>
+        <div class="form-field">
+          <label>Selecione as Skills deste Agente (Relação 1:N):</label>
+          <div class="checkbox-grid">${skillsCheckboxes}</div>
+        </div>
+        <div class="form-field">
+          <label>Servidores MCP que este Agente pode utilizar:</label>
+          <div class="checkbox-grid">${mcpsCheckboxes}</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:18px;">
+          ${agentId ? `<button class="btn btn-rose" onclick="deleteAgent('${agentId}')">Excluir Agente</button>` : '<span></span>'}
+          <div style="display:flex; gap:10px;">
+            <button class="btn" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveAgentModal()">💾 Salvar Agente no Harness</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function saveAgentModal() {
+      const id = document.getElementById("m-agent-id").value.trim().replace(/\s+/g, "_").toLowerCase();
+      const role = document.getElementById("m-agent-role").value.trim();
+      const seniority = document.getElementById("m-agent-seniority").value.trim();
+      const persona = document.getElementById("m-agent-persona").value.trim();
+      const skills = Array.from(document.querySelectorAll("input[name='agent-skill']:checked")).map(i => i.value);
+      const mcps = Array.from(document.querySelectorAll("input[name='agent-mcp']:checked")).map(i => i.value);
+
+      if (!id || !role) return alert("Preencha o ID e o Papel do Agente!");
+      state.agents[id] = { role, seniority, persona, skills, mcps };
+      closeModal();
+      persistState(`Agente '${role}' salvo automaticamente no harness.yaml!`);
+    }
+
+    function deleteAgent(id) {
+      if (!confirm("Deseja remover este agente do catálogo?")) return;
+      delete state.agents[id];
+      closeModal();
+      persistState("Agente removido do harness.yaml.");
+    }
+
+    // MODAL DE SKILL (CRIAR / EDITAR + ATRIBUIR A AGENTES)
+    function openSkillModal(skillId = null) {
+      const s = skillId ? state.skills[skillId] : { name: "", category: "Engenharia Mobile", file: "", desc: "", rules: "" };
+      const assignedAgents = Object.entries(state.agents).map(([aid, ag]) => `
+        <label class="check-item">
+          <input type="checkbox" name="skill-agent" value="${aid}" ${(ag.skills || []).includes(skillId) ? 'checked' : ''}>
+          <span>${ag.role}</span>
+        </label>
+      `).join('');
+
+      openModal(`
+        <div class="modal-header">
+          <h3>⚡ ${skillId ? 'Inspecionar / Editar Skill' : 'Criar Nova Skill no Harness'}</h3>
+          <button class="btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="form-field">
+          <label>ID da Skill (ex: frontend_best_practices)</label>
+          <input type="text" id="m-skill-id" value="${skillId || ''}" ${skillId ? 'readonly' : ''} placeholder="Ex: design_tokens_m3">
+        </div>
+        <div class="form-field">
+          <label>Nome da Habilidade</label>
+          <input type="text" id="m-skill-name" value="${s.name}" placeholder="Ex: Boas Práticas de Frontend & Design System">
+        </div>
+        <div class="form-field">
+          <label>Categoria</label>
+          <input type="text" id="m-skill-cat" value="${s.category}" placeholder="Ex: UI/UX & Frontend">
+        </div>
+        <div class="form-field">
+          <label>Descrição Técnica da Competência</label>
+          <textarea id="m-skill-desc" rows="3">${s.desc}</textarea>
+        </div>
+        <div class="form-field">
+          <label>Guardrails e Regras Estritas (Conteúdo do SKILL.md)</label>
+          <textarea id="m-skill-rules" rows="3">${s.rules || ''}</textarea>
+        </div>
+        <div class="form-field">
+          <label>Vincular esta Skill imediatamente aos seguintes Agentes:</label>
+          <div class="checkbox-grid">${assignedAgents}</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:18px;">
+          ${skillId ? `<button class="btn btn-rose" onclick="deleteSkill('${skillId}')">Excluir Skill</button>` : '<span></span>'}
+          <div style="display:flex; gap:10px;">
+            <button class="btn" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveSkillModal()">💾 Salvar Skill Automaticamente</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function saveSkillModal() {
+      const id = document.getElementById("m-skill-id").value.trim().replace(/\s+/g, "_").toLowerCase();
+      const name = document.getElementById("m-skill-name").value.trim();
+      const category = document.getElementById("m-skill-cat").value.trim();
+      const desc = document.getElementById("m-skill-desc").value.trim();
+      const rules = document.getElementById("m-skill-rules").value.trim();
+      const folder = id.replace(/_/g, "-");
+
+      if (!id || !name) return alert("Preencha ID e Nome da Skill!");
+      state.skills[id] = { name, category, file: `.agents/skills/${folder}/SKILL.md`, desc, rules };
+
+      const checkedAgents = Array.from(document.querySelectorAll("input[name='skill-agent']:checked")).map(i => i.value);
+      Object.entries(state.agents).forEach(([aid, ag]) => {
+        ag.skills = ag.skills || [];
+        if (checkedAgents.includes(aid) && !ag.skills.includes(id)) ag.skills.push(id);
+        if (!checkedAgents.includes(aid)) ag.skills = ag.skills.filter(x => x !== id);
       });
-    });
-    yamlPreview.value = lines.join("\n");
-  }
 
-  document.getElementById("btn-copy-yaml").addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(yamlPreview.value);
-      toast("YAML copiado para a área de transferência.");
-    } catch (error) {
-      yamlPreview.select();
-      document.execCommand("copy");
-      toast("YAML copiado (fallback).");
-    }
-  });
-
-  document.getElementById("btn-reset-agents").addEventListener("click", () => {
-    if (!confirm("Restaurar a matriz 1:N padrão de todos os agentes?")) return;
-    state.agentSkills = Object.fromEntries(AGENTS.map(a => [a.id, a.skills.slice()]));
-    saveState();
-    renderAgents();
-    toast("Matriz de skills restaurada.");
-  });
-
-  /* ============================================================
-     TDD
-     ============================================================ */
-  const tddFlow = document.getElementById("tdd-flow");
-  const tddLog = document.getElementById("tdd-log");
-  const tddProgress = document.getElementById("tdd-progress");
-  const tddPhaseLabel = document.getElementById("tdd-phase-label");
-  const tddCycleLabel = document.getElementById("tdd-cycle-label");
-
-  function renderTdd() {
-    tddFlow.innerHTML = "";
-    TDD_PHASES.forEach((phase, index) => {
-      const step = document.createElement("article");
-      step.className = "tdd-step " + phase.id + (state.tdd.phase === index ? " active" : "");
-      step.innerHTML = `
-        <span class="tdd-kicker">${escapeHtml(phase.kicker)}</span>
-        <h3 style="color:${phase.color}">${escapeHtml(phase.title)}</h3>
-        <p>${escapeHtml(phase.desc)}</p>
-        <code class="tdd-cmd">$ ${escapeHtml(phase.cmd)}</code>
-      `;
-      tddFlow.appendChild(step);
-    });
-    const phase = TDD_PHASES[state.tdd.phase] || TDD_PHASES[0];
-    tddProgress.style.width = Math.round(((state.tdd.phase + 1) / TDD_PHASES.length) * 100) + "%";
-    tddPhaseLabel.textContent = "Fase: " + phase.title;
-    tddCycleLabel.textContent = "Ciclo: " + state.tdd.cycle;
-    tddLog.innerHTML = state.tdd.log.length
-      ? state.tdd.log.map(entry => `<li><strong>${escapeHtml(entry.time)}</strong> — ${escapeHtml(entry.message)}</li>`).join("")
-      : `<li>Aguardando o primeiro avanço do ciclo.</li>`;
-  }
-
-  function pushTddLog(message) {
-    state.tdd.log.unshift({ time: new Date().toLocaleTimeString("pt-BR"), message });
-    state.tdd.log = state.tdd.log.slice(0, 40);
-  }
-
-  document.getElementById("btn-tdd-next").addEventListener("click", () => {
-    const current = TDD_PHASES[state.tdd.phase];
-    state.tdd.phase += 1;
-    if (state.tdd.phase >= TDD_PHASES.length) {
-      state.tdd.phase = 0;
-      state.tdd.cycle += 1;
-      pushTddLog("Ciclo " + (state.tdd.cycle - 1) + " concluído. Iniciando ciclo " + state.tdd.cycle + " em RED.");
-    } else {
-      pushTddLog("Gate de " + current.title + " aprovado. Avançando para " + TDD_PHASES[state.tdd.phase].title + ".");
-    }
-    saveState();
-    renderTdd();
-  });
-
-  document.getElementById("btn-tdd-reset").addEventListener("click", () => {
-    if (!confirm("Resetar o ciclo TDD para RED e limpar o log?")) return;
-    state.tdd = { phase: 0, cycle: 1, log: [] };
-    saveState();
-    renderTdd();
-    toast("Ciclo TDD resetado.");
-  });
-
-  /* ============================================================
-     Analisador de Spec
-     ============================================================ */
-  const specInput = document.getElementById("spec-input");
-  const specCharCount = document.getElementById("spec-char-count");
-  const scoreRing = document.getElementById("score-ring");
-  const scoreValue = document.getElementById("score-value");
-  const scoreTitle = document.getElementById("score-title");
-  const scoreSubtitle = document.getElementById("score-subtitle");
-  const checkList = document.getElementById("check-list");
-  const vagueList = document.getElementById("vague-list");
-  const questionsList = document.getElementById("questions-list");
-  const scoreNote = document.getElementById("score-note");
-
-  const SPEC_CHECKS = [
-    { id: "problem", label: "Problema / objetivo de negócio", re: /(problema|objetivo|dor|proposta de valor|por que|para qu[eê])/i, question: "Qual é o problema central que esta feature resolve e como mediremos o sucesso?" },
-    { id: "persona", label: "Público-alvo / persona", re: /(p[uú]blico|persona|usu[aá]rio|cliente|perfil)/i, question: "Quem usa esta feature (persona) e qual é o contexto de uso?" },
-    { id: "platform", label: "Plataformas e versões mínimas", re: /(android|ios|plataforma|vers[aã]o m[ií]nima|tablet|web)/i, question: "Quais plataformas e versões mínimas de SO precisam ser suportadas?" },
-    { id: "data", label: "Estratégia de dados / persistência", re: /(sqlite|drift|banco|persist[eê]ncia|supabase|firebase|api|rest|local|offline|nuvem)/i, question: "Onde os dados vivem (local, nuvem ou híbrido) e qual é a estratégia de sincronização?" },
-    { id: "auth", label: "Autenticação / sessão", re: /(autentica|login|senha|sess[aã]o|token|oauth|biometria|jwt)/i, question: "Como o usuário se autentica e o que acontece quando a sessão expira?" },
-    { id: "offline", label: "Comportamento offline / sync", re: /(offline|sincron|sync|conflito|fila|retry|backoff)/i, question: "Qual é o comportamento offline e como conflitos de sincronização são resolvidos?" },
-    { id: "states", label: "4 estados de tela (loading/empty/error/success)", re: /(loading|carregamento|empty|vazio|error|erro|falha|sucesso|skeleton|shimmer)/i, question: "Como serão os estados de carregamento, vazio, erro e sucesso desta tela?" },
-    { id: "a11y", label: "Acessibilidade (Semantics, contraste, touch)", re: /(acessibilidade|a11y|semantics|contraste|wcag|touch target|leitor de tela|teclado)/i, question: "Quais requisitos de acessibilidade (contraste AA, Semantics, touch 48x48dp) são obrigatórios?" },
-    { id: "acceptance", label: "Critérios de aceitação verificáveis", re: /(crit[eé]rio|aceita|dado que|quando|ent[aã]o|deve|obrigat[oó]rio)/i, question: "Quais são os critérios de aceitação objetivos, incluindo casos de borda e falha?" },
-    { id: "metric", label: "Métrica de sucesso / North Star", re: /(m[eé]trica|kpi|north star|convers[aã]o|reten[cç][aã]o|tempo|n[uú]mero)/i, question: "Qual número ou resultado valida o sucesso desta entrega?" },
-    { id: "i18n", label: "Idioma e textos (pt-BR / i18n)", re: /(pt-br|portugu[eê]s|idioma|i18n|localiza|texto)/i, question: "Todos os textos estarão em pt-BR e passíveis de localização via ARB?" },
-    { id: "security", label: "Segurança e segredos", re: /(seguran[cç]a|segredo|chave|token|rls|permiss[aã]o|criptograf|sanitiz)/i, question: "Quais dados são sensíveis e como chaves/segredos e permissões (RLS) serão protegidos?" },
-    { id: "performance", label: "Performance e limites", re: /(performance|desempenho|lat[eê]ncia|fps|jank|pagina[cç][aã]o|limite|tamanho)/i, question: "Quais são os limites de performance (latência, FPS, paginação, tamanho) e como serão medidos?" },
-    { id: "notifications", label: "Integrações e permissões do device", re: /(notifica|c[aâ]mera|gps|localiza[cç][aã]o|biometria|bluetooth|permiss[aã]o)/i, question: "Quais permissões/integrações do dispositivo serão usadas e como o usuário será informado?" }
-  ];
-
-  const VAGUE_TERMS = [
-    { term: "rápido", hint: "Defina latência alvo (ex.: < 300 ms)." },
-    { term: "bonito", hint: "Anexe referência visual/tokens no _references/screens." },
-    { term: "vários", hint: "Liste os itens e a quantidade esperada." },
-    { term: "alguns", hint: "Quantifique os casos de uso." },
-    { term: "etc", hint: "Substitua por uma lista fechada de requisitos." },
-    { term: "melhor", hint: "Defina o critério objetivo de comparação." },
-    { term: "simples", hint: "Descreva o escopo mínimo verificável." },
-    { term: "moderno", hint: "Aponte o design system e os tokens." }
-  ];
-
-  function analyzeSpec() {
-    const text = specInput.value.trim();
-    state.specText = text;
-    saveState();
-    if (!text) {
-      scoreRing.style.setProperty("--p", "0");
-      scoreValue.textContent = "0%";
-      scoreTitle.textContent = "Nenhum texto informado";
-      scoreSubtitle.textContent = "Cole uma spec ou carregue o exemplo para começar.";
-      checkList.innerHTML = "";
-      vagueList.innerHTML = "";
-      questionsList.innerHTML = "";
-      scoreNote.textContent = "";
-      return;
+      closeModal();
+      persistState(`Skill '${name}' salva em .agents/skills/${folder}/SKILL.md!`);
     }
 
-    const passed = SPEC_CHECKS.filter(check => check.re.test(text));
-    const missing = SPEC_CHECKS.filter(check => !check.re.test(text));
-    const score = Math.round((passed.length / SPEC_CHECKS.length) * 100);
-
-    scoreRing.style.setProperty("--p", String(score));
-    scoreValue.textContent = score + "%";
-    scoreTitle.textContent = score >= 80 ? "Spec pronta para TDD" : score >= 50 ? "Spec precisa de ajustes" : "Spec incompleta — não codifique ainda";
-    scoreSubtitle.textContent = passed.length + " de " + SPEC_CHECKS.length + " dimensões cobertas.";
-
-    checkList.innerHTML = SPEC_CHECKS.map(check => {
-      const ok = passed.includes(check);
-      return `<div class="check-item ${ok ? "ok" : "miss"}">
-        <span class="check-icon">${ok ? "✅" : "⚠️"}</span>
-        <span><strong>${escapeHtml(check.label)}</strong>${ok ? "" : "<br>" + escapeHtml(check.question)}</span>
-      </div>`;
-    }).join("");
-
-    const foundVague = VAGUE_TERMS.filter(item => new RegExp("\\b" + item.term + "\\b", "i").test(text));
-    vagueList.innerHTML = foundVague.length
-      ? foundVague.map(item => `<span title="${escapeHtml(item.hint)}">“${escapeHtml(item.term)}” → quantificar</span>`).join("")
-      : "";
-
-    questionsList.innerHTML = missing.length
-      ? missing.map(check => `<li>${escapeHtml(check.question)}</li>`).join("")
-      : `<li>Nenhuma pergunta crítica pendente. Valide os critérios de aceitação com o desenvolvedor e inicie o TDD RED.</li>`;
-
-    scoreNote.textContent = missing.length
-      ? "Regra do harness: sem spec aprovada, nenhum builder escreve código de produção."
-      : "Próximo passo: levar os critérios para a coluna TDD RED do Kanban.";
-  }
-
-  document.getElementById("btn-analyze").addEventListener("click", analyzeSpec);
-
-  specInput.addEventListener("input", () => {
-    specCharCount.textContent = specInput.value.length + " caracteres";
-    state.specText = specInput.value;
-  });
-
-  document.getElementById("btn-sample-spec").addEventListener("click", () => {
-    specInput.value = [
-      "Feature: Recuperação de senha",
-      "",
-      "Problema: usuários esquecem a senha e abandonam o app.",
-      "Público-alvo: clientes do app Android e iOS (Android 8+, iOS 15+).",
-      "Fluxo: o usuário informa o e-mail, recebe um código de 6 dígitos e define uma nova senha.",
-      "Dados: Supabase Auth para sessão; nenhum dado sensível em log.",
-      "Offline: se estiver sem rede, exibir erro amigável com botão Tentar novamente.",
-      "Estados: loading com skeleton, empty state, error state e success state.",
-      "Acessibilidade: contraste WCAG AA, Semantics nos campos e touch target 48x48dp.",
-      "Critérios de aceitação: Dado que o e-mail existe, quando o código válido for enviado, então a senha é atualizada.",
-      "Métrica de sucesso: reduzir em 30% o abandono no fluxo de login.",
-      "Idioma: todos os textos em pt-BR com i18n via ARB.",
-      "Segurança: token expira em 15 minutos e RLS ativo.",
-      "Performance: resposta percebida abaixo de 300 ms.",
-      "Notificações: nenhuma permissão de device necessária."
-    ].join("\n");
-    specCharCount.textContent = specInput.value.length + " caracteres";
-    analyzeSpec();
-    toast("Exemplo carregado e analisado.");
-  });
-
-  document.getElementById("btn-copy-questions").addEventListener("click", async () => {
-    const questions = Array.from(questionsList.querySelectorAll("li")).map(li => "- " + li.textContent).join("\n");
-    if (!questions) { toast("Nada para copiar ainda."); return; }
-    try {
-      await navigator.clipboard.writeText(questions);
-      toast("Perguntas copiadas.");
-    } catch (error) {
-      toast("Não foi possível copiar automaticamente.");
+    function deleteSkill(id) {
+      if (!confirm("Remover esta skill do catálogo?")) return;
+      delete state.skills[id];
+      Object.values(state.agents).forEach(ag => {
+        ag.skills = (ag.skills || []).filter(s => s !== id);
+      });
+      closeModal();
+      persistState("Skill removida.");
     }
-  });
 
-  /* ============================================================
-     Reset geral e inicialização
-     ============================================================ */
-  document.getElementById("btn-reset").addEventListener("click", () => {
-    if (!confirm("Resetar Kanban, matriz de skills, ciclo TDD e análise de spec?")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    state = clone(DEFAULT_STATE);
-    specInput.value = "";
-    specCharCount.textContent = "0 caracteres";
-    analyzeSpec();
+    // MODAL DE TAREFA DO KANBAN (INSPECIONAR, EDITAR, APROVAR/REPROVAR)
+    function openTaskModal(taskId = null) {
+      const idx = state.tasks.findIndex(t => t.id === taskId);
+      const t = idx >= 0 ? state.tasks[idx] : {
+        id: "T-" + (101 + state.tasks.length),
+        title: "",
+        desc: "",
+        column: "backlog",
+        agent: "master_orchestrator",
+        skills: ["clean_architecture"],
+        complexity: "Média",
+        feedback: ""
+      };
+
+      const agentOptions = Object.entries(state.agents).map(([aid, ag]) => `
+        <option value="${aid}" ${t.agent === aid ? 'selected' : ''}>${ag.role} (${aid})</option>
+      `).join('');
+
+      const colOptions = COLUMNS.map(c => `
+        <option value="${c.id}" ${t.column === c.id ? 'selected' : ''}>${c.title}</option>
+      `).join('');
+
+      const skillChecks = Object.entries(state.skills).map(([sid, s]) => `
+        <label class="check-item">
+          <input type="checkbox" name="task-skill" value="${sid}" ${(t.skills || []).includes(sid) ? 'checked' : ''}>
+          <span>${s.name}</span>
+        </label>
+      `).join('');
+
+      openModal(`
+        <div class="modal-header">
+          <h3>📋 ${idx >= 0 ? `Tarefa ${t.id}` : 'Nova Tarefa no Kanban'}</h3>
+          <button class="btn" onclick="closeModal()">✕</button>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <div class="form-field">
+            <label>ID da Tarefa</label>
+            <input type="text" id="m-task-id" value="${t.id}" ${idx >= 0 ? 'readonly' : ''}>
+          </div>
+          <div class="form-field">
+            <label>Etapa Atual no Pipeline (Coluna)</label>
+            <select id="m-task-col">${colOptions}</select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Título da Tarefa</label>
+          <input type="text" id="m-task-title" value="${t.title}">
+        </div>
+        <div class="form-field">
+          <label>Especificação, Critérios de Aceitação e Escopo</label>
+          <textarea id="m-task-desc" rows="3">${t.desc}</textarea>
+        </div>
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
+          <div class="form-field">
+            <label>Agente Responsável</label>
+            <select id="m-task-agent" onchange="syncTaskAgentSkills(this.value)">${agentOptions}</select>
+          </div>
+          <div class="form-field">
+            <label>Complexidade</label>
+            <select id="m-task-comp">
+              <option value="Baixa" ${t.complexity==='Baixa'?'selected':''}>Baixa</option>
+              <option value="Média" ${t.complexity==='Média'?'selected':''}>Média</option>
+              <option value="Alta" ${t.complexity==='Alta'?'selected':''}>Alta</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Skills Ativadas para esta Tarefa:</label>
+          <div class="checkbox-grid" id="m-task-skills-box">${skillChecks}</div>
+        </div>
+        <div class="form-field">
+          <label>Feedback de Revisão Humana (Gate de Aprovação)</label>
+          <input type="text" id="m-task-feedback" value="${t.feedback || ''}" placeholder="Opcional: motivo de reprovação ou ajuste fino">
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:18px;">
+          ${idx >= 0 ? `<button class="btn btn-rose" onclick="deleteTask('${t.id}')">Excluir Tarefa</button>` : '<span></span>'}
+          <div style="display:flex; gap:8px;">
+            ${idx >= 0 && t.column === 'review' ? `
+              <button class="btn btn-emerald" onclick="approveTask('${t.id}'); closeModal();">✔ Aprovar Entrega</button>
+              <button class="btn btn-rose" onclick="rejectTask('${t.id}'); closeModal();">✖ Reprovar</button>
+            ` : ''}
+            <button class="btn btn-primary" onclick="saveTaskModal(${idx})">💾 Salvar Tarefa</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function syncTaskAgentSkills(agentId) {
+      const ag = state.agents[agentId];
+      if (!ag) return;
+      document.querySelectorAll("input[name='task-skill']").forEach(cb => {
+        cb.checked = (ag.skills || []).includes(cb.value);
+      });
+    }
+
+    function saveTaskModal(idx) {
+      const taskObj = {
+        id: document.getElementById("m-task-id").value.trim(),
+        title: document.getElementById("m-task-title").value.trim(),
+        desc: document.getElementById("m-task-desc").value.trim(),
+        column: document.getElementById("m-task-col").value,
+        agent: document.getElementById("m-task-agent").value,
+        complexity: document.getElementById("m-task-comp").value,
+        feedback: document.getElementById("m-task-feedback").value.trim(),
+        skills: Array.from(document.querySelectorAll("input[name='task-skill']:checked")).map(i => i.value)
+      };
+      if (!taskObj.title) return alert("Informe o título da tarefa!");
+      if (idx >= 0) state.tasks[idx] = taskObj;
+      else state.tasks.push(taskObj);
+      closeModal();
+      persistState(`Tarefa ${taskObj.id} atualizada no Kanban!`);
+    }
+
+    function deleteTask(id) {
+      state.tasks = state.tasks.filter(t => t.id !== id);
+      closeModal();
+      persistState(`Tarefa ${id} removida.`);
+    }
+
+    function approveTask(id) {
+      const t = state.tasks.find(x => x.id === id);
+      if (t) {
+        t.column = "done";
+        t.feedback = "Aprovado pelo Engenheiro Responsável.";
+        persistState(`Tarefa ${id} APROVADA e movida para Concluído!`);
+      }
+    }
+
+    function rejectTask(id) {
+      const t = state.tasks.find(x => x.id === id);
+      if (!t) return;
+      const reason = prompt("Informe o motivo da reprovação / ajuste necessário para o agente:", t.feedback || "");
+      if (reason !== null) {
+        t.column = "red";
+        t.feedback = reason || "Reprovado no Gate Humano — revisar testes e critérios.";
+        persistState(`Tarefa ${id} REPROVADA — retornou para TDD RED com feedback!`);
+      }
+    }
+
+    function toggleMcp(id) {
+      state.mcps[id].active = !state.mcps[id].active;
+      persistState(`Servidor MCP '${state.mcps[id].name}' ${state.mcps[id].active ? 'ATIVADO' : 'DESATIVADO'}!`);
+    }
+
+    // =========================================================================
+    // MASTER ORCHESTRATOR — DECOMPOSIÇÃO INTELIGENTE E GERAÇÃO DE PROMPT
+    // =========================================================================
+    function orchestrateDemand() {
+      const title = document.getElementById("orch-title").value.trim();
+      const desc = document.getElementById("orch-desc").value.trim();
+      const comp = document.getElementById("orch-complexity").value;
+      if (!title || !desc) return alert("Preencha o título e a descrição da demanda!");
+
+      const lower = (title + " " + desc).toLowerCase();
+      const usedIds = new Set(state.tasks.map(t => t.id));
+      let baseNum = 1;
+      while (usedIds.has(`T${String(baseNum).padStart(2, "0")}`)) baseNum++;
+      const nextId = (offset) => `T${String(baseNum + offset).padStart(2, "0")}`;
+      const createdTasks = [];
+
+      if (comp.startsWith("Alta")) {
+        // Decompõe em 3 sub-tarefas coordenadas
+        const t1 = {
+          id: nextId(0),
+          title: `[Spec & Contrato] ${title}`,
+          desc: `Mapear contratos de domínio, impactos via Graft AST e definir critérios TDD para: ${desc}`,
+          column: "backlog",
+          agent: "master_orchestrator",
+          skills: ["spec_discovery", "clean_architecture"],
+          complexity: "Alta",
+          feedback: ""
+        };
+        const dataOrUiAgent = (lower.includes("sql") || lower.includes("supabase") || lower.includes("banco") || lower.includes("offline") || lower.includes("busca"))
+          ? "data_supabase_specialist"
+          : "mobile_domain_builder";
+        const t2 = {
+          id: nextId(1),
+          title: `[TDD & Domínio/Dados] ${title}`,
+          desc: `Criar teste falho (Fase RED) e implementar serviço/repositório (Fase GREEN): ${desc}`,
+          column: "red",
+          agent: dataOrUiAgent,
+          skills: state.agents[dataOrUiAgent].skills,
+          complexity: "Alta",
+          feedback: ""
+        };
+        const t3 = {
+          id: nextId(2),
+          title: `[UI/UX & Gate QA] ${title}`,
+          desc: `Integrar na camada de apresentação respeitando os 4 estados de UI, Design Tokens e validar em loop fechado.`,
+          column: "backlog",
+          agent: "ui_ux_specialist",
+          skills: ["mobile_ux_design_system", "stitch_visual_ingest", "tdd_red_green"],
+          complexity: "Média",
+          feedback: ""
+        };
+        state.tasks.push(t1, t2, t3);
+        createdTasks.push(t1, t2, t3);
+      } else {
+        let bestAgent = "mobile_domain_builder";
+        if (lower.includes("ui") || lower.includes("tela") || lower.includes("layout") || lower.includes("design") || lower.includes("stitch")) bestAgent = "ui_ux_specialist";
+        else if (lower.includes("sql") || lower.includes("supabase") || lower.includes("query") || lower.includes("índice") || lower.includes("offline")) bestAgent = "data_supabase_specialist";
+        else if (lower.includes("teste") || lower.includes("linter") || lower.includes("bug")) bestAgent = "qa_self_healer";
+
+        const singleTask = {
+          id: nextId(0),
+          title,
+          desc,
+          column: "backlog",
+          agent: bestAgent,
+          skills: state.agents[bestAgent].skills,
+          complexity: comp.split(" ")[0],
+          feedback: ""
+        };
+        state.tasks.push(singleTask);
+        createdTasks.push(singleTask);
+      }
+
+      const activeMcps = Object.entries(state.mcps).filter(([_, m]) => m.active).map(([id, m]) => `${id} (${m.command})`).join(", ");
+      const promptText = `Atue como o master_orchestrator do Antigravity Harness v3.0 (Google Harness² Architecture).
+
+1. CONTEXTO DO PROJETO & MCPS ATIVOS:
+   - Leia .agents/PROJECT_BRAIN.md, .agents/harness.yaml e _specs/task-board.md.
+   - Servidores MCP conectados neste ambiente: ${activeMcps}.
+
+2. DEMANDA SOLICITADA:
+   - Épico: "${title}"
+   - Especificação: "${desc}"
+   - Complexidade: ${comp}
+
+3. TAREFAS CRIADAS E ESCALADAS NO KANBAN:
+${createdTasks.map(ct => `   - [${ct.id}] ${ct.title}
+     • Agente Escalado: ${ct.agent} (${state.agents[ct.agent].role})
+     • Skills Ativadas: ${ct.skills.map(s => state.skills[s]?.file || s).join(", ")}`).join("\n")}
+
+4. PIPELINE DE EXECUÇÃO OBRIGATÓRIO:
+   - Passo A (Spec & AST): Use o Graft AST e Dart MCP para inspecionar impactos sem quebrar contratos existentes.
+   - Passo B (Fase RED): Acione as diretrizes de tdd_red_green e crie os testes que comprovem a necessidade/falha.
+   - Passo C (Fase GREEN): Implemente a solução mantendo regras de negócio estritamente na camada de Domain/Data.
+   - Passo D (QA Loop & Gate Humano): Rode os testes e linters até zerar erros, mova os cards para a coluna '4. Gate de Aprovação' em _specs/task-board.md e aguarde minha aprovação no Kanban.`;
+
+      document.getElementById("orch-output").value = promptText;
+      persistState(`${createdTasks.length} tarefa(s) criada(s) e atribuída(s) no Kanban!`);
+    }
+
+    function copyOrchestratorPrompt() {
+      const txt = document.getElementById("orch-output").value;
+      if (!txt) return alert("Gere uma análise no Orquestrador primeiro!");
+      navigator.clipboard.writeText(txt);
+      showToast("📋 Prompt copiado para a área de transferência!");
+    }
+
+    function downloadHarnessBundle() {
+      const blob = new Blob([generateHarnessYAML()], { type: "text/yaml" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "harness.yaml";
+      a.click();
+    }
+
     renderAll();
-    toast("Studio restaurado ao estado padrão.");
-  });
-
-  function renderAll() {
-    renderKanban();
-    renderAgents();
-    renderTdd();
-    if (state.specText) {
-      specInput.value = state.specText;
-      specCharCount.textContent = state.specText.length + " caracteres";
-      analyzeSpec();
-    }
-  }
-
-  renderAll();
-})();
-</script>
+  </script>
 </body>
 </html>
 EOF
@@ -3013,41 +3119,48 @@ EOF
 cat << 'EOF' > _specs/task-board.md
 # 📋 Kanban de Desenvolvimento do Projeto (`task-board.md`)
 
-> Sincronizado com `harness-studio.html` e gerenciado pelo `@product_architect` durante o `dev-cycle`.
+> Sincronizado via Antigravity Harness Studio v3.0 e gerenciado pelo `master_orchestrator`.
 > **Regra de ouro:** nenhum card avança de coluna sem cumprir o gate de saída da coluna atual.
 
 ```text
 Backlog ──▶ TDD RED ──▶ TDD GREEN ──▶ Loop QA/A11y ──▶ Concluído
 ```
 
-## 🗂️ 1. Backlog & Especificação (`@product_architect`) — WIP livre
+## 1. Backlog & Specs
 > **Gate de saída:** PRD/spec aprovada, critérios de aceitação objetivos e skills 1:N definidas.
 
-- [ ] **T01** — [Recuperação de Senha](tasks/T01-recuperacao-senha.md) | Skills: `spec-discovery`, `clean-architecture`
-- [ ] **T02** — [Dashboard Gerencial](tasks/T02-dashboard-gerencial.md) | Skills: `mobile-ux`, `flutter-build-responsive-layout`
-- [ ] **T03** — [Push Notifications](tasks/T03-push-notifications.md) | Skills: `local-first-data`
-- [ ] **T04** — [In-App Purchases](tasks/T04-in-app-purchases.md) | Skills: `store-publishing`
-- [ ] **T05** — [Backend Alternativo / Sync](tasks/T05-firebase-alternativo.md) | Skills: `supabase-flutter`
+- **[T01] Recuperação de Senha** — *Agente:* `mobile_domain_builder` (Senior Flutter & Domain Engineer) | *Skills:* `spec_discovery, clean_architecture`
+  - Fluxo completo de reset de senha com Supabase Auth, deep link e os 4 estados de tela. Spec: _specs/tasks/T01-recuperacao-senha.md
+- **[T02] Dashboard Gerencial** — *Agente:* `ui_ux_specialist` (Senior UI/UX & Design System Engineer) | *Skills:* `mobile_ux_design_system, stitch_visual_ingest`
+  - Painel responsivo com Design Tokens, gráficos e estados de carregamento. Spec: _specs/tasks/T02-dashboard-gerencial.md
+- **[T03] Push Notifications** — *Agente:* `mobile_domain_builder` (Senior Flutter & Domain Engineer) | *Skills:* `flutter_riverpod_state, clean_architecture`
+  - Notificações com fila offline, permissões e deep link para a tela de destino. Spec: _specs/tasks/T03-push-notifications.md
+- **[T04] In-App Purchases** — *Agente:* `mobile_domain_builder` (Senior Flutter & Domain Engineer) | *Skills:* `clean_architecture, flutter_riverpod_state`
+  - Compra de assinatura com validação de recibo e restauração de compras. Spec: _specs/tasks/T04-in-app-purchases.md
+- **[T05] Backend Alternativo / Sync** — *Agente:* `data_supabase_specialist` (Offline-First SQLite & Supabase Architect) | *Skills:* `supabase_fullstack, local_first_sqlite`
+  - Sincronização incremental Supabase + cache local SQLite com políticas RLS. Spec: _specs/tasks/T05-firebase-alternativo.md
 
-## 🔴 2. TDD Fase RED — Testes Falhos (`@tdd_tester`) — WIP 2
-> **Gate de saída:** suíte criada e executada com falha comprovada pelo motivo correto (RED).
+## 2. TDD Fase RED (Testes Falhos)
+> **Gate de saída:** Suíte criada e executada com falha comprovada pelo motivo correto (RED).
 
-*(Nenhuma tarefa ativa nesta coluna)*
+- *(Nenhuma tarefa ativa nesta coluna)*
 
-## 🟢 3. TDD Fase GREEN — Em Implementação (`@mobile_builder` / `@data_offline_specialist`) — WIP 2
-> **Gate de saída:** menor código possível para a suíte ficar verde; `dart analyze` sem erros.
+## 3. TDD Fase GREEN (Implementação)
+> **Gate de saída:** Menor código possível para a suíte ficar verde; `dart analyze` sem erros.
 
-*(Nenhuma tarefa ativa nesta coluna)*
+- *(Nenhuma tarefa ativa nesta coluna)*
 
-## 🔁 4. Loop de Autorreparo QA & Acessibilidade (`@qa_validator` / `@flutter_a11y_auditor`) — WIP 1
-> **Gate de saída:** até 3 ciclos de autorreparo, cobertura mínima, Semantics/contraste/touch targets validados.
+## 4. Loop QA/A11y & Gate Humano
+> **Gate de saída:** Até 3 ciclos de autorreparo, cobertura mínima, Semantics/contraste/touch targets validados.
 
-*(Nenhuma tarefa ativa nesta coluna)*
+- *(Nenhuma tarefa ativa nesta coluna)*
 
-## ✅ 5. Concluído & Commitado (`@git_committer`) — arquivo
-> **Gate de saída:** commit semântico atômico, Kanban atualizado e `PROJECT_BRAIN.md` com o aprendizado.
+## 5. Concluído & Evoluído
+> **Gate de saída:** Commit semântico atômico, Kanban atualizado e PROJECT_BRAIN.md com o aprendizado.
 
-- [x] **T00** — Unificação do Harness v2.1 com Dart MCP Server e Matriz 1:N de Agentes/Skills.
+- **[T00] Unificação do Harness v2.1 com Dart MCP Server e Matriz 1:N** — *Agente:* `master_orchestrator` (Master Orchestrator & Principal Architect) | *Skills:* `spec_discovery, clean_architecture`
+  - Base do Flutter Mobile Harness v2.1 consolidada, validada e commitada.
+  - ⚠️ **Feedback de Revisão**: Aprovado e commitado.
 
 ---
 
@@ -3055,7 +3168,7 @@ Backlog ──▶ TDD RED ──▶ TDD GREEN ──▶ Loop QA/A11y ──▶ C
 | Campo | Significado |
 |---|---|
 | `Skills:` | Lista 1:N de skills ativadas para o card (editável no `harness-studio.html`). |
-| `WIP` | Limite de trabalho em progresso da coluna; exceder exige justificativa no `ai-memory`. |
+| `WIP` | Limite de trabalho em progresso da coluna; exceder exige justificativa no `ai_memory`. |
 | `@agente` | Subagente responsável pela coluna, conforme `.agents/harness.yaml#subagents`. |
 EOF
 
@@ -3094,5 +3207,5 @@ echo -e "Próximos passos recomendados:"
 echo -e " 1. Adicione prints/telas de inspiração em:  ${CYAN}_references/screens/${NC}"
 echo -e " 2. Inicie a descoberta do produto:          ${CYAN}Copie _specs/prd-template.md para _specs/prd.md${NC}"
 echo -e " 3. Modelos: herda o modelo logado por padrão (inherit). Opcional: ${CYAN}export AI_MODEL_REASONING='...' AI_MODEL_CODING='...'${NC}"
-echo -e " 4. Studio visual: abra ${CYAN}harness-studio.html${NC} no navegador para gerenciar Kanban, agentes e skills."
+echo -e " 4. Studio visual v3.0: abra ${CYAN}harness-studio.html${NC}, clique em um card para editar e use 'Conectar Pasta do Projeto' para auto-save direto em .agents/ e _specs/."
 echo ""
