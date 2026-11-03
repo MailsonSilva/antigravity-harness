@@ -13,10 +13,14 @@ Este documento estabelece as regras universais e inegociáveis para todos os age
 
 ---
 
-## 2. Princípio de Desenvolvimento Orientado a Especificações (Spec-Driven)
-1. **Sem Spec, Sem Código**: Nenhum subagente de codificação (`builder`) tem permissão para escrever código de produção sem que exista uma especificação aprovada em `_specs/` com critérios de aceitação objetivos.
-2. **Fidelidade ao Contrato**: O código implementado deve atender estritamente ao que foi pedido na spec — sem suposições arbitrárias (*scope creep*) e sem código desnecessário além do escopo.
-3. **Identificação de Ambiguidade**: Se a especificação for ambígua ou contraditória, o agente deve interromper o fluxo e solicitar alinhamento antes de codificar.
+## 2. Princípio de Desenvolvimento Orientado a Especificações (Spec-Driven) & Kanban Controlado pela IA
+1. **Controle Autônomo do Kanban pela IA**:
+   - A IA em uso (Antigravity, Claude Code, Cursor, Codex) é a **única responsável** por criar, dimensionar e gerenciar as tarefas em `_specs/task-board.md`.
+   - Ao receber qualquer demanda ou épico, a IA deve quebrar o escopo em tarefas menores e atômicas, definindo a dificuldade objetiva (`Baixa`, `Média`, `Alta`), escalando os subagentes competentes e selecionando as skills necessárias para cada card.
+   - O avanço dos cards entre as colunas (`1. Backlog & Specs` ──▶ `2. TDD Fase RED` ──▶ `3. TDD Fase GREEN` ──▶ `4. Loop QA/A11y & Gate Humano` ──▶ `5. Concluído & Evoluído`) deve ser refletido pela IA diretamente no arquivo `_specs/task-board.md` à medida que cada etapa for cumprida.
+2. **Sem Spec, Sem Código**: Nenhum subagente de codificação (`builder`) tem permissão para escrever código de produção sem que exista uma especificação aprovada em `_specs/` com critérios de aceitação objetivos.
+3. **Fidelidade ao Contrato**: O código implementado deve atender estritamente ao que foi pedido na spec — sem suposições arbitrárias (*scope creep*) e sem código desnecessário além do escopo.
+4. **Identificação de Ambiguidade**: Se a especificação for ambígua ou contraditória, o agente deve interromper o fluxo e solicitar alinhamento antes de codificar.
 
 ---
 

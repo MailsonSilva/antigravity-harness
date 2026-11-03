@@ -2,7 +2,7 @@
 # ==============================================================================
 # Antigravity Developer Harness - Instalador Universal (Linux / macOS / WSL / Git Bash)
 # 100% Autocontido: Instala ferramentas (ai-memory, graft), regras, skills e workflows
-# v3.0: Studio com modal/auto-save, 5 MCPs, catalogo desacoplado de agentes/skills (1:N).
+# v3.2: Isolamento Git nativo, Studio sem loop de refresh, 5 MCPs, catalogo desacoplado de agentes/skills (1:N).
 # Opcional: INSTALL_FLUTTER_SKILLS=1 ./install.sh instala os plugins oficiais do Flutter.
 # ==============================================================================
 
@@ -3199,6 +3199,73 @@ echo -e "${GREEN}✔ .gitignore padrão criado.${NC}"
 fi
 
 echo ""
+# ------------------------------------------------------------------------------
+# 10. Isolamento Git Nativo (Local-Only nos Projetos Consumidores)
+# ------------------------------------------------------------------------------
+IS_BASE_REPO=0
+if [ -d ".git" ]; then
+    REMOTE_URL=$(git config --get remote.origin.url 2>/dev/null || echo "")
+    if [[ "$REMOTE_URL" == *"antigravity-harness"* ]]; then
+        IS_BASE_REPO=1
+    fi
+fi
+
+if [ -d ".git" ] && [ "$IS_BASE_REPO" -eq 0 ]; then
+    echo -e "${CYAN}🔒 Blindando o Git do projeto consumidor contra envio do Harness ao GitHub...${NC}"
+    if ! grep -q "Antigravity Harness (Local-Only" .gitignore 2>/dev/null; then
+        cat << 'EOF' >> .gitignore
+
+# === Antigravity Harness (Local-Only - Nao subir para o GitHub) ===
+.agents/
+.agents.bak-*/
+_specs/
+_references/
+harness-studio.html
+docs-harness.html
+install.ps1
+install.sh
+install-harness.ps1
+install-harness.sh
+update.ps1
+update.sh
+populate-skills.ps1
+populate-deep-skills.sh
+COMANDOS.md
+EOF
+    fi
+
+    if [ -f ".git/info/exclude" ]; then
+        if ! grep -q "Antigravity Harness (Local-Only" .git/info/exclude 2>/dev/null; then
+            cat << 'EOF' >> .git/info/exclude
+
+# === Antigravity Harness (Local-Only - Nao subir para o GitHub) ===
+.agents/
+.agents.bak-*/
+_specs/
+_references/
+harness-studio.html
+docs-harness.html
+install.ps1
+install.sh
+install-harness.ps1
+install-harness.sh
+update.ps1
+update.sh
+populate-skills.ps1
+populate-deep-skills.sh
+COMANDOS.md
+EOF
+        fi
+    fi
+
+    git rm -r --cached --ignore-unmatch \
+      .agents _specs _references harness-studio.html docs-harness.html \
+      install.ps1 install.sh install-harness.ps1 install-harness.sh \
+      update.ps1 update.sh populate-skills.ps1 COMANDOS.md 2>/dev/null || true
+
+    echo -e "${GREEN}✔ Git isolado com sucesso! Apenas o código do projeto subirá para o repositório remoto.${NC}"
+fi
+
 echo -e "${GREEN}=====================================================${NC}"
 echo -e "${GREEN}  🎉 Harness configurado com sucesso!               ${NC}"
 echo -e "${GREEN}=====================================================${NC}"

@@ -1,7 +1,7 @@
 ﻿# ==============================================================================
 # Antigravity Developer Harness - Instalador Nativo PowerShell (Windows)
 # 100% Autocontido: Instala ferramentas (ai-memory, graft), regras, skills e workflows
-# v3.0: Studio com modal/auto-save, 5 MCPs, catalogo desacoplado de agentes/skills (1:N).
+# v3.2: Isolamento Git nativo, Studio sem loop de refresh, 5 MCPs, catalogo desacoplado de agentes/skills (1:N).
 # Opcional: .\install.ps1 -WithFlutterSkills instala os plugins oficiais do Flutter.
 # ==============================================================================
 
@@ -3216,6 +3216,61 @@ Thumbs.db
 .idea/
 '@ | Set-Content -Path ".gitignore" -Encoding UTF8
     Write-Host "✔ .gitignore padrão criado." -ForegroundColor Green
+}
+
+# ------------------------------------------------------------------------------
+# 10. Isolamento Git Nativo (Local-Only nos Projetos Consumidores)
+# ------------------------------------------------------------------------------
+$isHarnessBaseRepo = $false
+if (Test-Path ".git") {
+    $remoteUrl = (git config --get remote.origin.url 2>$null)
+    if ($remoteUrl -and ($remoteUrl -match "antigravity-harness")) {
+        $isHarnessBaseRepo = $true
+    }
+}
+
+if ((Test-Path ".git") -and (-not $isHarnessBaseRepo)) {
+    Write-Host "`n🔒 Blindando o Git do projeto consumidor contra envio do Harness ao GitHub..." -ForegroundColor Cyan
+    $ignoreEntries = @(
+        "",
+        "# === Antigravity Harness (Local-Only - Nao subir para o GitHub) ===",
+        ".agents/",
+        ".agents.bak-*/",
+        "_specs/",
+        "_references/",
+        "harness-studio.html",
+        "docs-harness.html",
+        "install.ps1",
+        "install.sh",
+        "install-harness.ps1",
+        "install-harness.sh",
+        "update.ps1",
+        "update.sh",
+        "populate-skills.ps1",
+        "populate-deep-skills.sh",
+        "COMANDOS.md"
+    )
+    $gitignorePath = ".gitignore"
+    $currentIgnore = if (Test-Path $gitignorePath) { Get-Content $gitignorePath -Raw } else { "" }
+    if ($currentIgnore -notmatch "Antigravity Harness \(Local-Only") {
+        Add-Content -Path $gitignorePath -Value ($ignoreEntries -join "`r`n") -Encoding UTF8
+    }
+
+    $excludePath = ".git\info\exclude"
+    if (Test-Path $excludePath) {
+        $currentExclude = Get-Content $excludePath -Raw
+        if ($currentExclude -notmatch "Antigravity Harness \(Local-Only") {
+            Add-Content -Path $excludePath -Value ($ignoreEntries -join "`r`n") -Encoding UTF8
+        }
+    }
+
+    $pathsToUntrack = @(".agents", "_specs", "_references", "harness-studio.html", "docs-harness.html", "install.ps1", "install.sh", "update.ps1", "update.sh", "populate-skills.ps1", "COMANDOS.md")
+    foreach ($p in $pathsToUntrack) {
+        if (Test-Path $p) {
+            git rm -r --cached --ignore-unmatch $p 2>$null | Out-Null
+        }
+    }
+    Write-Host "✔ Git isolado com sucesso! Apenas o código do projeto subirá para o repositório remoto." -ForegroundColor Green
 }
 
 Write-Host "`n=====================================================" -ForegroundColor Green

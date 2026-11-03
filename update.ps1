@@ -164,7 +164,60 @@ try {
     if (-not (Test-Path "_references\brand\.gitkeep")) { Set-Content -Path "_references\brand\.gitkeep" -Value "" }
     if (-not (Test-Path ".agents\memory\.gitkeep")) { Set-Content -Path ".agents\memory\.gitkeep" -Value "" }
 
-    Write-Ok "Harness v3.0 sincronizado com $repoUrl@$Branch."
+        # 7. Isolamento Git Nativo: impede que o Harness suba para o GitHub do projeto consumidor
+    $isHarnessBaseRepo = $false
+    if (Test-Path ".git") {
+        $remoteUrl = (git config --get remote.origin.url 2>$null)
+        if ($remoteUrl -and ($remoteUrl -match "antigravity-harness")) {
+            $isHarnessBaseRepo = $true
+        }
+    }
+
+    if ((Test-Path ".git") -and (-not $isHarnessBaseRepo)) {
+        Write-Step "Blindando o Git do projeto para não enviar o Harness ao GitHub..."
+        $ignoreEntries = @(
+            "",
+            "# === Antigravity Harness (Local-Only - Nao subir para o GitHub) ===",
+            ".agents/",
+            ".agents.bak-*/",
+            "_specs/",
+            "_references/",
+            "harness-studio.html",
+            "docs-harness.html",
+            "install.ps1",
+            "install.sh",
+            "install-harness.ps1",
+            "install-harness.sh",
+            "update.ps1",
+            "update.sh",
+            "populate-skills.ps1",
+            "populate-deep-skills.sh",
+            "COMANDOS.md"
+        )
+        $gitignorePath = ".gitignore"
+        $currentIgnore = if (Test-Path $gitignorePath) { Get-Content $gitignorePath -Raw } else { "" }
+        if ($currentIgnore -notmatch "Antigravity Harness \(Local-Only") {
+            Add-Content -Path $gitignorePath -Value ($ignoreEntries -join "`r`n") -Encoding UTF8
+        }
+
+        $excludePath = ".git\info\exclude"
+        if (Test-Path $excludePath) {
+            $currentExclude = Get-Content $excludePath -Raw
+            if ($currentExclude -notmatch "Antigravity Harness \(Local-Only") {
+                Add-Content -Path $excludePath -Value ($ignoreEntries -join "`r`n") -Encoding UTF8
+            }
+        }
+
+        $pathsToUntrack = @(".agents", "_specs", "_references", "harness-studio.html", "docs-harness.html", "install.ps1", "install.sh", "update.ps1", "update.sh", "populate-skills.ps1", "COMANDOS.md")
+        foreach ($p in $pathsToUntrack) {
+            if (Test-Path $p) {
+                git rm -r --cached --ignore-unmatch $p 2>$null | Out-Null
+            }
+        }
+        Write-Ok "Git limpo! Apenas o código do projeto subirá para o GitHub."
+    }
+
+    Write-Ok "Harness v3.2 sincronizado com $repoUrl@$Branch."
     Write-Ok "Preservados: PROJECT_BRAIN.md, .agents/skills/, .agents/memory/ e _specs/task-board.md."
     Write-Ok "Sincronizado quando presente: harness-studio.html, harness.yaml, mcp.json (Dart MCP) e regras."
     Write-Warn "Backup dos arquivos gerenciados: $backup"

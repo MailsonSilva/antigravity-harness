@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antigravity Studio v3.0 — AI Software Engineering OS</title>
+  <title>Antigravity Studio v3.2 — AI Software Engineering OS</title>
   <style>
     :root {
       --bg-base: #07090e;
@@ -232,30 +232,30 @@
       <div class="brand-logo">A²</div>
       <div class="brand-text">
         <h1>Antigravity Studio</h1>
-        <span>v3.0 • Harness² OS</span>
+        <span>v3.2 • Harness² OS</span>
       </div>
     </div>
 
     <div class="nav-group-label">Engenharia & Fluxo</div>
-    <button class="nav-btn active" onclick="switchView('orchestrator', this)">
+    <button type="button" class="nav-btn active" onclick="switchView('orchestrator', this)">
       <span>🧠 Master Orchestrator</span>
       <span class="nav-pill">IA</span>
     </button>
-    <button class="nav-btn" onclick="switchView('kanban', this)">
+    <button type="button" class="nav-btn" onclick="switchView('kanban', this)">
       <span>📋 Kanban & Gates</span>
       <span class="nav-pill" id="nav-count-tasks">0</span>
     </button>
 
     <div class="nav-group-label">Arquitetura Modular (1:N)</div>
-    <button class="nav-btn" onclick="switchView('agents', this)">
+    <button type="button" class="nav-btn" onclick="switchView('agents', this)">
       <span>🤖 Especialistas (Agentes)</span>
       <span class="nav-pill" id="nav-count-agents">0</span>
     </button>
-    <button class="nav-btn" onclick="switchView('skills', this)">
+    <button type="button" class="nav-btn" onclick="switchView('skills', this)">
       <span>⚡ Catálogo de Skills</span>
       <span class="nav-pill" id="nav-count-skills">0</span>
     </button>
-    <button class="nav-btn" onclick="switchView('mcps', this)">
+    <button type="button" class="nav-btn" onclick="switchView('mcps', this)">
       <span>🔌 Servidores MCP</span>
       <span class="nav-pill" id="nav-count-mcps">0</span>
     </button>
@@ -265,10 +265,10 @@
         <span class="dot" id="fs-dot"></span>
         <span id="fs-text">Modo Memória Local (Conecte a pasta p/ Auto-Save real)</span>
       </div>
-      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="connectRepositoryFolder()">
+      <button type="button" class="btn btn-primary" style="width:100%; justify-content:center;" onclick="connectRepositoryFolder()">
         🔗 Conectar Pasta do Projeto
       </button>
-      <button class="btn" style="width:100%; justify-content:center;" onclick="downloadHarnessBundle()">
+      <button type="button" class="btn" style="width:100%; justify-content:center;" onclick="downloadHarnessBundle()">
         ⬇ Baixar harness.yaml
       </button>
     </div>
@@ -282,10 +282,10 @@
         <div class="mcp-strip" id="topbar-mcps"></div>
       </div>
       <div class="topbar-actions">
-        <button class="btn" onclick="reloadSkillsFromDisk()" title="Recarrega os 23 arquivos SKILL.md físicos e limpa cache do localStorage">🔄 Recarregar Skills do Disco</button>
-        <button class="btn" onclick="openSkillModal()">+ Nova Skill</button>
-        <button class="btn" onclick="openAgentModal()">+ Novo Agente</button>
-        <button class="btn btn-primary" onclick="openTaskModal()">+ Nova Tarefa</button>
+        <button type="button" class="btn" onclick="reloadSkillsFromDisk()" title="Recarrega os 23 arquivos SKILL.md físicos e limpa cache do localStorage">🔄 Recarregar Skills do Disco</button>
+        <button type="button" class="btn" onclick="openSkillModal()">+ Nova Skill</button>
+        <button type="button" class="btn" onclick="openAgentModal()">+ Novo Agente</button>
+        <button type="button" class="btn btn-primary" onclick="openTaskModal()">+ Nova Tarefa</button>
       </div>
     </header>
 
@@ -315,7 +315,7 @@
               </select>
             </div>
             <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary" onclick="orchestrateDemand()">⚡ Analisar, Decompor no Kanban & Gerar Prompt</button>
+              <button type="button" class="btn btn-primary" onclick="orchestrateDemand()">⚡ Analisar, Decompor no Kanban & Gerar Prompt</button>
             </div>
           </div>
 
@@ -325,7 +325,7 @@
             <div class="form-field">
               <textarea id="orch-output" rows="13" readonly style="font-family:monospace; font-size:0.79rem; color:#a5f3fc;"></textarea>
             </div>
-            <button class="btn" onclick="copyOrchestratorPrompt()">📋 Copiar Prompt para o Agente</button>
+            <button type="button" class="btn" onclick="copyOrchestratorPrompt()">📋 Copiar Prompt para o Agente</button>
           </div>
         </div>
       </section>
@@ -342,7 +342,7 @@
       <section id="view-agents" class="view-pane">
         <div class="section-bar">
           <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer Agente para editar sua persona, senioridade, MCPs permitidos e selecionar suas Skills (1:N).</p>
-          <button class="btn btn-primary" onclick="openAgentModal()">+ Criar Novo Agente</button>
+          <button type="button" class="btn btn-primary" onclick="openAgentModal()">+ Criar Novo Agente</button>
         </div>
         <div class="cards-grid" id="agents-grid"></div>
       </section>
@@ -351,7 +351,7 @@
       <section id="view-skills" class="view-pane">
         <div class="section-bar">
           <p style="font-size:0.85rem; color:var(--text-muted);">Catálogo global desacoplado. Ao criar ou editar uma Skill, ela é gravada em <code>.agents/skills/&lt;id&gt;/SKILL.md</code> e fica disponível para qualquer Agente.</p>
-          <button class="btn btn-primary" onclick="openSkillModal()">+ Criar Nova Skill</button>
+          <button type="button" class="btn btn-primary" onclick="openSkillModal()">+ Criar Nova Skill</button>
         </div>
         <div class="cards-grid" id="skills-grid"></div>
       </section>
@@ -733,10 +733,17 @@
 
     function loadState() {
       const saved = localStorage.getItem("antigravity_studio_v3");
+      let st = null;
       if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
+        try { st = JSON.parse(saved); } catch (e) {}
       }
-      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      if (!st) {
+        st = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      }
+      if (!st.activeView) {
+        st.activeView = localStorage.getItem("antigravity_active_view") || "orchestrator";
+      }
+      return st;
     }
 
     async function persistState(toastMsg = "Alterações salvas automaticamente no Harness!") {
@@ -760,48 +767,149 @@
     // =========================================================================
     // AUTO-SAVE DIRETO NOS ARQUIVOS DO PROJETO (FILE SYSTEM ACCESS API)
     // =========================================================================
-    // Leitura dinâmica e real de todas as skills que existem na pasta .agents/skills/
-    async function syncFromDisk(rootHandle) {
-      try {
-        const agentsDir = await rootHandle.getDirectoryHandle('.agents');
-        const skillsDir = await agentsDir.getDirectoryHandle('skills');
-        
-        const loadedSkills = {};
-        for await (const [folderName, handle] of skillsDir.entries()) {
-          if (handle.kind === 'directory') {
-            try {
-              const fileHandle = await handle.getFileHandle('SKILL.md');
-              const file = await fileHandle.getFile();
-              const text = await file.text();
-              
-              // Extrai metadados do Frontmatter YAML e Markdown
-              const descMatch = text.match(/description:\s*["']?([^"'\n\r]+)["']?/i);
-              const nameMatch = text.match(/#\s*(?:Skill:)?\s*([^\n\r]+)/i);
-              const catMatch = text.match(/category:\s*["']?([^"'\n\r]+)["']?/i);
+        // Parser inteligente do _specs/task-board.md gerido pela IA
+    function parseTaskBoardMarkdown(md) {
+      if (!md) return null;
+      const tasks = [];
+      const colMap = {
+        '1. backlog': 'backlog',
+        'backlog': 'backlog',
+        '2. tdd fase red': 'red',
+        'testes falhos': 'red',
+        'red': 'red',
+        '3. tdd fase green': 'green',
+        'implementação': 'green',
+        'green': 'green',
+        '4. loop qa': 'review',
+        'autorreparo': 'review',
+        'gate humano': 'review',
+        'review': 'review',
+        '5. concluído': 'done',
+        'evoluído': 'done',
+        'commitado': 'done',
+        'done': 'done'
+      };
 
-              const skillId = folderName.replace(/-/g, '_');
-              loadedSkills[skillId] = {
-                name: nameMatch ? nameMatch[1].trim() : folderName,
-                category: catMatch ? catMatch[1].trim() : "Engenharia Mobile",
-                file: `.agents/skills/${folderName}/SKILL.md`,
-                desc: descMatch ? descMatch[1].trim() : text.slice(0, 150).replace(/\n/g, ' ') + "...",
-                rawMarkdown: text
-              };
-            } catch (e) {
-              console.warn(`SKILL.md ausente em ${folderName}`);
+      const sections = md.split(/\r?\n##\s+/);
+      for (const section of sections.slice(1)) {
+        const lines = section.split(/\r?\n/);
+        const header = lines[0].toLowerCase().trim();
+        let columnId = null;
+        for (const [key, id] of Object.entries(colMap)) {
+          if (header.includes(key)) {
+            columnId = id;
+            break;
+          }
+        }
+        if (!columnId) continue;
+
+        let currentTask = null;
+        for (let i = 1; i < lines.length; i++) {
+          const rawLine = lines[i];
+          const line = rawLine.trim();
+          if (!line || line.startsWith('>')) continue;
+
+          // Ex: - **[T01] Recuperação de Senha** — *Agente:* `mobile_domain_builder` ... | *Skills:* `spec_discovery, clean_architecture`
+          const cardMatch = line.match(/^-\s*(?:\*\*|\[[ xX]\])?\s*\[?([A-Za-z0-9_-]+)\]?\s*\*?\*?\s*[—-]\s*(.*?)(?:\s*[—-]\s*\*?Agente:\*?\s*`([^`]+)`)?(?:.*?\|\s*\*?Skills:\*?\s*`([^`]+)`)?$/i);
+
+          if (cardMatch) {
+            if (currentTask) tasks.push(currentTask);
+            const id = cardMatch[1].trim();
+            let title = (cardMatch[2] || id).trim().replace(/^\*\*|\*\*$/g, '').trim();
+            const agent = (cardMatch[3] || 'master_orchestrator').trim();
+            const skillsStr = cardMatch[4] || '';
+            const skills = skillsStr ? skillsStr.split(',').map(s => s.trim().replace(/-/g, '_')) : ['clean_architecture'];
+
+            currentTask = {
+              id,
+              title,
+              desc: '',
+              column: columnId,
+              agent,
+              skills,
+              complexity: 'Média',
+              feedback: ''
+            };
+          } else if (currentTask && line.startsWith('-')) {
+            const sub = line.replace(/^-\s*/, '').trim();
+            if (sub.includes('Feedback de Revisão') || sub.includes('Feedback:')) {
+              currentTask.feedback = sub.replace(/.*?Feedback[^:]*:\s*/i, '').trim();
+            } else if (!currentTask.desc) {
+              currentTask.desc = sub;
+            } else {
+              currentTask.desc += ' ' + sub;
             }
           }
         }
+        if (currentTask) tasks.push(currentTask);
+      }
+      return tasks.length > 0 ? tasks : null;
+    }
 
-        if (Object.keys(loadedSkills).length > 0) {
-          state.skills = loadedSkills;
-          localStorage.setItem("antigravity_studio_v3", JSON.stringify(state));
-          renderAll();
-          showToast(`✔ ${Object.keys(loadedSkills).length} skills reais lidas do disco com sucesso!`);
+    // Leitura dinâmica e real de todas as skills e tarefas do disco
+    async function syncFromDisk(rootHandle) {
+      try {
+        let skillsCount = 0;
+        let tasksCount = 0;
+
+        // 1. Ler Skills em .agents/skills/
+        try {
+          const agentsDir = await rootHandle.getDirectoryHandle('.agents');
+          const skillsDir = await agentsDir.getDirectoryHandle('skills');
+          const loadedSkills = {};
+          for await (const [folderName, handle] of skillsDir.entries()) {
+            if (handle.kind === 'directory') {
+              try {
+                const fileHandle = await handle.getFileHandle('SKILL.md');
+                const file = await fileHandle.getFile();
+                const text = await file.text();
+                
+                const descMatch = text.match(/description:\s*["']?([^"'\n\r]+)["']?/i);
+                const nameMatch = text.match(/#\s*(?:Skill:)?\s*([^\n\r]+)/i);
+                const catMatch = text.match(/category:\s*["']?([^"'\n\r]+)["']?/i);
+
+                const skillId = folderName.replace(/-/g, '_');
+                loadedSkills[skillId] = {
+                  name: nameMatch ? nameMatch[1].trim() : folderName,
+                  category: catMatch ? catMatch[1].trim() : "Engenharia Mobile",
+                  file: `.agents/skills/${folderName}/SKILL.md`,
+                  desc: descMatch ? descMatch[1].trim() : text.slice(0, 150).replace(/\n/g, ' ') + "...",
+                  rawMarkdown: text
+                };
+              } catch (e) {
+                console.warn(`SKILL.md ausente em ${folderName}`);
+              }
+            }
+          }
+          if (Object.keys(loadedSkills).length > 0) {
+            state.skills = loadedSkills;
+            skillsCount = Object.keys(loadedSkills).length;
+          }
+        } catch (e) {
+          console.warn("Pasta .agents/skills não encontrada no root handle", e);
         }
+
+        // 2. Ler tarefas em _specs/task-board.md (sincronização com a IA)
+        try {
+          const specsDir = await rootHandle.getDirectoryHandle('_specs');
+          const boardHandle = await specsDir.getFileHandle('task-board.md');
+          const boardFile = await boardHandle.getFile();
+          const boardText = await boardFile.text();
+          const parsedTasks = parseTaskBoardMarkdown(boardText);
+          if (parsedTasks && parsedTasks.length > 0) {
+            state.tasks = parsedTasks;
+            tasksCount = parsedTasks.length;
+          }
+        } catch (e) {
+          console.warn("_specs/task-board.md não encontrado ou sem tarefas válidas", e);
+        }
+
+        localStorage.setItem("antigravity_studio_v3", JSON.stringify(state));
+        renderAll();
+        showToast(`✔ Sincronizado do disco: ${skillsCount} skills e ${tasksCount} tarefas do Kanban!`);
       } catch (err) {
         console.error("Erro ao sincronizar do disco:", err);
-        showToast("Erro ao ler skills do disco: " + err.message);
+        showToast("Erro ao sincronizar: " + err.message);
       }
     }
 
@@ -944,10 +1052,20 @@
     // NAVEGAÇÃO E RENDERIZAÇÃO
     // =========================================================================
     function switchView(view, btn) {
+      state.activeView = view;
+      localStorage.setItem("antigravity_active_view", view);
       document.querySelectorAll(".view-pane").forEach(p => p.classList.remove("active"));
       document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-      document.getElementById("view-" + view).classList.add("active");
-      if (btn) btn.classList.add("active");
+      
+      const pane = document.getElementById("view-" + view);
+      if (pane) pane.classList.add("active");
+      
+      if (btn) {
+        btn.classList.add("active");
+      } else {
+        const foundBtn = document.querySelector(`.nav-btn[onclick*="'${view}'"]`);
+        if (foundBtn) foundBtn.classList.add("active");
+      }
 
       const titles = {
         orchestrator: "🧠 Master Orchestrator & Planejamento de Engenharia",
@@ -956,8 +1074,8 @@
         skills: "⚡ Catálogo Global de Skills Reutilizáveis",
         mcps: "🔌 Servidores MCP & Sensores do Ambiente"
       };
-      document.getElementById("view-title").innerText = titles[view] || "Antigravity Studio";
-      renderAll();
+      const titleElem = document.getElementById("view-title");
+      if (titleElem) titleElem.innerText = titles[view] || "Antigravity Studio";
     }
 
     function renderAll() {
@@ -1007,8 +1125,8 @@
                     </div>
                     ${col.id === 'review' ? `
                       <div class="gate-box" onclick="event.stopPropagation()">
-                        <button class="btn-emerald" onclick="approveTask('${t.id}')">✔ Aprovar</button>
-                        <button class="btn-rose" onclick="rejectTask('${t.id}')">✖ Reprovar</button>
+                        <button type="button" class="btn-emerald" onclick="approveTask('${t.id}')">✔ Aprovar</button>
+                        <button type="button" class="btn-rose" onclick="rejectTask('${t.id}')">✖ Reprovar</button>
                       </div>
                     ` : ''}
                   </div>
@@ -1122,7 +1240,7 @@
       openModal(`
         <div class="modal-header">
           <h3>🤖 ${agentId ? 'Editar Agente Especialista' : 'Criar Novo Agente Especialista'}</h3>
-          <button class="btn" onclick="closeModal()">✕</button>
+          <button type="button" class="btn" onclick="closeModal()">✕</button>
         </div>
         <div class="form-field">
           <label>ID Técnico do Agente (ex: ui_ux_specialist)</label>
@@ -1149,10 +1267,10 @@
           <div class="checkbox-grid">${mcpsCheckboxes}</div>
         </div>
         <div style="display:flex; justify-content:space-between; margin-top:18px;">
-          ${agentId ? `<button class="btn btn-rose" onclick="deleteAgent('${agentId}')">Excluir Agente</button>` : '<span></span>'}
+          ${agentId ? `<button type="button" class="btn btn-rose" onclick="deleteAgent('${agentId}')">Excluir Agente</button>` : '<span></span>'}
           <div style="display:flex; gap:10px;">
-            <button class="btn" onclick="closeModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="saveAgentModal()">💾 Salvar Agente no Harness</button>
+            <button type="button" class="btn" onclick="closeModal()">Cancelar</button>
+            <button type="button" class="btn btn-primary" onclick="saveAgentModal()">💾 Salvar Agente no Harness</button>
           </div>
         </div>
       `);
@@ -1209,15 +1327,15 @@
             <h3>⚡ ${isEdit ? `Inspecionar / Editar Skill: ${s.name}` : 'Criar Nova Skill'}</h3>
             <span style="font-size:0.75rem; color:var(--text-dim); font-family:monospace;">${s.file || '.agents/skills/<pasta>/SKILL.md'}</span>
           </div>
-          <button class="btn" onclick="closeModal()">✕</button>
+          <button type="button" class="btn" onclick="closeModal()">✕</button>
         </div>
 
         ${!isEdit ? `
           <div style="display:flex; gap:8px; margin-bottom:16px; background:var(--bg-base); padding:4px; border-radius:8px; border:1px solid var(--border);">
-            <button id="tab-btn-manual" class="btn ${currentSkillTab === 'manual' ? 'btn-primary' : ''}" style="flex:1; justify-content:center;" onclick="toggleSkillCreateMode('manual')">
+            <button type="button" id="tab-btn-manual" class="btn ${currentSkillTab === 'manual' ? 'btn-primary' : ''}" style="flex:1; justify-content:center;" onclick="toggleSkillCreateMode('manual')">
               ✍️ Edição Direta / Markdown
             </button>
-            <button id="tab-btn-ai" class="btn ${currentSkillTab === 'ai' ? 'btn-primary' : ''}" style="flex:1; justify-content:center;" onclick="toggleSkillCreateMode('ai')">
+            <button type="button" id="tab-btn-ai" class="btn ${currentSkillTab === 'ai' ? 'btn-primary' : ''}" style="flex:1; justify-content:center;" onclick="toggleSkillCreateMode('ai')">
               🤖 Criar com IA (Skill Creator)
             </button>
           </div>
@@ -1263,8 +1381,8 @@
             <input type="text" id="ai-skill-stack" value="Flutter, Dart 3, SQLite, Riverpod, Clean Architecture">
           </div>
           <div style="display:flex; gap:10px; margin-bottom:12px;">
-            <button class="btn btn-primary" onclick="generateSkillWithAI()">⚡ Gerar Skill Completa no Studio</button>
-            <button class="btn" onclick="copySkillCreatorPrompt()">📋 Copiar Prompt para Executar no Agente da IDE</button>
+            <button type="button" class="btn btn-primary" onclick="generateSkillWithAI()">⚡ Gerar Skill Completa no Studio</button>
+            <button type="button" class="btn" onclick="copySkillCreatorPrompt()">📋 Copiar Prompt para Executar no Agente da IDE</button>
           </div>
           <div class="form-field">
             <label>Pré-visualização da Estrutura Gerada (Pronta para salvar no disco):</label>
@@ -1278,10 +1396,10 @@
         </div>
 
         <div style="display:flex; justify-content:space-between; margin-top:18px;">
-          ${isEdit ? `<button class="btn btn-rose" onclick="deleteSkill('${skillId}')">Excluir Skill</button>` : '<span></span>'}
+          ${isEdit ? `<button type="button" class="btn btn-rose" onclick="deleteSkill('${skillId}')">Excluir Skill</button>` : '<span></span>'}
           <div style="display:flex; gap:10px;">
-            <button class="btn" onclick="closeModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="saveSkillModal()">💾 Salvar & Sincronizar no Disco</button>
+            <button type="button" class="btn" onclick="closeModal()">Cancelar</button>
+            <button type="button" class="btn btn-primary" onclick="saveSkillModal()">💾 Salvar & Sincronizar no Disco</button>
           </div>
         </div>
       `);
@@ -1460,7 +1578,7 @@ INSTRUÇÕES OBRIGATÓRIAS:
       openModal(`
         <div class="modal-header">
           <h3>📋 ${idx >= 0 ? `Tarefa ${t.id}` : 'Nova Tarefa no Kanban'}</h3>
-          <button class="btn" onclick="closeModal()">✕</button>
+          <button type="button" class="btn" onclick="closeModal()">✕</button>
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
           <div class="form-field">
@@ -1503,13 +1621,13 @@ INSTRUÇÕES OBRIGATÓRIAS:
           <input type="text" id="m-task-feedback" value="${t.feedback || ''}" placeholder="Opcional: motivo de reprovação ou ajuste fino">
         </div>
         <div style="display:flex; justify-content:space-between; margin-top:18px;">
-          ${idx >= 0 ? `<button class="btn btn-rose" onclick="deleteTask('${t.id}')">Excluir Tarefa</button>` : '<span></span>'}
+          ${idx >= 0 ? `<button type="button" class="btn btn-rose" onclick="deleteTask('${t.id}')">Excluir Tarefa</button>` : '<span></span>'}
           <div style="display:flex; gap:8px;">
             ${idx >= 0 && t.column === 'review' ? `
-              <button class="btn btn-emerald" onclick="approveTask('${t.id}'); closeModal();">✔ Aprovar Entrega</button>
-              <button class="btn btn-rose" onclick="rejectTask('${t.id}'); closeModal();">✖ Reprovar</button>
+              <button type="button" class="btn btn-emerald" onclick="approveTask('${t.id}'); closeModal();">✔ Aprovar Entrega</button>
+              <button type="button" class="btn btn-rose" onclick="rejectTask('${t.id}'); closeModal();">✖ Reprovar</button>
             ` : ''}
-            <button class="btn btn-primary" onclick="saveTaskModal(${idx})">💾 Salvar Tarefa</button>
+            <button type="button" class="btn btn-primary" onclick="saveTaskModal(${idx})">💾 Salvar Tarefa</button>
           </div>
         </div>
       `);
@@ -1688,6 +1806,9 @@ ${createdTasks.map(ct => `   - [${ct.id}] ${ct.title}
     }
 
     renderAll();
+    // Restaura a visualização salva para evitar reset ao atualizar Live Server
+    const initialView = state.activeView || localStorage.getItem("antigravity_active_view") || "orchestrator";
+    switchView(initialView);
   </script>
 </body>
 </html>

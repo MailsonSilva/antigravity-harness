@@ -45,7 +45,7 @@ cleanup() { rm -rf "$WORKDIR"; }
 trap cleanup EXIT
 
 echo "====================================================="
-echo "  Atualizador do Antigravity Flutter Harness (v3.0)"
+echo "  Atualizador do Antigravity Flutter Harness (v3.2 Local-Only)"
 echo "====================================================="
 echo "Baixando ${REPO_URL} (branch ${BRANCH}) ..."
 
@@ -134,6 +134,69 @@ fi
 touch "_references/screens/.gitkeep"
 touch "_references/brand/.gitkeep"
 touch ".agents/memory/.gitkeep"
+
+# 10. Isolamento Git Nativo: impede que o Harness suba para o GitHub do projeto consumidor
+IS_BASE_REPO=0
+if [ -d ".git" ]; then
+    REMOTE_URL=$(git config --get remote.origin.url 2>/dev/null || echo "")
+    if [[ "$REMOTE_URL" == *"antigravity-harness"* ]]; then
+        IS_BASE_REPO=1
+    fi
+fi
+
+if [ -d ".git" ] && [ "$IS_BASE_REPO" -eq 0 ]; then
+    echo "🔒 Blindando o Git do projeto para não enviar o Harness ao GitHub..."
+    if ! grep -q "Antigravity Harness (Local-Only" .gitignore 2>/dev/null; then
+        cat << 'EOF' >> .gitignore
+
+# === Antigravity Harness (Local-Only - Nao subir para o GitHub) ===
+.agents/
+.agents.bak-*/
+_specs/
+_references/
+harness-studio.html
+docs-harness.html
+install.ps1
+install.sh
+install-harness.ps1
+install-harness.sh
+update.ps1
+update.sh
+populate-skills.ps1
+populate-deep-skills.sh
+COMANDOS.md
+EOF
+    fi
+
+    # Também adiciona em .git/info/exclude para garantia dupla
+    if [ -f ".git/info/exclude" ]; then
+        if ! grep -q "Antigravity Harness (Local-Only" .git/info/exclude 2>/dev/null; then
+            cat << 'EOF' >> .git/info/exclude
+
+# === Antigravity Harness (Local-Only - Nao subir para o GitHub) ===
+.agents/
+.agents.bak-*/
+_specs/
+_references/
+harness-studio.html
+docs-harness.html
+install.ps1
+install.sh
+install-harness.ps1
+install-harness.sh
+update.ps1
+update.sh
+populate-skills.ps1
+populate-deep-skills.sh
+COMANDOS.md
+EOF
+        fi
+    fi
+
+    git rm -r --cached --ignore-unmatch       .agents _specs _references harness-studio.html docs-harness.html       install.ps1 install.sh install-harness.ps1 install-harness.sh       update.ps1 update.sh populate-skills.ps1 COMANDOS.md 2>/dev/null || true
+
+    echo "✔ Git limpo! Apenas o código do projeto subirá para o GitHub."
+fi
 
 echo "✔ Atualização concluída com sucesso!"
 echo "✔ PROJECT_BRAIN.md, skills existentes e .agents/memory preservados."
