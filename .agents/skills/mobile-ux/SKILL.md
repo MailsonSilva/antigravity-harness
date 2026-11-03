@@ -1,38 +1,20 @@
----
+﻿---
 name: mobile-ux
-description: Diretrizes de UX/UI mobile, extração de Design DNA com Google Stitch MCP a partir de prints e geração de tokens visuais.
+description: Engenharia de Experiência do Usuário Mobile em Flutter: Material 3, Design Tokens, 4 estados obrigatórios de tela, ergonomia de toque (48dp) e micro-interações.
+category: UI/UX & Frontend
 ---
 
-# Skill: Mobile UX & Google Stitch Integration
+# Skill: Mobile UX, Ergonomia & Design Systems
 
-Esta skill capacita o agente a atuar como um designer de produto e engenheiro de interface, integrando referências visuais em telas funcionais.
+## 1. Os 4 Estados Obrigatórios de Qualquer Tela ou BottomSheet
+Nenhuma tela está pronta se apenas o caminho feliz foi desenhado. Implemente obrigatoriamente:
+1. **Estado Loading**: Skeleton / Shimmer que preserva a geometria do card real, evitando saltos de layout (Layout Shift).
+2. **Estado Empty (Vazio)**: Ícone semântico, título claro ("Nenhum produto encontrado para 'X'") e botão para limpar filtros.
+3. **Estado Error (Falha)**: Card informativo com o motivo claro e botão de retentativa (`onRetry`).
+4. **Estado Success (Dados)**: Hierarquia tipográfica clara (Título em destaque, código/embalagem secundários, preço final em evidência e badge de estoque colorido).
 
-## 1. Fluxo de Extração com Google Stitch MCP
-Quando existirem capturas ou imagens em `_references/screens/`:
-1. **Inspeção de Referência**:
-   - Acione a tool `google_stitch_mcp` com a ação `extract_design_context` apontando para o diretório `_references/screens/`.
-   - Extraia a paleta de cores primárias, superfícies, contraste, pesos tipográficos e bordas.
-2. **Exportação de Design Tokens**:
-   - Salve os valores extraídos em `_specs/design-tokens.json` no formato padrão W3C:
-     ```json
-     {
-       "color": {
-         "brand": { "primary": { "value": "#..." }, "secondary": { "value": "#..." } },
-         "background": { "screen": { "value": "#..." }, "card": { "value": "#..." } }
-       },
-       "radius": { "md": { "value": "12px" } },
-       "spacing": { "base": { "value": "8px" } }
-     }
-     ```
-
-## 2. Princípios Inegociáveis de Ergonomia Mobile (Touch & Layout)
-- **Área Mínima de Toque (Touch Target)**: Todo botão, ícone ou linha clicável deve ter no mínimo 48x48 dp. Se o ícone for menor (ex: 24 dp), adicione padding transparente de padding/hit-test.
-- **Zona de Alcance do Polegar (Thumb Zone)**: Ações primárias e botões de avanço/salvamento devem estar posicionados no terço inferior da tela. Evite botões críticos nos cantos superiores.
-- **Feedback Háptico e Visual de Toque**: Todo elemento interativo deve ter indicação visual imediata de clique (ripple ou feedback de opacidade).
-
-## 3. A Regra dos 4 Estados de Tela
-Nenhuma tela mobile é entregue contendo apenas o estado de dados. A skill exige:
-1. `LoadingState`: Uso de shimmers/skeletons para conteúdo assíncrono.
-2. `EmptyState`: Ilustração ou ícone sutil, explicação curta em pt-BR e botão de ação primária (Call to Action).
-3. `ErrorState`: Mensagem em linguagem humana amigável, ícone de aviso e botão com ação de retentativa.
-4. `SuccessState`: Renderização fluida, com scroll desacoplado e animações suaves.
+## 2. Checklist de Ergonomia e Acessibilidade
+- [ ] Alvos de toque (`IconButton`, `InkWell`, chips) possuem no mínimo `48x48dp`.
+- [ ] Campos numéricos (quantidade, desconto, preço) abrem teclado numérico apropriado (`TextInputType.numberWithOptions(decimal: true)`) e selecionam o texto ao receber foco.
+- [ ] Listas com scroll fecham o teclado automaticamente ao arrastar (`keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag`).
+- [ ] Textos dinâmicos usam `maxLines` e `TextOverflow.ellipsis` dentro de `Expanded`/`Flexible` para jamais causar erro de faixa amarela/preta (`RenderFlex overflowed`).

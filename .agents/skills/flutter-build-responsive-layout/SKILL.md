@@ -1,44 +1,15 @@
----
+﻿---
 name: flutter-build-responsive-layout
-description: Layouts adaptativos (LayoutBuilder, breakpoints, telas grandes). Use ao construir telas que funcionam em celular, tablet e dobráveis, sem overflow.
+description: Construção de layouts adaptativos e responsivos em Flutter para smartphones pequenos, grandes e tablets usando LayoutBuilder, MediaQuery.sizeOf e Slivers.
+category: UI/UX & Frontend
 ---
 
-# Skill: Layout Responsivo/Adaptativo
+# Skill: Responsive & Adaptive Layouts em Flutter
 
-> Adaptado de `flutter/skills` (time oficial do Flutter, licença BSD-3-Clause).
-> Foco mobile-first: celular → tablet/dobrável (form factors desktop são secundários).
-
-## 1. Regras de Medição
-- Decida pelo **espaço disponível**, não pelo device: `LayoutBuilder` + `constraints.maxWidth` (nunca "é tablet?" por hardware).
-- `MediaQuery.sizeOf(context)` para a janela do app; **não** use `OrientationBuilder` no topo para trocar layout.
-- Regra de ouro: constraints descem, tamanhos sobem, o pai posiciona.
-
-## 2. Distribuição e Limites
-- `Expanded` (preenche resto) vs `Flexible` (até o limite, com `flex` proporcional) em `Row`/`Column`.
-- Telas grandes: `ConstrainedBox(maxWidth: ...)` centralizado para não esticar; listas viram `GridView.builder` com `SliverGridDelegateWithMaxCrossAxisExtent`.
-- Listas sempre `builder` (lazy); nunca travar orientação (quebra dobráveis — letterboxing).
-
-## 3. Workflow (checklist)
-- [ ] Envolver em `LayoutBuilder`; breakpoint (ex.: `600` para 2 colunas/sidebar).
-- [ ] `maxWidth > breakpoint` → layout expandido; senão → layout compacto.
-- [ ] Redimensionar/rotacionar no emulador e corrigir overflows (`flutter-fix` conceitual: `Expanded`, `Flexible`, `SingleChildScrollView` onde couber scroll).
-- [ ] Touch targets ≥ 48x48 dp preservados em todos os breakpoints.
-
-## 4. Exemplo Mínimo
-
-```dart
-const largeMinWidth = 600.0;
-
-LayoutBuilder(
-  builder: (context, c) {
-    if (c.maxWidth > largeMinWidth) {
-      return const Row(children: [
-        SizedBox(width: 250, child: NavRail()),
-        VerticalDivider(width: 1),
-        Expanded(child: Content()),
-      ]);
-    }
-    return const Content();
-  },
-)
-```
+## 1. Regras de Responsividade
+1. **Use `MediaQuery.sizeOf(context)`** em vez de `MediaQuery.of(context).size` para evitar rebuilds desnecessários quando o teclado abre.
+2. **Breakpoints Canônicos**:
+   - Compacto (Celular): `< 600dp` (Lista em 1 coluna, BottomNavigationBar).
+   - Médio (Tablet Vertical / Dobrável): `600dp – 839dp` (Grid de 2 colunas, NavigationRail).
+   - Expandido (Tablet Horizontal / Desktop): `>= 840dp` (Layout Master-Detail lado a lado).
+3. **Prevenção de Overflow em Modais/BottomSheets**: Todo `BottomSheet` com campos de texto deve envolver seu conteúdo em `SingleChildScrollView` + `Padding(padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom))`.

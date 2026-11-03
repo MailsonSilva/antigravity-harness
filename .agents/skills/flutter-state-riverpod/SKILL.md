@@ -1,23 +1,46 @@
----
+﻿---
 name: flutter-state-riverpod
-description: Padrão de gerência de estado com Riverpod em Flutter. Use ao criar providers, consumir estado em widgets, testar lógica de estado e ligar telas à regra dos 4 estados.
+description: Gerenciamento de estado reativo, previsível e testável em Flutter usando Riverpod (Notifier, AsyncNotifier, paginação e descarte automático).
+category: Engenharia Mobile
 ---
 
-# Skill: Gerência de Estado com Riverpod (padrão do harness)
+# Skill: Reactive State Management com Riverpod
 
-Riverpod é o padrão oficial de estado deste harness: testável, sem BuildContext global e com escopo por feature.
+## 1. Diretrizes Técnicas
+1. **Prefira `AsyncNotifier` e `Notifier`**: Evite `StateNotifierProvider` e `ChangeNotifierProvider` legados.
+2. **Imutabilidade**: O estado exposto deve ser imutável (`final` fields + método `copyWith`).
+3. **Sem Lógica de UI no Notifier**: Nunca passe `BuildContext`, `TextEditingController` ou `Navigator` para dentro de um Notifier.
+4. **Uso de `ref.watch` vs `ref.read`**:
+   - Dentro do método `build()`: use SEMPRE `ref.watch(provider)`.
+   - Dentro de callbacks (`onPressed`, `onSubmitted`): use SEMPRE `ref.read(provider.notifier).acao()`.
 
-## 1. Tipos de Provider por Caso
-- **Estado imutável simples** (filtros, seleções): `StateProvider` / `NotifierProvider`.
-- **Estado assíncrono** (buscas, login): `AsyncNotifierProvider` — o `AsyncValue` casa direto com os 4 estados de tela (`loading` → LoadingState, `error` → ErrorState, `data` vazia → EmptyState, `data` → SuccessState).
-- **Dependências** (repositórios, clientes): `Provider` puro, sobrescrito em testes via `ProviderScope(overrides: [...])`.
-- **Parâmetros** (ex.: detalhe por id): `family` com parcimônia — prefira um Notifier que recebe o id no método.
+## 2. Padrão Canônico de State Imutável
+```dart
+class CatalogoState {
+  final List<ProdutoEntity> itens;
+  final bool carregandoMais;
+  final bool temMais;
+  final String termoBusca;
 
-## 2. Regras Inegociáveis
-- Widgets **observam** (`ref.watch`) apenas o que renderizam; ações usam `ref.read(provider.notifier)` — nunca `watch` dentro de callbacks.
-- Nenhum provider acessa SQLite, HTTP ou Supabase diretamente: ele chama o **repositório do domínio**.
-- `autoDispose` por padrão em telas descartáveis para não vazar estado entre rotas.
+  const CatalogoState({
+    this.itens = const [],
+    this.carregandoMais = false,
+    this.temMais = true,
+    this.termoBusca = '',
+  });
 
-## 3. Testabilidade
-- Teste Notifiers com `ProviderContainer` puro (sem `pumpWidget`), sobrescrevendo o repositório por mock.
-- Teste widgets com `ProviderScope` + `UncontrolledProviderScope` quando precisar de estado inicial fixo.
+  CatalogoState copyWith({
+    List<ProdutoEntity>? itens,
+    bool? carregandoMais,
+    bool? temMais,
+    String? termoBusca,
+  }) {
+    return CatalogoState(
+      itens: itens ?? this.itens,
+      carregandoMais: carregandoMais ?? this.carregandoMais,
+      temMais: temMais ?? this.temMais,
+      termoBusca: termoBusca ?? this.termoBusca,
+    );
+  }
+}
+```
