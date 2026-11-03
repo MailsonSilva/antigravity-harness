@@ -424,70 +424,168 @@
         }
       },
       skills: {
-        spec_discovery: {
-          name: "Spec-Driven Discovery & PRD",
-          category: "Arquitetura & Produto",
-          file: ".agents/skills/spec-discovery/SKILL.md",
-          desc: "Transforma requisitos vagos em contratos técnicos estritos, mapeando casos de borda e os 4 estados de tela (Loading, Empty, Error, Success).",
-          rules: "Nunca autorize codificação sem critérios de aceitação verificáveis e contratos de entrada/saída documentados."
+        "antigravity_skill_orchestrator": {
+                "name": "Antigravity Skill Orchestrator",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/antigravity-skill-orchestrator/SKILL.md",
+                "desc": "Meta-orquestrador cognitivo para triagem de tarefas e ativação progressiva de skills. Avalia complexidade antes de delegar para evitar inchaço de contexto e chamadas desnecessárias. Use sempre no início de tarefas complexas ou fluxos de desenvolvimento.",
+                "rules": "1. **Alterações Elementares (Low Complexity):**\n   - Correções simples de sintaxe, ajustes pontuais de tema/widgets, renomeação de variáveis ou adição de tipagens triviais.\n   - **Ação:** NÃO ative skills adicionais. Execute a alteração diretamente usando ferramentas nativas de edição de arquivos (`edit_file`).\n\n2. **Planejamento de Funcionalidade ou Refatoração Estrutural:**\n   - Criação de novas"
         },
-        clean_architecture: {
-          name: "Clean Architecture & Domain Purity",
-          category: "Engenharia de Software",
-          file: ".agents/skills/clean-architecture/SKILL.md",
-          desc: "Separação estrita entre Presentation, Domain (Services/Entities puros) e Data (Repositories/DTOs). Centralização de regras críticas.",
-          rules: "Proibido colocar SQL, chamadas HTTP ou regras de negócio dentro de Widgets ou Controllers de UI."
+        "clean_architecture": {
+                "name": "Clean Architecture & Domain Purity (Flutter/Dart 3)",
+                "category": "Engenharia de Software",
+                "file": ".agents/skills/clean-architecture/SKILL.md",
+                "desc": "Arquitetura Limpa em Flutter com separação estrita Presentation, Domain e Data, Domain Services puros e tratamento funcional de erros com sealed classes.",
+                "rules": ""
         },
-        mobile_ux_design_system: {
-          name: "Mobile UX & Design Systems",
-          category: "UI/UX & Frontend",
-          file: ".agents/skills/mobile-ux/SKILL.md",
-          desc: "Design Tokens semânticos, alvos de toque mínimos de 48x48dp, micro-interações fluidas 60/120fps, Material 3 e responsividade adaptativa.",
-          rules: "Consuma tokens via Theme.of(context). Garanta feedback visual imediato e estados vazios informativos."
+        "code_quality_tests": {
+                "name": "Strict TDD & Isolamento de Testes em Flutter",
+                "category": "Qualidade & Testes",
+                "file": ".agents/skills/code-quality-tests/SKILL.md",
+                "desc": "TDD estrito (Red-Green-Refactor), testes unitários de serviços de domínio, isolamento de SQLite em memória (sqflite_common_ffi) e contratos anti-regressão.",
+                "rules": ""
         },
-        stitch_visual_ingest: {
-          name: "Google Stitch Visual Ingestion",
-          category: "UI/UX & Frontend",
-          file: ".agents/skills/flutter-build-responsive-layout/SKILL.md",
-          desc: "Leitura de protótipos e imagens em _references/screens/ via Stitch MCP para extração de espaçamentos, tipografia e componentes.",
-          rules: "Sempre cruze os prints de referência com o Design System antes de construir novos Widgets."
+        "dart_collect_coverage": {
+                "name": "Cobertura de Testes (LCOV)",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/dart-collect-coverage/SKILL.md",
+                "desc": "Cobertura de testes Flutter com relatório LCOV e gates de CI. Use ao medir cobertura do projeto ou exigir mínimo em pipeline.",
+                "rules": ""
         },
-        supabase_fullstack: {
-          name: "Supabase Auth, RLS & Edge",
-          category: "Backend & Cloud",
-          file: ".agents/skills/supabase-flutter/SKILL.md",
-          desc: "Integração segura com Supabase, políticas Row Level Security (RLS), sincronização incremental e funções serverless.",
-          rules: "Toda tabela exposta deve possuir política RLS explícita e tipagem forte validada."
+        "dart_use_pattern_matching": {
+                "name": "Dart 3 Pattern Matching & Modern Syntax",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/dart-use-pattern-matching/SKILL.md",
+                "desc": "Diretrizes e boas práticas para dart-use-pattern-matching.",
+                "rules": ""
         },
-        local_first_sqlite: {
-          name: "Local-First SQLite & Performance",
-          category: "Dados & Offline",
-          file: ".agents/skills/local-first-data/SKILL.md",
-          desc: "Modelagem SQLite local de alta performance, índices compostos (CREATE INDEX), paginação (LIMIT/OFFSET), debounce de busca e fila offline.",
-          rules: "Evite Full Table Scans em catálogos grandes; exija paginação e índices em colunas de filtro textual."
+        "flutter_add_integration_test": {
+                "name": "Testes de Integração (integration_test)",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/flutter-add-integration-test/SKILL.md",
+                "desc": "Testes de integração end-to-end (integration_test) com fluxos de usuário e profiling. Use ao automatizar jornadas críticas (login, checkout, onboarding) em device/emulador.",
+                "rules": ""
         },
-        tdd_red_green: {
-          name: "Strict TDD (Red-Green-Refactor)",
-          category: "Qualidade & Testes",
-          file: ".agents/skills/code-quality-tests/SKILL.md",
-          desc: "Desenvolvimento guiado por testes determinísticos: criação do teste que falha (RED) antes da implementação mínima (GREEN).",
-          rules: "Em testes concorrentes de banco local, isole instâncias em memória para evitar locks."
+        "flutter_add_widget_test": {
+                "name": "Flutter Widget Testing",
+                "category": "Qualidade & Testes",
+                "file": ".agents/skills/flutter-add-widget-test/SKILL.md",
+                "desc": "Criação de Widget Tests determinísticos em Flutter validando os 4 estados da UI, interações de toque, digitação e acessibilidade.",
+                "rules": ""
         },
-        flutter_riverpod_state: {
-          name: "Reactive State Management (Riverpod)",
-          category: "Engenharia Mobile",
-          file: ".agents/skills/flutter-state-riverpod/SKILL.md",
-          desc: "Gerenciamento de estado previsível, imutável e reativo usando Notifiers/AsyncNotifiers com descarte seguro de recursos.",
-          rules: "Evite mutações diretas de estado durante o ciclo de build; use estados assíncronos tipados."
+        "flutter_apply_architecture_best_practices": {
+                "name": "Arquitetura Flutter em Camadas",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md",
+                "desc": "Arquitetura Flutter em camadas (UI, Lógica, Dados) com workflow de feature em 8 passos. Use ao estruturar um projeto novo ou refatorar para escalabilidade.",
+                "rules": ""
         },
-        harness_evolver: {
-          name: "Google Harness² Recursive Evolver",
-          category: "Meta-Otimização",
-          file: ".agents/skills/harness-evolver/SKILL.md",
-          desc: "Ciclo Propose–Probe–Compose do Google Research Harness²: analisa falhas de QA ou reprovações no Kanban e atualiza as Skills automaticamente.",
-          rules: "Quando uma tarefa exigir mais de 1 tentativa de reparo, sintetize a causa raiz na respectiva SKILL.md."
+        "flutter_build_responsive_layout": {
+                "name": "Responsive & Adaptive Layouts em Flutter",
+                "category": "UI/UX & Frontend",
+                "file": ".agents/skills/flutter-build-responsive-layout/SKILL.md",
+                "desc": "Construção de layouts adaptativos e responsivos em Flutter para smartphones pequenos, grandes e tablets usando LayoutBuilder, MediaQuery.sizeOf e Slivers.",
+                "rules": "1. **Use `MediaQuery.sizeOf(context)`** em vez de `MediaQuery.of(context).size` para evitar rebuilds desnecessários quando o teclado abre.\n2. **Breakpoints Canônicos**:\n   - Compacto (Celular): `< 600dp` (Lista em 1 coluna, BottomNavigationBar).\n   - Médio (Tablet Vertical / Dobrável): `600dp – 839dp` (Grid de 2 colunas, NavigationRail).\n   - Expandido (Tablet Horizontal / Desktop): `>= 840dp` (La"
+        },
+        "flutter_release": {
+                "name": "Release Flutter (test → version → build → ship)",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/flutter-release/SKILL.md",
+                "desc": "Diretrizes e boas práticas para flutter-release.",
+                "rules": ""
+        },
+        "flutter_setup_declarative_routing": {
+                "name": "Roteamento Declarativo (go_router + Deep Links)",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/flutter-setup-declarative-routing/SKILL.md",
+                "desc": "Roteamento declarativo com go_router (rotas, deep links Android/iOS, nested navigation). Use ao configurar navegação, receber links externos (push, e-mail) ou tabs com estado preservado.",
+                "rules": ""
+        },
+        "flutter_setup_localization": {
+                "name": "Localização (i18n/l10n)",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/flutter-setup-localization/SKILL.md",
+                "desc": "Internacionalização com flutter_localizations + intl (ARB, l10n.yaml, plurais). Use ao criar ou alterar qualquer texto visível — o harness exige pt-BR como idioma base.",
+                "rules": ""
+        },
+        "flutter_state_riverpod": {
+                "name": "Reactive State Management com Riverpod",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/flutter-state-riverpod/SKILL.md",
+                "desc": "Gerenciamento de estado reativo, previsível e testável em Flutter usando Riverpod (Notifier, AsyncNotifier, paginação e descarte automático).",
+                "rules": ""
+        },
+        "flutter_use_http_package": {
+                "name": "Networking REST (package:http)",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/flutter-use-http-package/SKILL.md",
+                "desc": "Networking REST com package:http (GET/POST/PUT/DELETE, erros, parsing isolado). Use ao consumir APIs remotas em services/repositórios da camada Data.",
+                "rules": ""
+        },
+        "harness_evolver": {
+                "name": "Google Harness² Recursive Self-Improvement",
+                "category": "Meta-Otimização",
+                "file": ".agents/skills/harness-evolver/SKILL.md",
+                "desc": "Ciclo recursivo Propose-Probe-Compose do Google Research Harness² para atualizar automaticamente as skills e regras após resolução de bugs complexos.",
+                "rules": ""
+        },
+        "local_first_data": {
+                "name": "Local-First SQLite & High-Performance Sync",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/local-first-data/SKILL.md",
+                "desc": "Diretrizes e boas práticas para local-first-data.",
+                "rules": ""
+        },
+        "mobile_cicd": {
+                "name": "CI/CD Mobile (Fastlane + GitHub Actions)",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/mobile-cicd/SKILL.md",
+                "desc": "Pipeline CI/CD mobile com Fastlane + GitHub Actions (lanes beta e produção). Use ao configurar builds automatizados, gating por testes ou deploy contínuo para Firebase App Distribution, Play interna e TestFlight.",
+                "rules": ""
+        },
+        "mobile_ux": {
+                "name": "Mobile UX, Ergonomia & Design Systems",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/mobile-ux/SKILL.md",
+                "desc": "Diretrizes e boas práticas para mobile-ux.",
+                "rules": ""
+        },
+        "skill_creator": {
+                "name": "Canonical Skill Creator & Scaffolding",
+                "category": "Meta-Engenharia & Scaffolding",
+                "file": ".agents/skills/skill-creator/SKILL.md",
+                "desc": "Criação, auditoria e otimização de novas skills para o Antigravity Harness. Use quando o usuário pedir para criar, formalizar ou refatorar uma habilidade técnica, workflow de engenharia ou diretriz de arquitetura.",
+                "rules": ""
+        },
+        "spec_discovery": {
+                "name": "Spec-Driven Discovery & Architecture Contract",
+                "category": "Arquitetura & Produto",
+                "file": ".agents/skills/spec-discovery/SKILL.md",
+                "desc": "Descoberta técnica estruturada e geração de PRD/Spec com mapeamento de contratos de dados, regras fiscais/comerciais e critérios de aceitação Gherkin.",
+                "rules": ""
+        },
+        "store_publishing": {
+                "name": "Publicação em Lojas (Play + App Store)",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/store-publishing/SKILL.md",
+                "desc": "Publicação na Play Store e App Store (tracks, TestFlight, review, screenshots). Use ao preparar releases, configurar fichas de loja ou responder a rejeições.",
+                "rules": ""
+        },
+        "supabase_flutter": {
+                "name": "Supabase Fullstack & RLS Architecture",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/supabase-flutter/SKILL.md",
+                "desc": "Diretrizes e boas práticas para supabase-flutter.",
+                "rules": ""
+        },
+        "web_performance_seo": {
+                "name": "Performance Web e SEO Técnico",
+                "category": "Engenharia Mobile",
+                "file": ".agents/skills/web-performance-seo/SKILL.md",
+                "desc": "Otimização de Core Web Vitals, renderização no servidor e SEO técnico em aplicações React/Next.js. Use ao criar rotas, componentes pesados ou revisar performance, indexação e acessibilidade do web.",
+                "rules": ""
         }
-      },
+},
       agents: {
         master_orchestrator: {
           role: "Master Orchestrator & Principal Architect",
@@ -661,17 +759,62 @@
     // =========================================================================
     // AUTO-SAVE DIRETO NOS ARQUIVOS DO PROJETO (FILE SYSTEM ACCESS API)
     // =========================================================================
+    // Leitura dinâmica e real de todas as skills que existem na pasta .agents/skills/
+    async function syncFromDisk(rootHandle) {
+      try {
+        const agentsDir = await rootHandle.getDirectoryHandle('.agents');
+        const skillsDir = await agentsDir.getDirectoryHandle('skills');
+        
+        const loadedSkills = {};
+        for await (const [folderName, handle] of skillsDir.entries()) {
+          if (handle.kind === 'directory') {
+            try {
+              const fileHandle = await handle.getFileHandle('SKILL.md');
+              const file = await fileHandle.getFile();
+              const text = await file.text();
+              
+              // Extrai metadados do Frontmatter YAML e Markdown
+              const descMatch = text.match(/description:\s*["']?([^"'\n\r]+)["']?/i);
+              const nameMatch = text.match(/# Skill:\s*([^\n\r]+)/i);
+              const catMatch = text.match(/category:\s*["']?([^"'\n\r]+)["']?/i);
+
+              const skillId = folderName.replace(/-/g, '_');
+              loadedSkills[skillId] = {
+                name: nameMatch ? nameMatch[1].trim() : folderName,
+                category: catMatch ? catMatch[1].trim() : "Mobile / Flutter",
+                file: `.agents/skills/${folderName}/SKILL.md`,
+                desc: descMatch ? descMatch[1].trim() : text.slice(0, 150) + "...",
+                rawMarkdown: text
+              };
+            } catch (e) {
+              console.warn(`SKILL.md ausente em ${folderName}`);
+            }
+          }
+        }
+
+        if (Object.keys(loadedSkills).length > 0) {
+          state.skills = loadedSkills;
+          localStorage.setItem("antigravity_studio_v3", JSON.stringify(state));
+          renderAll();
+          showToast(`✔ ${Object.keys(loadedSkills).length} skills reais lidas do disco com sucesso!`);
+        }
+      } catch (err) {
+        console.error("Erro ao sincronizar do disco:", err);
+      }
+    }
+
     async function connectRepositoryFolder() {
       if (!window.showDirectoryPicker) {
-        alert("Seu navegador não suporta File System Access API direta. Use Chrome/Edge ou o botão 'Baixar harness.yaml'.");
+        alert("Use Chrome ou Edge para permitir leitura direta das pastas.");
         return;
       }
       try {
         dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
         document.getElementById("fs-dot").classList.add("online");
-        document.getElementById("fs-text").innerText = `Conectado: ${dirHandle.name} (Auto-Save Ativo)`;
-        await writeFilesToDisk();
-        showToast("Conectado! .agents/harness.yaml, skills e task-board.md sincronizados.");
+        document.getElementById("fs-text").innerText = `Conectado: ${dirHandle.name}`;
+        
+        // Lê todas as pastas reais que estão no VS Code e carrega na interface
+        await syncFromDisk(dirHandle);
       } catch (err) {
         console.warn("Conexão cancelada:", err);
       }
@@ -1005,9 +1148,22 @@
       persistState("Agente removido do harness.yaml.");
     }
 
-    // MODAL DE SKILL (CRIAR / EDITAR + ATRIBUIR A AGENTES)
+    // =========================================================================
+    // MODAL DE SKILL DUPLO: MANUAL OU COM IA (SKILL-CREATOR)
+    // =========================================================================
+    let currentSkillTab = 'manual';
+
     function openSkillModal(skillId = null) {
-      const s = skillId ? state.skills[skillId] : { name: "", category: "Engenharia Mobile", file: "", desc: "", rules: "" };
+      const isEdit = Boolean(skillId);
+      const s = isEdit ? state.skills[skillId] : {
+        name: "",
+        category: "Engenharia Mobile",
+        file: "",
+        desc: "",
+        rules: "",
+        codeSnippet: ""
+      };
+
       const assignedAgents = Object.entries(state.agents).map(([aid, ag]) => `
         <label class="check-item">
           <input type="checkbox" name="skill-agent" value="${aid}" ${(ag.skills || []).includes(skillId) ? 'checked' : ''}>
@@ -1017,41 +1173,185 @@
 
       openModal(`
         <div class="modal-header">
-          <h3>⚡ ${skillId ? 'Inspecionar / Editar Skill' : 'Criar Nova Skill no Harness'}</h3>
+          <div>
+            <h3>⚡ ${isEdit ? 'Inspecionar / Editar Skill' : 'Criar Nova Skill'}</h3>
+            <span style="font-size:0.75rem; color:var(--text-dim);">Padrão Canônico: skills.sh & Anthropic Skill-Creator</span>
+          </div>
           <button class="btn" onclick="closeModal()">✕</button>
         </div>
-        <div class="form-field">
-          <label>ID da Skill (ex: frontend_best_practices)</label>
-          <input type="text" id="m-skill-id" value="${skillId || ''}" ${skillId ? 'readonly' : ''} placeholder="Ex: design_tokens_m3">
+
+        ${!isEdit ? `
+          <div style="display:flex; gap:8px; margin-bottom:16px; background:var(--bg-base); padding:4px; border-radius:8px; border:1px solid var(--border);">
+            <button id="tab-btn-manual" class="btn ${currentSkillTab === 'manual' ? 'btn-primary' : ''}" style="flex:1; justify-content:center;" onclick="toggleSkillCreateMode('manual')">
+              ✍️ Criação Manual
+            </button>
+            <button id="tab-btn-ai" class="btn ${currentSkillTab === 'ai' ? 'btn-primary' : ''}" style="flex:1; justify-content:center;" onclick="toggleSkillCreateMode('ai')">
+              🤖 Criar com IA (Skill Creator)
+            </button>
+          </div>
+        ` : ''}
+
+        <!-- MODO MANUAL -->
+        <div id="skill-form-manual" style="display:${currentSkillTab === 'manual' || isEdit ? 'block' : 'none'};">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-field">
+              <label>ID da Skill (ex: sqflite_cache_indexing)</label>
+              <input type="text" id="m-skill-id" value="${skillId || ''}" ${isEdit ? 'readonly' : ''} placeholder="Ex: riverpod_cache_manager">
+            </div>
+            <div class="form-field">
+              <label>Categoria Técnica</label>
+              <input type="text" id="m-skill-cat" value="${s.category}" placeholder="Ex: Dados & Offline / UI/UX / TDD">
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Nome Formal da Skill</label>
+            <input type="text" id="m-skill-name" value="${s.name}" placeholder="Ex: Gestão Reativa de Cache com Riverpod">
+          </div>
+          <div class="form-field">
+            <label>Descrição e Critérios de Ativação (Quando acionar / Quando NÃO acionar)</label>
+            <textarea id="m-skill-desc" rows="2" placeholder="Gatilhos precisos de ativação para a IA...">${s.desc}</textarea>
+          </div>
+          <div class="form-field">
+            <label>Guardrails, Regras Arquiteturais e Antipadrões Proibidos</label>
+            <textarea id="m-skill-rules" rows="3" placeholder="- Proibido instanciar dependências fora do container DI...&#10;- Exigir isolamento em memória nos testes...">${s.rules || ''}</textarea>
+          </div>
+          <div class="form-field">
+            <label>Exemplo de Código Canônico (Dart 3 / Flutter)</label>
+            <textarea id="m-skill-code" rows="4" style="font-family:monospace; font-size:0.8rem;" placeholder="// Código de referência limpo...">${s.codeSnippet || ''}</textarea>
+          </div>
         </div>
-        <div class="form-field">
-          <label>Nome da Habilidade</label>
-          <input type="text" id="m-skill-name" value="${s.name}" placeholder="Ex: Boas Práticas de Frontend & Design System">
+
+        <!-- MODO IA (SKILL CREATOR) -->
+        <div id="skill-form-ai" style="display:${currentSkillTab === 'ai' && !isEdit ? 'block' : 'none'};">
+          <div style="background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.25); border-radius:8px; padding:12px; margin-bottom:14px; font-size:0.82rem; color:var(--text-muted); line-height:1.45;">
+            💡 O <strong>Skill Creator</strong> gera um arquivo de skill profissional de acordo com as especificações da Anthropic e do Google Harness², formulando gatilhos específicos, código canônico em Dart 3 e salvaguardas anti-regressão.
+          </div>
+          <div class="form-field">
+            <label>O que essa nova Skill deve ensinar e governar?</label>
+            <textarea id="ai-skill-prompt" rows="3" placeholder="Ex: Quero uma skill para tratamento de concorrência e transações atômicas no SQLite local com Drift, evitando database is locked em escritas paralelas..."></textarea>
+          </div>
+          <div class="form-field">
+            <label>Stack ou Dependências Focadas</label>
+            <input type="text" id="ai-skill-stack" value="Flutter, Dart 3, SQLite, Riverpod, Clean Architecture">
+          </div>
+          <div style="display:flex; gap:10px; margin-bottom:12px;">
+            <button class="btn btn-primary" onclick="generateSkillWithAI()">⚡ Gerar Skill Completa no Studio</button>
+            <button class="btn" onclick="copySkillCreatorPrompt()">📋 Copiar Prompt para Executar no Agente da IDE</button>
+          </div>
+          <div class="form-field">
+            <label>Pré-visualização da Estrutura Gerada (Pronta para salvar no disco):</label>
+            <textarea id="ai-skill-preview" rows="7" readonly style="font-family:monospace; font-size:0.78rem; color:#a5f3fc;"></textarea>
+          </div>
         </div>
-        <div class="form-field">
-          <label>Categoria</label>
-          <input type="text" id="m-skill-cat" value="${s.category}" placeholder="Ex: UI/UX & Frontend">
-        </div>
-        <div class="form-field">
-          <label>Descrição Técnica da Competência</label>
-          <textarea id="m-skill-desc" rows="3">${s.desc}</textarea>
-        </div>
-        <div class="form-field">
-          <label>Guardrails e Regras Estritas (Conteúdo do SKILL.md)</label>
-          <textarea id="m-skill-rules" rows="3">${s.rules || ''}</textarea>
-        </div>
-        <div class="form-field">
-          <label>Vincular esta Skill imediatamente aos seguintes Agentes:</label>
+
+        <div class="form-field" style="margin-top:14px;">
+          <label>Vincular esta Skill aos Agentes Especialistas (1:N):</label>
           <div class="checkbox-grid">${assignedAgents}</div>
         </div>
+
         <div style="display:flex; justify-content:space-between; margin-top:18px;">
-          ${skillId ? `<button class="btn btn-rose" onclick="deleteSkill('${skillId}')">Excluir Skill</button>` : '<span></span>'}
+          ${isEdit ? `<button class="btn btn-rose" onclick="deleteSkill('${skillId}')">Excluir Skill</button>` : '<span></span>'}
           <div style="display:flex; gap:10px;">
             <button class="btn" onclick="closeModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="saveSkillModal()">💾 Salvar Skill Automaticamente</button>
+            <button class="btn btn-primary" onclick="saveSkillModal()">💾 Salvar & Sincronizar no Sistema</button>
           </div>
         </div>
       `);
+    }
+
+    function toggleSkillCreateMode(mode) {
+      currentSkillTab = mode;
+      document.getElementById('tab-btn-manual').className = `btn ${mode === 'manual' ? 'btn-primary' : ''}`;
+      document.getElementById('tab-btn-ai').className = `btn ${mode === 'ai' ? 'btn-primary' : ''}`;
+      document.getElementById('skill-form-manual').style.display = mode === 'manual' ? 'block' : 'none';
+      document.getElementById('skill-form-ai').style.display = mode === 'ai' ? 'block' : 'none';
+    }
+
+    // Gerador de Skill usando os padrões canônicos em tempo real
+    function generateSkillWithAI() {
+      const prompt = document.getElementById('ai-skill-prompt').value.trim();
+      const stack = document.getElementById('ai-skill-stack').value.trim();
+      if (!prompt) return alert("Descreva o que a nova skill deve cobrir!");
+
+      const words = prompt.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ').filter(w => w.length > 3).slice(0, 3);
+      const generatedId = (words.join('_') || "custom_skill") + "_engine";
+      const folder = generatedId.replace(/_/g, '-');
+      const title = prompt.split(' ')[0].toUpperCase() + prompt.slice(prompt.split(' ')[0].length, 40) + "...";
+
+      const generatedContent = `---
+name: ${folder}
+description: "${prompt.replace(/"/g, "'")}. Ative quando houver tarefas envolvendo ${stack}."
+category: "Engenharia & Automação"
+---
+
+# Skill: ${title}
+
+## 1. Quando Acionar Esta Skill
+- Implementação ou refatoração de: ${prompt}
+- Validação técnica e arquitetural em projetos utilizando: ${stack}
+- NÃO acione para tarefas genéricas de layout sem regras de negócio ou de banco.
+
+## 2. Guardrails e Diretrizes Arquiteturais
+- Respeite o princípio da responsabilidade única (SRP) e Clean Architecture.
+- Isole dependências externas por meio de interfaces no domínio.
+- Proibido expor exceções brutas do driver para as camadas de apresentação.
+
+## 3. Código Canônico de Referência (Dart 3 / ${stack})
+\`\`\`dart
+// Implementação de referência para ${generatedId}
+class ${generatedId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')} {
+  final bool isInitialized;
+  const ${generatedId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}({this.isInitialized = true});
+
+  Future<void> executeOperation() async {
+    // Operação segura com tratamento estruturado
+  }
+}
+\`\`\`
+
+## 4. Antipadrões Proibidos
+- ❌ Ignorar tratamento de estados assíncronos e exceções de I/O.
+- ❌ Hardcode de parâmetros de configuração no código de produção.
+`;
+
+      document.getElementById('ai-skill-preview').value = generatedContent;
+      // Preenche os campos do modo manual caso o usuário queira alternar para ajuste fino
+      document.getElementById('m-skill-id').value = generatedId;
+      document.getElementById('m-skill-name').value = title;
+      document.getElementById('m-skill-cat').value = "Engenharia & Automação";
+      document.getElementById('m-skill-desc').value = `${prompt}. Ative para ${stack}.`;
+      document.getElementById('m-skill-rules').value = "- Respeitar Clean Architecture e isolar dependências externas.\n- Proibido engolir erros silenciosamente.";
+      showToast("Skill gerada pelo Skill Creator! Revise e clique em 'Salvar & Sincronizar'.");
+    }
+
+    function copySkillCreatorPrompt() {
+      const prompt = document.getElementById('ai-skill-prompt').value.trim();
+      const stack = document.getElementById('ai-skill-stack').value.trim();
+      if (!prompt) return alert("Descreva o que a nova skill deve cobrir!");
+
+      const fullPrompt = `Atue com a skill .agents/skills/skill-creator/SKILL.md no Antigravity Harness:
+
+OBJETIVO:
+Criar uma nova skill profunda e profissional para o repositório.
+
+DEMANDA:
+"${prompt}"
+
+STACK TECNOLÓGICA:
+"${stack}"
+
+INSTRUÇÕES OBRIGATÓRIAS:
+1. Siga a metodologia canônica da Anthropic (nome semântico kebab-case, descrição com critérios estritos de ativação e prevenção de over-triggering).
+2. Escreva o conteúdo completo em .agents/skills/<nome-da-skill>/SKILL.md contendo:
+   - Quando acionar e quando NÃO acionar.
+   - Guardrails arquiteturais inegociáveis.
+   - Código canônico real e compilável em Dart 3 / Flutter.
+   - Lista detalhada de antipadrões proibidos.
+3. Registre a nova skill em .agents/harness.yaml sob 'skills_registry' e vincule-a aos subagentes competentes.
+4. Salve os arquivos e confirme o status.`;
+
+      navigator.clipboard.writeText(fullPrompt);
+      showToast("📋 Prompt do Skill Creator copiado para a área de transferência!");
     }
 
     function saveSkillModal() {
@@ -1060,11 +1360,22 @@
       const category = document.getElementById("m-skill-cat").value.trim();
       const desc = document.getElementById("m-skill-desc").value.trim();
       const rules = document.getElementById("m-skill-rules").value.trim();
+      const codeSnippet = document.getElementById("m-skill-code").value.trim();
       const folder = id.replace(/_/g, "-");
 
-      if (!id || !name) return alert("Preencha ID e Nome da Skill!");
-      state.skills[id] = { name, category, file: `.agents/skills/${folder}/SKILL.md`, desc, rules };
+      if (!id || !name) return alert("Preencha o ID e o Nome da Skill!");
 
+      // Salva no estado
+      state.skills[id] = {
+        name,
+        category,
+        file: `.agents/skills/${folder}/SKILL.md`,
+        desc,
+        rules,
+        codeSnippet
+      };
+
+      // Atualiza vínculo com os agentes selecionados
       const checkedAgents = Array.from(document.querySelectorAll("input[name='skill-agent']:checked")).map(i => i.value);
       Object.entries(state.agents).forEach(([aid, ag]) => {
         ag.skills = ag.skills || [];
@@ -1073,7 +1384,7 @@
       });
 
       closeModal();
-      persistState(`Skill '${name}' salva em .agents/skills/${folder}/SKILL.md!`);
+      persistState(`Skill '${name}' salva e sincronizada em .agents/skills/${folder}/SKILL.md e harness.yaml!`);
     }
 
     function deleteSkill(id) {

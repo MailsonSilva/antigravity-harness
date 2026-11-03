@@ -29,17 +29,29 @@ mcp_servers:
     description: "Memória persistente de longo prazo e tickets de handoff entre agentes."
 
 skills_registry:
-  spec_discovery: ".agents/skills/spec-discovery/SKILL.md"
+  antigravity_skill_orchestrator: ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
   clean_architecture: ".agents/skills/clean-architecture/SKILL.md"
-  flutter_state_riverpod: ".agents/skills/flutter-state-riverpod/SKILL.md"
-  local_first_data: ".agents/skills/local-first-data/SKILL.md"
-  supabase_flutter: ".agents/skills/supabase-flutter/SKILL.md"
-  mobile_ux: ".agents/skills/mobile-ux/SKILL.md"
-  flutter_responsive: ".agents/skills/flutter-build-responsive-layout/SKILL.md"
   code_quality_tests: ".agents/skills/code-quality-tests/SKILL.md"
-  flutter_widget_test: ".agents/skills/flutter-add-widget-test/SKILL.md"
-  dart_pattern_matching: ".agents/skills/dart-use-pattern-matching/SKILL.md"
+  dart_collect_coverage: ".agents/skills/dart-collect-coverage/SKILL.md"
+  dart_use_pattern_matching: ".agents/skills/dart-use-pattern-matching/SKILL.md"
+  flutter_add_integration_test: ".agents/skills/flutter-add-integration-test/SKILL.md"
+  flutter_add_widget_test: ".agents/skills/flutter-add-widget-test/SKILL.md"
+  flutter_apply_architecture_best_practices: ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
+  flutter_build_responsive_layout: ".agents/skills/flutter-build-responsive-layout/SKILL.md"
+  flutter_release: ".agents/skills/flutter-release/SKILL.md"
+  flutter_setup_declarative_routing: ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
+  flutter_setup_localization: ".agents/skills/flutter-setup-localization/SKILL.md"
+  flutter_state_riverpod: ".agents/skills/flutter-state-riverpod/SKILL.md"
+  flutter_use_http_package: ".agents/skills/flutter-use-http-package/SKILL.md"
   harness_evolver: ".agents/skills/harness-evolver/SKILL.md"
+  local_first_data: ".agents/skills/local-first-data/SKILL.md"
+  mobile_cicd: ".agents/skills/mobile-cicd/SKILL.md"
+  mobile_ux: ".agents/skills/mobile-ux/SKILL.md"
+  skill_creator: ".agents/skills/skill-creator/SKILL.md"
+  spec_discovery: ".agents/skills/spec-discovery/SKILL.md"
+  store_publishing: ".agents/skills/store-publishing/SKILL.md"
+  supabase_flutter: ".agents/skills/supabase-flutter/SKILL.md"
+  web_performance_seo: ".agents/skills/web-performance-seo/SKILL.md"
 
 subagents:
   master_orchestrator:
@@ -68,6 +80,18 @@ subagents:
          - Se envolver queries SQLite lentas, sincronização offline ou tabelas remotas, acione `data_supabase_specialist`.
       5. GATE DE APROVAÇÃO: Atualize `_specs/task-board.md` movendo a tarefa concluída para a coluna "4. Gate de Aprovação" e aguarde validação humana.
 
+  skill_engineer:
+    model: "inherit"
+    role: "Skill & Harness Scaffolding Engineer"
+    seniority: "Staff Agent Engineer"
+    mcps: ["dart_mcp", "graft_ast"]
+    skills:
+      - ".agents/skills/skill-creator/SKILL.md"
+      - ".agents/skills/clean-architecture/SKILL.md"
+    system_prompt: |
+      Você é o especialista responsável por expandir as habilidades do Antigravity Harness.
+      Siga rigorosamente a metodologia canônica de criação de skills: analise a stack técnica, defina critérios estritos de ativação para prevenir falsos positivos, documente guardrails de Clean Architecture, forneça código real em Dart 3 e registre tudo em .agents/harness.yaml.
+      
   ui_ux_specialist:
     model: "inherit"
     role: "Senior Flutter UI/UX & Design System Architect"
