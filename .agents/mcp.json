@@ -1,5 +1,10 @@
 {
   "mcpServers": {
+    "dart": {
+      "command": "dart",
+      "args": ["mcp-server"],
+      "description": "Servidor MCP oficial do Dart e Flutter SDK (analyzer, symbol resolution, test runner e runtime inspection)."
+    },
     "google-stitch": {
       "command": "npx",
       "args": [
@@ -10,7 +15,7 @@
         "STITCH_REFERENCES_DIR": "./_references/screens",
         "STITCH_OUTPUT_DIR": "./_specs"
       },
-      "description": "Servidor MCP do Google Stitch para extrair o Design DNA de referências em _references/screens/ e gerar protótipos visuais de telas."
+      "description": "Servidor MCP do Google Stitch para extrair o Design DNA de referências em _references/screens/."
     },
     "graft-ast": {
       "command": "graft",
@@ -18,7 +23,7 @@
         "mcp",
         "--watch"
       ],
-      "description": "Grafo estático do código com Tree-sitter para consulta determinística de símbolos, funções e contratos sem consumir tokens desnecessários."
+      "description": "Grafo estático do código com Tree-sitter para consulta determinística de símbolos."
     },
     "ai-memory": {
       "command": "ai-memory",
@@ -28,7 +33,7 @@
       "env": {
         "AI_MEMORY_DB_PATH": "./.agents/memory/context.db"
       },
-      "description": "Servidor de memória local para persistência de tickets de handoff entre subagentes e histórico de aprendizados do ciclo TDD."
+      "description": "Servidor de memória local para persistência de tickets de handoff entre subagentes."
     }
   }
 }

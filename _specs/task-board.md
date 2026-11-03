@@ -1,30 +1,46 @@
-# 📋 Task Board (gerado — não edite à mão)
+# 📋 Kanban de Desenvolvimento do Projeto (`task-board.md`)
 
-> Gerado em: 2026-10-06. Regra de ordenação: `score = urgência×10 − dificuldade`
-> (quick wins primeiro). Empates: menor dificuldade, depois menor id.
-> Para alterar, edite os arquivos em `_specs/tasks/` e regenere este quadro.
+> Sincronizado com `harness-studio.html` e gerenciado pelo `@product_architect` durante o `dev-cycle`.
+> **Regra de ouro:** nenhum card avança de coluna sem cumprir o gate de saída da coluna atual.
 
-## 🏆 Ranking geral (somente `todo`)
+```text
+Backlog ──▶ TDD RED ──▶ TDD GREEN ──▶ Loop QA/A11y ──▶ Concluído
+```
 
-| # | ID | Tarefa | Target | Dific. | Urgência | Score |
-|---|----|--------|--------|--------|----------|-------|
-| 1 | T03 | Push notifications com deep links | mobile | 3 | 3 | 27 |
-| 2 | T04 | In-app purchases (assinaturas e consumíveis) | mobile | 4 | 2 | 16 |
-| 3 | T02 | Dashboard gerencial no app | mobile | 5 | 2 | 15 |
-| 4 | T05 | Spike: Firebase como backend alternativo | mobile | 2 | 1 | 8 |
+## 🗂️ 1. Backlog & Especificação (`@product_architect`) — WIP livre
+> **Gate de saída:** PRD/spec aprovada, critérios de aceitação objetivos e skills 1:N definidas.
 
-## 🗺️ Quadrantes (urgência × dificuldade)
+- [ ] **T01** — [Recuperação de Senha](tasks/T01-recuperacao-senha.md) | Skills: `spec-discovery`, `clean-architecture`
+- [ ] **T02** — [Dashboard Gerencial](tasks/T02-dashboard-gerencial.md) | Skills: `mobile-ux`, `flutter-build-responsive-layout`
+- [ ] **T03** — [Push Notifications](tasks/T03-push-notifications.md) | Skills: `local-first-data`
+- [ ] **T04** — [In-App Purchases](tasks/T04-in-app-purchases.md) | Skills: `store-publishing`
+- [ ] **T05** — [Backend Alternativo / Sync](tasks/T05-firebase-alternativo.md) | Skills: `supabase-flutter`
 
-- **⚡ Quick wins** (urgência ≥ 3, dificuldade ≤ 2): _(nenhuma)_
-- **🔥 Apostas altas** (urgência ≥ 3, dificuldade ≥ 3): T03
-- **🧩 Preenchimento** (urgência ≤ 2, dificuldade ≤ 2): T05
-- **🧊 Evitar por agora** (urgência ≤ 2, dificuldade ≥ 3): T04, T02
+## 🔴 2. TDD Fase RED — Testes Falhos (`@tdd_tester`) — WIP 2
+> **Gate de saída:** suíte criada e executada com falha comprovada pelo motivo correto (RED).
 
-## 🎯 Por plataforma
+*(Nenhuma tarefa ativa nesta coluna)*
 
-- **mobile (android + ios)**: T03 (27), T04 (16), T02 (15), T05 (8)
+## 🟢 3. TDD Fase GREEN — Em Implementação (`@mobile_builder` / `@data_offline_specialist`) — WIP 2
+> **Gate de saída:** menor código possível para a suíte ficar verde; `dart analyze` sem erros.
 
-## 🔄 Em andamento / Concluídas
+*(Nenhuma tarefa ativa nesta coluna)*
 
-- **doing**: _(nenhuma)_
-- **done**: T01 (Recuperação de senha por e-mail, score 38)
+## 🔁 4. Loop de Autorreparo QA & Acessibilidade (`@qa_validator` / `@flutter_a11y_auditor`) — WIP 1
+> **Gate de saída:** até 3 ciclos de autorreparo, cobertura mínima, Semantics/contraste/touch targets validados.
+
+*(Nenhuma tarefa ativa nesta coluna)*
+
+## ✅ 5. Concluído & Commitado (`@git_committer`) — arquivo
+> **Gate de saída:** commit semântico atômico, Kanban atualizado e `PROJECT_BRAIN.md` com o aprendizado.
+
+- [x] **T00** — Unificação do Harness v2.1 com Dart MCP Server e Matriz 1:N de Agentes/Skills.
+
+---
+
+### Legenda de skills por card
+| Campo | Significado |
+|---|---|
+| `Skills:` | Lista 1:N de skills ativadas para o card (editável no `harness-studio.html`). |
+| `WIP` | Limite de trabalho em progresso da coluna; exceder exige justificativa no `ai-memory`. |
+| `@agente` | Subagente responsável pela coluna, conforme `.agents/harness.yaml#subagents`. |

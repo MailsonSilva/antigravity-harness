@@ -11,8 +11,11 @@
 #
 # ATUALIZADO (backup previo em %TEMP%\harness-backup-<data>):
 #   .agents/harness.yaml  .agents/mcp.json  .agents/rules/**  .agents/workflows/**
-#   _specs/prd-template.md  _specs/tasks/_template.md
+#   harness-studio.html  _specs/prd-template.md  _specs/tasks/_template.md
 #   install.ps1  install.sh  update.ps1  update.sh
+#
+# CRIADO SOMENTE SE AUSENTE:
+#   .agents/PROJECT_BRAIN.md  _specs/task-board.md
 # ==============================================================================
 
 param(
@@ -52,15 +55,22 @@ New-Item -ItemType Directory -Path $work -Force | Out-Null
 try {
     Write-Step "Sincronizando de $repoUrl (branch $Branch)..."
 
-    & git clone --quiet --depth 1 --branch $Branch $repoUrl $work
-    if ($LASTEXITCODE -ne 0) {
-        throw "git clone falhou para $repoUrl (codigo $LASTEXITCODE)."
+    # Git pode emitir warnings em stderr (ex.: clone local ignora --depth).
+    # Com ErrorActionPreference=Stop isso viraria excecao; por isso isolamos
+    # o clone e validamos apenas o codigo de saida real.
+    $previousEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    $cloneOutput = & git clone --quiet --depth 1 --branch $Branch $repoUrl $work 2>&1
+    $cloneExit = $LASTEXITCODE
+    $ErrorActionPreference = $previousEap
+    if ($cloneExit -ne 0) {
+        throw "git clone falhou para $repoUrl (codigo $cloneExit): $($cloneOutput -join ' ')"
     }
     $src = $work
 
     # Backup dos arquivos gerenciados antes de sobrescrever.
     New-Item -ItemType Directory -Path $backup -Force | Out-Null
-    foreach ($p in @(".agents\harness.yaml", ".agents\mcp.json", ".agents\rules", ".agents\workflows")) {
+    foreach ($p in @(".agents\harness.yaml", ".agents\mcp.json", ".agents\rules", ".agents\workflows", "harness-studio.html")) {
         if (Test-Path $p) {
             $dest = Join-Path $backup $p
             New-Item -ItemType Directory -Path (Split-Path -Parent $dest) -Force | Out-Null
@@ -91,6 +101,7 @@ try {
         ".agents\mcp.json",
         "_specs\prd-template.md",
         "_specs\tasks\_template.md",
+        "harness-studio.html",
         "install.ps1",
         "install.sh",
         "update.ps1",
@@ -139,13 +150,23 @@ try {
         Copy-Item -Force $brainSrc ".agents\PROJECT_BRAIN.md"
     }
 
+    # 5.1 Task board: cria somente se ainda nao existir (preserva o Kanban local).
+    $boardSrc = Join-Path $src "_specs/task-board.md"
+    if ((Test-Path $boardSrc) -and (-not (Test-Path "_specs\task-board.md"))) {
+        if (-not (Test-Path "_specs")) {
+            New-Item -ItemType Directory -Path "_specs" -Force | Out-Null
+        }
+        Copy-Item -Force $boardSrc "_specs\task-board.md"
+    }
+
     # 6. Marcadores de versionamento das pastas vazias.
     if (-not (Test-Path "_references\screens\.gitkeep")) { Set-Content -Path "_references\screens\.gitkeep" -Value "" }
     if (-not (Test-Path "_references\brand\.gitkeep")) { Set-Content -Path "_references\brand\.gitkeep" -Value "" }
     if (-not (Test-Path ".agents\memory\.gitkeep")) { Set-Content -Path ".agents\memory\.gitkeep" -Value "" }
 
-    Write-Ok "Harness sincronizado com $repoUrl@$Branch."
-    Write-Ok "Preservados: PROJECT_BRAIN.md, .agents/skills/ e .agents/memory/."
+    Write-Ok "Harness v2.1 sincronizado com $repoUrl@$Branch."
+    Write-Ok "Preservados: PROJECT_BRAIN.md, .agents/skills/, .agents/memory/ e _specs/task-board.md."
+    Write-Ok "Sincronizado quando presente: harness-studio.html, harness.yaml, mcp.json (Dart MCP) e regras."
     Write-Warn "Backup dos arquivos gerenciados: $backup"
 }
 finally {

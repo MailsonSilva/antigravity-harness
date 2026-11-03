@@ -1,12 +1,10 @@
-version: "2.0-universal"
-name: "universal-developer-harness"
-description: "Harness agnóstico de fornecedor de IA com 8 componentes canônicos e interoperabilidade com Claude Code, Codex, Antigravity e Cursor."
+version: "2.1-flutter-mobile"
+name: "universal-flutter-mobile-harness"
+description: "Harness Mobile Flutter oficial com Dart MCP Server, Kanban, TDD Loop e associação 1:N de Skills por Agente."
 
 # ==============================================================================
-# 1. Perfis de Modelos Abstratos (Zero Vendor Lock-in)
+# 1. Perfis de Modelos Abstratos (Agnóstico: Antigravity, Claude Code, Cursor, Codex)
 # ==============================================================================
-# Por padrão, assume 'inherit' (usa o modelo atualmente logado na sua CLI/IDE).
-# Sobrescrita opcional via variáveis de ambiente limpas:
 model_profiles:
   reasoning: "${AI_MODEL_REASONING:-inherit}"
   coding: "${AI_MODEL_CODING:-inherit}"
@@ -14,7 +12,7 @@ model_profiles:
   fast_ops: "${AI_MODEL_FAST:-inherit}"
 
 # ==============================================================================
-# 2. Configurações Globais
+# 2. Configurações Globais e Caminhos do Projeto
 # ==============================================================================
 settings:
   language: "pt-BR"
@@ -22,11 +20,12 @@ settings:
   max_repair_cycles: 3
   prd_path: "_specs/prd.md"
   task_board: "_specs/task-board.md"
+  visual_studio_html: "harness-studio.html"
   memory_target: ".agents/PROJECT_BRAIN.md"
-  recursive_learning: true # Habilita síntese de aprendizado pós-reparo
+  recursive_learning: true
 
 # ==============================================================================
-# 3. Os 8 Componentes do Harness (Padrão Google Research Harness²)
+# 3. Os 8 Componentes Canônicos (Google Research Harness² + Flutter AI)
 # ==============================================================================
 scaffolding:
   system_prompts:
@@ -48,7 +47,7 @@ scaffolding:
   plugins_ref: ".agents/mcp.json"
 
 # ==============================================================================
-# 4. Workspaces e Comandos de Validação
+# 4. Workspaces
 # ==============================================================================
 workspaces:
   shared:
@@ -60,92 +59,159 @@ workspaces:
     path: "./"
     test_command: "flutter test"
     lint_command: "dart analyze"
-  web:
-    path: "apps/web/"
-    test_command: "npm test"
-    lint_command: "npm run lint"
-  landing:
-    path: "apps/landing/"
-    test_command: "npm test"
-    lint_command: "npm run lint"
+    format_command: "dart format ."
 
 # ==============================================================================
-# 5. Ferramentas e MCPs
+# 5. Ferramentas e Servidores MCP Oficiais
 # ==============================================================================
 tools:
-  ai_memory:
-    cli: "ai-memory"
-    description: "Handoffs atômicos entre agentes e histórico de aprendizado do ciclo TDD."
-  graft:
-    cli: "graft"
-    description: "Grafo estático via AST Tree-sitter para consulta determinística de símbolos."
+  dart:
+    server_id: "dart"
+    command: "dart mcp-server"
+    description: "Servidor MCP oficial do Dart/Flutter SDK: analyzer, resolução de símbolos, test runner e inspeção de runtime."
   google_stitch_mcp:
     server_id: "google-stitch"
     description: "Leitor de referências visuais de telas e prototipagem de UI."
+  graft:
+    server_id: "graft-ast"
+    description: "Grafo estático via AST Tree-sitter para consulta determinística de símbolos."
+  ai_memory:
+    server_id: "ai-memory"
+    description: "Handoffs atômicos entre agentes e histórico de aprendizado do ciclo TDD."
   git:
     cli: "git"
     description: "Controle de versão e commits semânticos atômicos."
 
 # ==============================================================================
-# 6. Elenco de Subagentes
+# 6. Subagentes Especializados para Cada Fase do Projeto Flutter (1:N Skills)
 # ==============================================================================
 subagents:
+  # FASE 1: Planejamento, Entrevista de Perguntas e Kanban
   product_architect:
     profile: "reasoning"
-    role: "Entrevista o desenvolvedor, decompõe requisitos em _specs/tasks/ e coordena o task-board."
-    rules: [".agents/rules/global.md"]
-    skills: [".agents/skills/spec-discovery/SKILL.md", ".agents/skills/antigravity-skill-orchestrator/SKILL.md"]
+    phase: "Fase 1 - Descoberta, Specs & Kanban"
+    role: "Orquestrador principal: analisa pedidos do desenvolvedor, formula perguntas de esclarecimento, cria specs em _specs/features/ e organiza o Kanban em _specs/task-board.md."
+    rules:
+      - ".agents/rules/global.md"
+    skills:
+      - ".agents/skills/spec-discovery/SKILL.md"
+      - ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
+      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
     tools: ["file_read", "file_write", "ai_memory"]
 
+  # FASE 2: Design, UX, Layouts Responsivos e Rotas
   ui_ux_designer:
     profile: "multimodal_design"
-    role: "Inspeciona capturas visuais via Google Stitch MCP e extrai tokens de design para _specs/design-tokens.json."
-    rules: [".agents/rules/global.md"]
-    skills: [".agents/skills/mobile-ux/SKILL.md"]
-    tools: ["google_stitch_mcp", "file_read", "file_write", "ai_memory"]
+    phase: "Fase 2 - UI/UX, Tokens, Responsividade & Rotas"
+    role: "Extrai tokens de _references/screens/ via Stitch MCP, projeta layouts responsivos e implementa navegação declarativa respeitando os 4 estados de tela."
+    rules:
+      - ".agents/rules/global.md"
+      - ".agents/rules/mobile.md"
+    skills:
+      - ".agents/skills/mobile-ux/SKILL.md"
+      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
+      - ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
+      - ".agents/skills/flutter-setup-localization/SKILL.md"
+    tools: ["google_stitch_mcp", "dart", "file_read", "file_write"]
 
+  # FASE 3: TDD Fase Vermelha (Testes Antes do Código)
   tdd_tester:
     profile: "coding"
-    role: "Fase Vermelha (RED): cria testes unitários e de widgets que obrigatoriamente falham antes do código."
-    rules: [".agents/rules/global.md"]
-    skills: [".agents/skills/clean-architecture/SKILL.md", ".agents/skills/flutter-add-widget-test/SKILL.md"]
-    tools: ["file_read", "file_write", "bash", "graft", "ai_memory"]
+    phase: "Fase 3 - TDD Fase Vermelha (RED)"
+    role: "Cria testes unitários (com sqflite_common_ffi isolado em memória), widget tests e integration tests que obrigatoriamente falham antes da implementação."
+    rules:
+      - ".agents/rules/global.md"
+      - ".agents/rules/mobile.md"
+    skills:
+      - ".agents/skills/code-quality-tests/SKILL.md"
+      - ".agents/skills/flutter-add-widget-test/SKILL.md"
+      - ".agents/skills/flutter-add-integration-test/SKILL.md"
+      - ".agents/skills/dart-collect-coverage/SKILL.md"
+    tools: ["dart", "file_read", "file_write", "bash", "graft"]
 
+  # FASE 4A: Implementação de Domínio, Estado e UI Flutter (GREEN)
   mobile_builder:
     profile: "coding"
-    role: "Fase Verde (GREEN): escreve código Flutter estritamente tipado e modular com Clean Architecture."
-    rules: [".agents/rules/global.md", ".agents/rules/mobile.md"]
-    skills: [".agents/skills/clean-architecture/SKILL.md", ".agents/skills/local-first-data/SKILL.md"]
-    tools: ["file_read", "file_write", "graft", "ai_memory"]
+    phase: "Fase 4A - Construção Flutter & Gerenciamento de Estado (GREEN)"
+    role: "Escreve código Dart 3 e Flutter estritamente tipado, desacoplado em Clean Architecture para fazer os testes da Fase RED passarem."
+    rules:
+      - ".agents/rules/global.md"
+      - ".agents/rules/mobile.md"
+    skills:
+      - ".agents/skills/clean-architecture/SKILL.md"
+      - ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md"
+      - ".agents/skills/flutter-state-riverpod/SKILL.md"
+      - ".agents/skills/dart-use-pattern-matching/SKILL.md"
+    tools: ["dart", "file_read", "file_write", "graft"]
 
-  web_builder:
+  # FASE 4B: Persistência Local SQLite, Performance de Busca e APIs
+  data_offline_specialist:
     profile: "coding"
-    role: "Fase Verde (GREEN): escreve componentes React/Next.js com Server Components e otimização Core Web Vitals."
-    rules: [".agents/rules/global.md", ".agents/rules/web.md"]
-    skills: [".agents/skills/web-performance-seo/SKILL.md"]
-    tools: ["file_read", "file_write", "graft", "ai_memory"]
+    phase: "Fase 4B - Banco Local SQLite, Índices, Sincronização & APIs"
+    role: "Implementa DAOs, repositórios offline-first, índices de performance SQLite, pacotes .pac/FTP e integrações REST/Supabase."
+    rules:
+      - ".agents/rules/global.md"
+      - ".agents/rules/mobile.md"
+    skills:
+      - ".agents/skills/local-first-data/SKILL.md"
+      - ".agents/skills/flutter-use-http-package/SKILL.md"
+      - ".agents/skills/supabase-flutter/SKILL.md"
+      - ".agents/skills/clean-architecture/SKILL.md"
+    tools: ["dart", "file_read", "file_write", "graft"]
 
+  # FASE 5: Loop de Autorreparo e Validação (QA)
   qa_validator:
     profile: "coding"
-    role: "Fase Refatoração & QA: executa linters, testes e orquestra até 3 ciclos de autorreparo automático."
-    rules: [".agents/rules/global.md"]
-    skills: [".agents/skills/code-quality-tests/SKILL.md"]
-    tools: ["bash", "file_read", "file_write", "ai_memory"]
+    phase: "Fase 5 - Validação, Linter & Loop de Autorreparo (REFACTOR)"
+    role: "Executa dart analyze e flutter test via Dart MCP Server, conduzindo até 3 ciclos autônomos de autorreparo."
+    rules:
+      - ".agents/rules/global.md"
+      - ".agents/rules/mobile.md"
+    skills:
+      - ".agents/skills/code-quality-tests/SKILL.md"
+      - ".agents/skills/dart-collect-coverage/SKILL.md"
+    tools: ["dart", "bash", "file_read", "file_write"]
 
+  # FASE 6: Acessibilidade Oficial Flutter (a11y)
+  flutter_a11y_auditor:
+    profile: "coding"
+    phase: "Fase 6 - Auditoria de Acessibilidade (a11y) & Ergonomia"
+    role: "Persona oficial recomendada pelo Flutter AI para auditar Semantics, leitores de tela, contraste WCAG AA e touch targets mínimos de 48x48dp."
+    rules:
+      - ".agents/rules/global.md"
+      - ".agents/rules/mobile.md"
+    skills:
+      - ".agents/skills/mobile-ux/SKILL.md"
+      - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
+      - ".agents/skills/flutter-add-widget-test/SKILL.md"
+    tools: ["dart", "file_read", "file_write"]
+
+  # FASE 7: Auto-Aperfeiçoamento Recursivo (Harness²)
   harness_evolver:
     profile: "reasoning"
-    role: "Ciclo Propose-Probe-Compose: analisa falhas ocorridas e atualiza as regras ou skills do harness para evitar reincidência."
-    rules: [".agents/rules/global.md"]
-    skills: [".agents/skills/harness-evolver/SKILL.md"]
-    tools: ["file_read", "file_write", "bash"]
+    phase: "Fase 7 - Evolução Propose-Probe-Compose"
+    role: "Analisa falhas que exigiram autorreparo e atualiza as SKILL.md ou PROJECT_BRAIN.md para evitar reincidência."
+    rules:
+      - ".agents/rules/global.md"
+    skills:
+      - ".agents/skills/harness-evolver/SKILL.md"
+      - ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
+    tools: ["file_read", "file_write"]
 
+  # FASE 8: Fechamento Git, Build e Publicação nas Lojas
   git_committer:
     profile: "fast_ops"
-    role: "Inspeciona o diff staged, extrai o contexto do ticket no ai-memory e cria o commit semântico atômico."
-    rules: [".agents/rules/global.md"]
-    tools: ["git", "ai_memory", "bash"]
+    phase: "Fase 8 - Commit Atômico, CI/CD & Publicação"
+    role: "Inspeciona o git diff, atualiza o Kanban para Concluído, executa commit semântico e prepara releases."
+    rules:
+      - ".agents/rules/global.md"
+    skills:
+      - ".agents/skills/flutter-release/SKILL.md"
+      - ".agents/skills/mobile-cicd/SKILL.md"
+      - ".agents/skills/store-publishing/SKILL.md"
+    tools: ["git", "bash", "file_read", "file_write"]
 
 workflows:
   dev_cycle:
     file: ".agents/workflows/dev-cycle.yaml"
-    description: "Ciclo ponta a ponta: Ingestão -> Design -> TDD Red -> Green -> Refactor -> Autoevolução -> Commit."
+    description: "Ciclo completo: Descoberta/Kanban -> Design -> TDD Red -> Green -> Repair Loop (3x) -> A11y -> Evolver -> Commit."
