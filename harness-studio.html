@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,8 +29,20 @@
       --shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-base); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
 
     /* SIDEBAR */
     .sidebar {
@@ -41,6 +54,7 @@
       padding: 20px 14px;
       flex-shrink: 0;
     }
+
     .brand {
       display: flex;
       align-items: center;
@@ -49,181 +63,581 @@
       border-bottom: 1px solid var(--border);
       margin-bottom: 16px;
     }
+
     .brand-logo {
-      width: 34px; height: 34px; border-radius: 9px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
       background: linear-gradient(135deg, var(--primary), var(--indigo));
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; color: #050811; font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #050811;
+      font-size: 1.1rem;
       box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
     }
-    .brand-text h1 { font-size: 0.98rem; font-weight: 700; letter-spacing: -0.02em; }
-    .brand-text span { font-size: 0.72rem; color: var(--primary); font-family: monospace; }
+
+    .brand-text h1 {
+      font-size: 0.98rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-text span {
+      font-size: 0.72rem;
+      color: var(--primary);
+      font-family: monospace;
+    }
 
     .nav-group-label {
-      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
-      color: var(--text-dim); font-weight: 700; padding: 10px 10px 6px;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      font-weight: 700;
+      padding: 10px 10px 6px;
     }
+
     .nav-btn {
-      display: flex; align-items: center; justify-content: space-between;
-      width: 100%; background: transparent; border: 1px solid transparent;
-      color: var(--text-muted); padding: 10px 12px; border-radius: var(--radius-md);
-      font-size: 0.86rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
-      margin-bottom: 4px; text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 4px;
+      text-align: left;
     }
-    .nav-btn:hover { background: var(--bg-elevated); color: var(--text-main); }
+
+    .nav-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-main);
+    }
+
     .nav-btn.active {
-      background: var(--primary-glow); border-color: rgba(56, 189, 248, 0.35);
-      color: var(--primary); font-weight: 600;
+      background: var(--primary-glow);
+      border-color: rgba(56, 189, 248, 0.35);
+      color: var(--primary);
+      font-weight: 600;
     }
+
     .nav-pill {
-      font-size: 0.7rem; background: var(--bg-base); color: var(--text-muted);
-      padding: 2px 7px; border-radius: 999px; border: 1px solid var(--border);
+      font-size: 0.7rem;
+      background: var(--bg-base);
+      color: var(--text-muted);
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
     }
 
     .sidebar-footer {
-      margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 8px;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .fs-status {
-      font-size: 0.75rem; padding: 10px; border-radius: var(--radius-md);
-      background: var(--bg-base); border: 1px solid var(--border);
-      display: flex; align-items: center; gap: 8px; color: var(--text-muted);
-    }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
-    .dot.online { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
 
-    /* MAIN AREA */
-    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar {
-      height: 64px; background: var(--bg-surface); border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 28px;
+    .fs-status {
+      font-size: 0.75rem;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
       flex-shrink: 0;
     }
-    .topbar-left { display: flex; align-items: center; gap: 14px; }
-    .topbar-title { font-size: 1.1rem; font-weight: 700; }
-    .mcp-strip { display: flex; align-items: center; gap: 6px; }
-    .mcp-chip {
-      font-size: 0.72rem; padding: 4px 9px; border-radius: 999px;
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      color: var(--text-muted); display: flex; align-items: center; gap: 5px; cursor: pointer;
-    }
-    .mcp-chip.active { border-color: rgba(16, 185, 129, 0.4); color: #a7f3d0; background: rgba(16, 185, 129, 0.1); }
 
-    .topbar-actions { display: flex; align-items: center; gap: 10px; }
-    .btn {
-      padding: 8px 14px; border-radius: var(--radius-sm); font-size: 0.82rem;
-      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
-      background: var(--bg-elevated); color: var(--text-main); transition: all 0.15s;
-      display: inline-flex; align-items: center; gap: 6px;
+    .dot.online {
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
     }
-    .btn:hover { border-color: var(--border-hover); background: #1e2638; }
+
+    /* MAIN AREA */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 64px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .topbar-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .mcp-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mcp-chip {
+      font-size: 0.72rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .mcp-chip.active {
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #a7f3d0;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      border-color: var(--border-hover);
+      background: #1e2638;
+    }
+
     .btn-primary {
       background: linear-gradient(135deg, var(--primary), #0284c7);
-      color: #04101c; border-color: transparent; font-weight: 700;
+      color: #04101c;
+      border-color: transparent;
+      font-weight: 700;
     }
-    .btn-primary:hover { filter: brightness(1.08); }
-    .btn-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.35); }
-    .btn-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.35); }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-emerald {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-rose {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border-color: rgba(244, 63, 94, 0.35);
+    }
 
     /* VIEWPORT CONTENT */
-    .viewport { flex: 1; overflow-y: auto; padding: 24px 28px; }
-    .view-pane { display: none; }
-    .view-pane.active { display: block; }
+    .viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+    }
+
+    .view-pane {
+      display: none;
+    }
+
+    .view-pane.active {
+      display: block;
+    }
 
     /* KANBAN */
     .kanban-grid {
-      display: grid; grid-template-columns: repeat(5, minmax(260px, 1fr));
-      gap: 16px; align-items: start; overflow-x: auto; padding-bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(260px, 1fr));
+      gap: 16px;
+      align-items: start;
+      overflow-x: auto;
+      padding-bottom: 16px;
     }
+
     .kanban-col {
-      background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 14px; min-height: 72vh;
-      display: flex; flex-direction: column;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      min-height: 72vh;
+      display: flex;
+      flex-direction: column;
     }
+
     .col-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
     }
-    .col-header h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: flex; align-items: center; gap: 7px; }
+
+    .col-header h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
     .task-card {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px;
-      cursor: pointer; transition: all 0.16s; position: relative;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.16s;
+      position: relative;
     }
-    .task-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
-    .task-id { font-family: monospace; font-size: 0.7rem; color: var(--primary); font-weight: 700; }
-    .task-title { font-size: 0.9rem; font-weight: 600; margin: 5px 0 6px; color: var(--text-main); line-height: 1.35; }
-    .task-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
-    .task-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .chip { font-size: 0.68rem; padding: 2px 7px; border-radius: 4px; background: var(--bg-base); border: 1px solid var(--border); color: var(--text-muted); }
-    .chip-agent { color: var(--indigo); border-color: rgba(129, 140, 248, 0.3); background: rgba(129, 140, 248, 0.1); }
-    .chip-skill { color: var(--primary); border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.08); }
+
+    .task-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .task-id {
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .task-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 5px 0 6px;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+
+    .task-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .chip {
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .chip-agent {
+      color: var(--indigo);
+      border-color: rgba(129, 140, 248, 0.3);
+      background: rgba(129, 140, 248, 0.1);
+    }
+
+    .chip-skill {
+      color: var(--primary);
+      border-color: rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
     .gate-box {
-      margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border);
-      display: flex; gap: 6px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      gap: 6px;
     }
-    .gate-box button { flex: 1; padding: 6px; font-size: 0.74rem; border-radius: 5px; cursor: pointer; font-weight: 700; border: none; }
+
+    .gate-box button {
+      flex: 1;
+      padding: 6px;
+      font-size: 0.74rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 700;
+      border: none;
+    }
 
     /* CARDS GRID (AGENTS, SKILLS, MCPS) */
-    .section-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
-    .entity-card {
-      background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 20px; cursor: pointer;
-      transition: all 0.16s; display: flex; flex-direction: column; justify-content: space-between;
+    .section-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
     }
-    .entity-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
-    .entity-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-    .entity-title { font-size: 1.02rem; font-weight: 700; color: var(--text-main); }
-    .entity-sub { font-size: 0.76rem; color: var(--primary); font-family: monospace; margin-bottom: 8px; }
-    .entity-body { font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
-    .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 18px;
+    }
+
+    .entity-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.16s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .entity-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .entity-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .entity-title {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .entity-sub {
+      font-size: 0.76rem;
+      color: var(--primary);
+      font-family: monospace;
+      margin-bottom: 8px;
+    }
+
+    .entity-body {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: auto;
+    }
 
     /* ORCHESTRATOR CONSOLE */
-    .orch-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
-    .panel { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; }
-    .panel h3 { font-size: 1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-    .panel p.sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; }
-    .form-field { margin-bottom: 14px; }
-    .form-field label { display: block; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
-    .form-field input, .form-field textarea, .form-field select {
-      width: 100%; background: var(--bg-base); border: 1px solid var(--border);
-      color: var(--text-main); padding: 10px 12px; border-radius: var(--radius-sm); font-size: 0.86rem;
+    .orch-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 22px;
     }
-    .form-field input:focus, .form-field textarea:focus { outline: none; border-color: var(--primary); }
+
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+    }
+
+    .panel h3 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel p.sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .form-field {
+      margin-bottom: 14px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+      width: 100%;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.86rem;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
 
     /* MODAL */
     .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(3, 6, 12, 0.82);
-      backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center;
-      z-index: 1000; padding: 20px;
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 12, 0.82);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
     }
-    .modal-backdrop.open { display: flex; }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
     .modal {
-      background: var(--bg-surface); border: 1px solid var(--border-hover);
-      border-radius: var(--radius-lg); width: 100%; max-width: 720px;
-      max-height: 90vh; overflow-y: auto; padding: 26px; box-shadow: var(--shadow);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hover);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 26px;
+      box-shadow: var(--shadow);
     }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 18px; }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
     .checkbox-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 8px; background: var(--bg-base); padding: 12px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); max-height: 210px; overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 8px;
+      background: var(--bg-base);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      max-height: 210px;
+      overflow-y: auto;
     }
-    .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-main); cursor: pointer; padding: 4px; border-radius: 4px; }
-    .check-item:hover { background: var(--bg-elevated); }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-main);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    .check-item:hover {
+      background: var(--bg-elevated);
+    }
 
     /* TOAST */
     #toast {
-      position: fixed; bottom: 22px; right: 22px; background: var(--bg-elevated);
-      border: 1px solid var(--primary); color: var(--text-main); padding: 12px 18px;
-      border-radius: var(--radius-md); font-size: 0.84rem; font-weight: 600;
-      box-shadow: var(--shadow); transform: translateY(120%); opacity: 0;
-      transition: all 0.25s; z-index: 2000;
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--primary);
+      color: var(--text-main);
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.84rem;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.25s;
+      z-index: 2000;
     }
-    #toast.show { transform: translateY(0); opacity: 1; }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- SIDEBAR -->
@@ -265,7 +679,8 @@
         <span class="dot" id="fs-dot"></span>
         <span id="fs-text">Modo Memória Local (Conecte a pasta p/ Auto-Save real)</span>
       </div>
-      <button type="button" class="btn btn-primary" style="width:100%; justify-content:center;" onclick="connectRepositoryFolder()">
+      <button type="button" class="btn btn-primary" style="width:100%; justify-content:center;"
+        onclick="connectRepositoryFolder()">
         🔗 Conectar Pasta do Projeto
       </button>
       <button type="button" class="btn" style="width:100%; justify-content:center;" onclick="downloadHarnessBundle()">
@@ -282,7 +697,9 @@
         <div class="mcp-strip" id="topbar-mcps"></div>
       </div>
       <div class="topbar-actions">
-        <button type="button" class="btn" onclick="reloadSkillsFromDisk()" title="Recarrega os 23 arquivos SKILL.md físicos e limpa cache do localStorage">🔄 Recarregar Skills do Disco</button>
+        <button type="button" class="btn" onclick="reloadSkillsFromDisk()"
+          title="Recarrega os 23 arquivos SKILL.md físicos e limpa cache do localStorage">🔄 Recarregar Skills do
+          Disco</button>
         <button type="button" class="btn" onclick="openSkillModal()">+ Nova Skill</button>
         <button type="button" class="btn" onclick="openAgentModal()">+ Novo Agente</button>
         <button type="button" class="btn btn-primary" onclick="openTaskModal()">+ Nova Tarefa</button>
@@ -296,26 +713,31 @@
         <div class="orch-layout">
           <div class="panel">
             <h3>🎯 Despacho Inteligente de Feature / Bugfix</h3>
-            <p class="sub">O Master Orchestrator analisa o <code>PROJECT_BRAIN.md</code>, detecta os MCPs ativos (Supabase, Stitch, Dart, Graft) e decompõe a demanda atribuindo o melhor Agente e suas Skills.</p>
-            
+            <p class="sub">O Master Orchestrator analisa o <code>PROJECT_BRAIN.md</code>, detecta os MCPs ativos
+              (Supabase, Stitch, Dart, Graft) e decompõe a demanda atribuindo o melhor Agente e suas Skills.</p>
+
             <div class="form-field">
               <label>Título da Demanda / Épico</label>
-              <input type="text" id="orch-title" placeholder="Ex: Implementar Checkout Offline com Sincronização Supabase e UI Material 3">
+              <input type="text" id="orch-title"
+                placeholder="Ex: Implementar Checkout Offline com Sincronização Supabase e UI Material 3">
             </div>
             <div class="form-field">
               <label>Descrição Técnica, Regras de Negócio e Restrições</label>
-              <textarea id="orch-desc" rows="5" placeholder="Descreva o que precisa ser feito. Ex: O preço deve ser centralizado no domínio (PrecoService), tela com 4 estados obrigatórios, persistência SQLite com índices e sincronização Supabase RLS..."></textarea>
+              <textarea id="orch-desc" rows="5"
+                placeholder="Descreva o que precisa ser feito. Ex: O preço deve ser centralizado no domínio (PrecoService), tela com 4 estados obrigatórios, persistência SQLite com índices e sincronização Supabase RLS..."></textarea>
             </div>
             <div class="form-field">
               <label>Complexidade Estimada</label>
               <select id="orch-complexity">
-                <option value="Alta (Decompor em Múltiplas Tarefas TDD)">Alta — Decompor em Spec + UI + TDD RED + GREEN + Auditoria</option>
+                <option value="Alta (Decompor em Múltiplas Tarefas TDD)">Alta — Decompor em Spec + UI + TDD RED + GREEN
+                  + Auditoria</option>
                 <option value="Média (Fluxo Padrão TDD)">Média — Fluxo Padrão TDD</option>
                 <option value="Baixa (Correção Cirúrgica)">Baixa — Correção Cirúrgica Direta</option>
               </select>
             </div>
             <div style="display:flex; gap:10px;">
-              <button type="button" class="btn btn-primary" onclick="orchestrateDemand()">⚡ Analisar, Decompor no Kanban & Gerar Prompt</button>
+              <button type="button" class="btn btn-primary" onclick="orchestrateDemand()">⚡ Analisar, Decompor no Kanban
+                & Gerar Prompt</button>
             </div>
           </div>
 
@@ -323,7 +745,8 @@
             <h3>📋 Prompt Canônico Gerado para o Chat da IDE</h3>
             <p class="sub">Copie e cole no Antigravity, Claude Code, Cursor ou Codex após decompor a demanda:</p>
             <div class="form-field">
-              <textarea id="orch-output" rows="13" readonly style="font-family:monospace; font-size:0.79rem; color:#a5f3fc;"></textarea>
+              <textarea id="orch-output" rows="13" readonly
+                style="font-family:monospace; font-size:0.79rem; color:#a5f3fc;"></textarea>
             </div>
             <button type="button" class="btn" onclick="copyOrchestratorPrompt()">📋 Copiar Prompt para o Agente</button>
           </div>
@@ -333,7 +756,8 @@
       <!-- VIEW 2: KANBAN -->
       <section id="view-kanban" class="view-pane">
         <div class="section-bar">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer card para inspecionar, editar agente/skills, mudar coluna ou aprovar no Gate Humano.</p>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer card para inspecionar, editar
+            agente/skills, mudar coluna ou aprovar no Gate Humano.</p>
         </div>
         <div class="kanban-grid" id="kanban-container"></div>
       </section>
@@ -341,7 +765,8 @@
       <!-- VIEW 3: AGENTES -->
       <section id="view-agents" class="view-pane">
         <div class="section-bar">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer Agente para editar sua persona, senioridade, MCPs permitidos e selecionar suas Skills (1:N).</p>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer Agente para editar sua persona,
+            senioridade, MCPs permitidos e selecionar suas Skills (1:N).</p>
           <button type="button" class="btn btn-primary" onclick="openAgentModal()">+ Criar Novo Agente</button>
         </div>
         <div class="cards-grid" id="agents-grid"></div>
@@ -350,7 +775,9 @@
       <!-- VIEW 4: SKILLS -->
       <section id="view-skills" class="view-pane">
         <div class="section-bar">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Catálogo global desacoplado. Ao criar ou editar uma Skill, ela é gravada em <code>.agents/skills/&lt;id&gt;/SKILL.md</code> e fica disponível para qualquer Agente.</p>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Catálogo global desacoplado. Ao criar ou editar uma
+            Skill, ela é gravada em <code>.agents/skills/&lt;id&gt;/SKILL.md</code> e fica disponível para qualquer
+            Agente.</p>
           <button type="button" class="btn btn-primary" onclick="openSkillModal()">+ Criar Nova Skill</button>
         </div>
         <div class="cards-grid" id="skills-grid"></div>
@@ -359,7 +786,8 @@
       <!-- VIEW 5: MCPS -->
       <section id="view-mcps" class="view-pane">
         <div class="section-bar">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Servidores Model Context Protocol reconhecidos pelo Orquestrador e pelos Especialistas (sincronizado com <code>.agents/mcp.json</code>).</p>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Servidores Model Context Protocol reconhecidos pelo
+            Orquestrador e pelos Especialistas (sincronizado com <code>.agents/mcp.json</code>).</p>
         </div>
         <div class="cards-grid" id="mcps-grid"></div>
       </section>
@@ -426,167 +854,167 @@
       },
       skills: {
         "antigravity_skill_orchestrator": {
-                "name": "Antigravity Skill Orchestrator",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/antigravity-skill-orchestrator/SKILL.md",
-                "desc": "Meta-orquestrador cognitivo para triagem de tarefas e ativação progressiva de skills. Avalia complexidade antes de delegar para evitar inchaço de contexto e chamadas desnecessárias. Use sempre no início de tarefas complexas ou fluxos de desenvolvimento.",
-                "rawMarkdown": "---\nname: antigravity-skill-orchestrator\ndescription: Meta-orquestrador cognitivo para triagem de tarefas e ativação progressiva de skills. Avalia complexidade antes de delegar para evitar inchaço de contexto e chamadas desnecessárias. Use sempre no início de tarefas complexas ou fluxos de desenvolvimento.\n---\n\n# Antigravity Skill Orchestrator\n\nVocê atua como o avaliador prévio de execução no harness. Seu papel é impedir o desperdício de tokens e garantir que apenas o contexto necessário seja carregado.\n\n## Regras de Triagem\n\n1. **Alterações Elementares (Low Complexity):**\n   - Correções simples de sintaxe, ajustes pontuais de tema/widgets, renomeação de variáveis ou adição de tipagens triviais.\n   - **Ação:** NÃO ative skills adicionais. Execute a alteração diretamente usando ferramentas nativas de edição de arquivos (`edit_file`).\n\n2. **Planejamento de Funcionalidade ou Refatoração Estrutural:**\n   - Criação de novas features, telas, fluxos de navegação ou integração de fontes de dados.\n   - **Ação:** Invoque a skill `spec-discovery` e/ou `clean-architecture`.\n\n3. **Performance Mobile (Flutter):**\n   - Rebuilds excessivos, jank em listas/animações, tamanho do app elevado ou descarte de quadros.\n   - **Ação:** Ative exclusivamente a skill `clean-architecture` (isolamento e refatoração) com apoio de `mobile-ux` (skeletons e estados).\n\n4. **Validação e Entrega:**\n   - Criação de testes unitários/integração ou preparação para merge.\n   - **Ação:** Ative a skill `code-quality-tests`.\n\n## Tabela de Roteamento (tarefa → agente + skills)\n\nConsulte esta tabela para delegar; ative no máximo 2 skills por turno, priorizando a primeira listada.\n\n| Tarefa | Agente | Skills (ordem de prioridade) |\n|---|---|---|\n| Descobrir escopo, PRD, regras de negócio | `product_architect` | `spec-discovery` |\n| Protótipo visual, tokens, Stitch | `ui_ux_designer` | `mobile-ux` |\n| Breakpoints e telas grandes (design) | `ui_ux_designer` | `flutter-build-responsive-layout`, `mobile-ux` |\n| Inventário de strings / idiomas (design) | `ui_ux_designer` | `flutter-setup-localization`, `mobile-ux` |\n| Estruturar feature (camadas, pastas) | `mobile_builder` | `flutter-apply-architecture-best-practices`, `clean-architecture` |\n| Estado com Riverpod / 4 estados | `mobile_builder` | `flutter-state-riverpod`, `mobile-ux` |\n| Navegação, rotas, deep links | `mobile_builder` | `flutter-setup-declarative-routing` |\n| Textos/i18n no código | `mobile_builder` | `flutter-setup-localization` |\n| Layout adaptativo no código | `mobile_builder` | `flutter-build-responsive-layout` |\n| REST/HTTP em services | `mobile_builder` | `flutter-use-http-package`, `local-first-data` |\n| Supabase (auth, RLS, storage) | `mobile_builder` | `supabase-flutter`, `local-first-data` |\n| Banco local, sync offline | `mobile_builder` | `local-first-data`, `supabase-flutter` |\n| Refatorar if-else/JSON/sealed | `mobile_builder` ou `qa_validator` | `dart-use-pattern-matching`, `clean-architecture` |\n| Testes RED (unit/widget) | `tdd_tester` | `clean-architecture`, `flutter-add-widget-test` |\n| Teste E2E em device | `tdd_tester` | `flutter-add-integration-test`, `code-quality-tests` |\n| QA, lint, autorreparo | `qa_validator` | `code-quality-tests`, `dart-use-pattern-matching` |\n| Cobertura e gate de CI | `qa_validator` | `dart-collect-coverage`, `code-quality-tests` |\n| Commit semântico | `git_committer` | (nenhuma — usa `ai-memory` + diff) |\n\n## Protocolo de Decisão\n- Nunca ative mais de duas skills simultaneamente no mesmo turno.\n- Garanta que as regras contidas em `.agents/rules/global.md` e `.agents/rules/mobile.md` sejam o teto máximo de conformidade."
+          "name": "Antigravity Skill Orchestrator",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/antigravity-skill-orchestrator/SKILL.md",
+          "desc": "Meta-orquestrador cognitivo para triagem de tarefas e ativação progressiva de skills. Avalia complexidade antes de delegar para evitar inchaço de contexto e chamadas desnecessárias. Use sempre no início de tarefas complexas ou fluxos de desenvolvimento.",
+          "rawMarkdown": "---\nname: antigravity-skill-orchestrator\ndescription: Meta-orquestrador cognitivo para triagem de tarefas e ativação progressiva de skills. Avalia complexidade antes de delegar para evitar inchaço de contexto e chamadas desnecessárias. Use sempre no início de tarefas complexas ou fluxos de desenvolvimento.\n---\n\n# Antigravity Skill Orchestrator\n\nVocê atua como o avaliador prévio de execução no harness. Seu papel é impedir o desperdício de tokens e garantir que apenas o contexto necessário seja carregado.\n\n## Regras de Triagem\n\n1. **Alterações Elementares (Low Complexity):**\n   - Correções simples de sintaxe, ajustes pontuais de tema/widgets, renomeação de variáveis ou adição de tipagens triviais.\n   - **Ação:** NÃO ative skills adicionais. Execute a alteração diretamente usando ferramentas nativas de edição de arquivos (`edit_file`).\n\n2. **Planejamento de Funcionalidade ou Refatoração Estrutural:**\n   - Criação de novas features, telas, fluxos de navegação ou integração de fontes de dados.\n   - **Ação:** Invoque a skill `spec-discovery` e/ou `clean-architecture`.\n\n3. **Performance Mobile (Flutter):**\n   - Rebuilds excessivos, jank em listas/animações, tamanho do app elevado ou descarte de quadros.\n   - **Ação:** Ative exclusivamente a skill `clean-architecture` (isolamento e refatoração) com apoio de `mobile-ux` (skeletons e estados).\n\n4. **Validação e Entrega:**\n   - Criação de testes unitários/integração ou preparação para merge.\n   - **Ação:** Ative a skill `code-quality-tests`.\n\n## Tabela de Roteamento (tarefa → agente + skills)\n\nConsulte esta tabela para delegar; ative no máximo 2 skills por turno, priorizando a primeira listada.\n\n| Tarefa | Agente | Skills (ordem de prioridade) |\n|---|---|---|\n| Descobrir escopo, PRD, regras de negócio | `product_architect` | `spec-discovery` |\n| Protótipo visual, tokens, Stitch | `ui_ux_designer` | `mobile-ux` |\n| Breakpoints e telas grandes (design) | `ui_ux_designer` | `flutter-build-responsive-layout`, `mobile-ux` |\n| Inventário de strings / idiomas (design) | `ui_ux_designer` | `flutter-setup-localization`, `mobile-ux` |\n| Estruturar feature (camadas, pastas) | `mobile_builder` | `flutter-apply-architecture-best-practices`, `clean-architecture` |\n| Estado com Riverpod / 4 estados | `mobile_builder` | `flutter-state-riverpod`, `mobile-ux` |\n| Navegação, rotas, deep links | `mobile_builder` | `flutter-setup-declarative-routing` |\n| Textos/i18n no código | `mobile_builder` | `flutter-setup-localization` |\n| Layout adaptativo no código | `mobile_builder` | `flutter-build-responsive-layout` |\n| REST/HTTP em services | `mobile_builder` | `flutter-use-http-package`, `local-first-data` |\n| Supabase (auth, RLS, storage) | `mobile_builder` | `supabase-flutter`, `local-first-data` |\n| Banco local, sync offline | `mobile_builder` | `local-first-data`, `supabase-flutter` |\n| Refatorar if-else/JSON/sealed | `mobile_builder` ou `qa_validator` | `dart-use-pattern-matching`, `clean-architecture` |\n| Testes RED (unit/widget) | `tdd_tester` | `clean-architecture`, `flutter-add-widget-test` |\n| Teste E2E em device | `tdd_tester` | `flutter-add-integration-test`, `code-quality-tests` |\n| QA, lint, autorreparo | `qa_validator` | `code-quality-tests`, `dart-use-pattern-matching` |\n| Cobertura e gate de CI | `qa_validator` | `dart-collect-coverage`, `code-quality-tests` |\n| Commit semântico | `git_committer` | (nenhuma — usa `ai-memory` + diff) |\n\n## Protocolo de Decisão\n- Nunca ative mais de duas skills simultaneamente no mesmo turno.\n- Garanta que as regras contidas em `.agents/rules/global.md` e `.agents/rules/mobile.md` sejam o teto máximo de conformidade."
         },
         "clean_architecture": {
-                "name": "Clean Architecture & Domain Purity (Flutter/Dart 3)",
-                "category": "Engenharia de Software",
-                "file": ".agents/skills/clean-architecture/SKILL.md",
-                "desc": "Arquitetura Limpa em Flutter com separação estrita Presentation, Domain e Data, Domain Services puros e tratamento funcional de erros com sealed classes.",
-                "rawMarkdown": "---\nname: clean-architecture\ndescription: Arquitetura Limpa em Flutter com separação estrita Presentation, Domain e Data, Domain Services puros e tratamento funcional de erros com sealed classes.\ncategory: Engenharia de Software\n---\n\n# Skill: Clean Architecture & Domain Purity (Flutter/Dart 3)\n\n## 1. Quando Acionar Esta Skill\nAcione sempre que criar uma nova feature, refatorar regras de negócio espalhadas em Widgets/Controllers ou corrigir divergências de cálculo comercial entre telas (ex: pesquisa vs pedido).\n\n## 2. Topologia de Pastas por Feature\n```text\nlib/features/<feature_name>/\n├── domain/\n│   ├── entities/          # Objetos imutáveis de negócio (100% Dart puro)\n│   ├── repositories/      # Interfaces abstratas (contratos)\n│   ├── services/          # Regras comerciais complexas (ex: PrecoDomainService)\n│   └── failures/          # Sealed classes de falhas de domínio\n├── data/\n│   ├── datasources/       # LocalDataSource (SQLite) e RemoteDataSource (REST/Supabase)\n│   ├── models/            # DTOs com fromJson/toJson e fromMap/toMap + toEntity()\n│   └── repositories/      # Implementação concreta dos contratos de domain\n└── presentation/\n    ├── controllers/       # Notifiers / AsyncNotifiers (Riverpod)\n    ├── pages/             # Scaffolds de tela\n    └── widgets/           # Componentes visuais desacoplados e const\n```\n\n## 3. Regras Inegociáveis (Guardrails)\n1. **Regra da Dependência**: `presentation` -> `domain` <- `data`. O diretório `domain` NUNCA importa pacotes de UI (`package:flutter/material.dart`) nem pacotes de banco/rede (`sqflite`, `dio`, `supabase_flutter`).\n2. **Centralização de Cálculos**: É proibido calcular preços, descontos, impostos ou saldos dentro de `Widget.build()` ou dentro de queries SQL duplicadas. Crie um `DomainService` testável.\n3. **Model vs Entity**: `Model` conhece JSON e colunas do SQLite (`pro00_codigo`). `Entity` usa nomes semânticos do domínio (`idProduto`, `precoBase`) e valida invariantes no construtor.\n\n## 4. Padrão de Código Canônico (Dart 3 Sealed Result & Domain Service)\n```dart\n// domain/failures/result.dart\nsealed class Result<T> {\n  const Result();\n}\nfinal class Success<T> extends Result<T> {\n  final T value;\n  const Success(this.value);\n}\nfinal class Failure<T> extends Result<T> {\n  final String message;\n  final String code;\n  const Failure(this.message, {this.code = 'DOMAIN_ERROR'});\n}\n\n// domain/services/preco_calculator_service.dart\nclass PrecoCalculatorService {\n  const PrecoCalculatorService();\n\n  double calcularPrecoFinal({\n    required double precoTabela,\n    required double fatorPlanoPagamento,\n    required double multiplicadorEmbalagem,\n    double percentualDesconto = 0,\n  }) {\n    final fator = fatorPlanoPagamento > 0 ? fatorPlanoPagamento : 1.0;\n    final mult = multiplicadorEmbalagem > 0 ? multiplicadorEmbalagem : 1.0;\n    final bruto = precoTabela * fator * mult;\n    final comDesconto = bruto * (1 - (percentualDesconto / 100));\n    return double.parse(comDesconto.toStringAsFixed(2));\n  }\n}\n```\n\n## 5. Antipadrões Proibidos\n- ❌ Chamar `DatabaseHelper.instance.query(...)` diretamente de dentro de um `StatefulWidget`.\n- ❌ Retornar `Map<String, dynamic>` cru do repositório para a camada de UI.\n- ❌ Silenciar exceções com `catch (e) { return []; }` sem propagar `Failure` para o estado da tela.\n"
+          "name": "Clean Architecture & Domain Purity (Flutter/Dart 3)",
+          "category": "Engenharia de Software",
+          "file": ".agents/skills/clean-architecture/SKILL.md",
+          "desc": "Arquitetura Limpa em Flutter com separação estrita Presentation, Domain e Data, Domain Services puros e tratamento funcional de erros com sealed classes.",
+          "rawMarkdown": "---\nname: clean-architecture\ndescription: Arquitetura Limpa em Flutter com separação estrita Presentation, Domain e Data, Domain Services puros e tratamento funcional de erros com sealed classes.\ncategory: Engenharia de Software\n---\n\n# Skill: Clean Architecture & Domain Purity (Flutter/Dart 3)\n\n## 1. Quando Acionar Esta Skill\nAcione sempre que criar uma nova feature, refatorar regras de negócio espalhadas em Widgets/Controllers ou corrigir divergências de cálculo comercial entre telas (ex: pesquisa vs pedido).\n\n## 2. Topologia de Pastas por Feature\n```text\nlib/features/<feature_name>/\n├── domain/\n│   ├── entities/          # Objetos imutáveis de negócio (100% Dart puro)\n│   ├── repositories/      # Interfaces abstratas (contratos)\n│   ├── services/          # Regras comerciais complexas (ex: PrecoDomainService)\n│   └── failures/          # Sealed classes de falhas de domínio\n├── data/\n│   ├── datasources/       # LocalDataSource (SQLite) e RemoteDataSource (REST/Supabase)\n│   ├── models/            # DTOs com fromJson/toJson e fromMap/toMap + toEntity()\n│   └── repositories/      # Implementação concreta dos contratos de domain\n└── presentation/\n    ├── controllers/       # Notifiers / AsyncNotifiers (Riverpod)\n    ├── pages/             # Scaffolds de tela\n    └── widgets/           # Componentes visuais desacoplados e const\n```\n\n## 3. Regras Inegociáveis (Guardrails)\n1. **Regra da Dependência**: `presentation` -> `domain` <- `data`. O diretório `domain` NUNCA importa pacotes de UI (`package:flutter/material.dart`) nem pacotes de banco/rede (`sqflite`, `dio`, `supabase_flutter`).\n2. **Centralização de Cálculos**: É proibido calcular preços, descontos, impostos ou saldos dentro de `Widget.build()` ou dentro de queries SQL duplicadas. Crie um `DomainService` testável.\n3. **Model vs Entity**: `Model` conhece JSON e colunas do SQLite (`pro00_codigo`). `Entity` usa nomes semânticos do domínio (`idProduto`, `precoBase`) e valida invariantes no construtor.\n\n## 4. Padrão de Código Canônico (Dart 3 Sealed Result & Domain Service)\n```dart\n// domain/failures/result.dart\nsealed class Result<T> {\n  const Result();\n}\nfinal class Success<T> extends Result<T> {\n  final T value;\n  const Success(this.value);\n}\nfinal class Failure<T> extends Result<T> {\n  final String message;\n  final String code;\n  const Failure(this.message, {this.code = 'DOMAIN_ERROR'});\n}\n\n// domain/services/preco_calculator_service.dart\nclass PrecoCalculatorService {\n  const PrecoCalculatorService();\n\n  double calcularPrecoFinal({\n    required double precoTabela,\n    required double fatorPlanoPagamento,\n    required double multiplicadorEmbalagem,\n    double percentualDesconto = 0,\n  }) {\n    final fator = fatorPlanoPagamento > 0 ? fatorPlanoPagamento : 1.0;\n    final mult = multiplicadorEmbalagem > 0 ? multiplicadorEmbalagem : 1.0;\n    final bruto = precoTabela * fator * mult;\n    final comDesconto = bruto * (1 - (percentualDesconto / 100));\n    return double.parse(comDesconto.toStringAsFixed(2));\n  }\n}\n```\n\n## 5. Antipadrões Proibidos\n- ❌ Chamar `DatabaseHelper.instance.query(...)` diretamente de dentro de um `StatefulWidget`.\n- ❌ Retornar `Map<String, dynamic>` cru do repositório para a camada de UI.\n- ❌ Silenciar exceções com `catch (e) { return []; }` sem propagar `Failure` para o estado da tela.\n"
         },
         "code_quality_tests": {
-                "name": "Strict TDD & Isolamento de Testes em Flutter",
-                "category": "Qualidade & Testes",
-                "file": ".agents/skills/code-quality-tests/SKILL.md",
-                "desc": "TDD estrito (Red-Green-Refactor), testes unitários de serviços de domínio, isolamento de SQLite em memória (sqflite_common_ffi) e contratos anti-regressão.",
-                "rawMarkdown": "---\nname: code-quality-tests\ndescription: TDD estrito (Red-Green-Refactor), testes unitários de serviços de domínio, isolamento de SQLite em memória (sqflite_common_ffi) e contratos anti-regressão.\ncategory: Qualidade & Testes\n---\n\n# Skill: Strict TDD & Isolamento de Testes em Flutter\n\n## 1. Fluxo Obrigatório Red-Green-Refactor\n1. **RED**: Crie o arquivo `*_test.dart` reproduzindo o bug ou validando o novo requisito. Rode `flutter test <caminho>` e confirme que FALHOU.\n2. **GREEN**: Escreva o código de produção mínimo para satisfazer o teste.\n3. **REFACTOR**: Elimine duplicações, rode `dart analyze` e confirme 0 warnings.\n\n## 2. Regra Crítica para Testes com SQLite (`sqflite_common_ffi`)\nNunca compartilhe o mesmo arquivo `.db` físico entre testes paralelos (isso causa `database is locked`). Use banco em memória isolado por cada teste:\n\n```dart\nimport 'package:flutter_test/flutter_test.dart';\nimport 'package:sqflite_common_ffi/sqflite_ffi.dart';\n\nvoid main() {\n  late Database db;\n\n  setUpAll(() {\n    sqfliteFfiInit();\n    databaseFactory = databaseFactoryFfi;\n  });\n\n  setUp(() async {\n    db = await databaseFactory.openDatabase(inMemoryDatabasePath);\n    await criarSchemaDeTeste(db);\n  });\n\n  tearDown(() async {\n    await db.close();\n  });\n\n  test('Deve calcular o mesmo preço na listagem e no detalhe do produto', () async {\n    // Arrange, Act, Assert\n  });\n}\n```\n"
+          "name": "Strict TDD & Isolamento de Testes em Flutter",
+          "category": "Qualidade & Testes",
+          "file": ".agents/skills/code-quality-tests/SKILL.md",
+          "desc": "TDD estrito (Red-Green-Refactor), testes unitários de serviços de domínio, isolamento de SQLite em memória (sqflite_common_ffi) e contratos anti-regressão.",
+          "rawMarkdown": "---\nname: code-quality-tests\ndescription: TDD estrito (Red-Green-Refactor), testes unitários de serviços de domínio, isolamento de SQLite em memória (sqflite_common_ffi) e contratos anti-regressão.\ncategory: Qualidade & Testes\n---\n\n# Skill: Strict TDD & Isolamento de Testes em Flutter\n\n## 1. Fluxo Obrigatório Red-Green-Refactor\n1. **RED**: Crie o arquivo `*_test.dart` reproduzindo o bug ou validando o novo requisito. Rode `flutter test <caminho>` e confirme que FALHOU.\n2. **GREEN**: Escreva o código de produção mínimo para satisfazer o teste.\n3. **REFACTOR**: Elimine duplicações, rode `dart analyze` e confirme 0 warnings.\n\n## 2. Regra Crítica para Testes com SQLite (`sqflite_common_ffi`)\nNunca compartilhe o mesmo arquivo `.db` físico entre testes paralelos (isso causa `database is locked`). Use banco em memória isolado por cada teste:\n\n```dart\nimport 'package:flutter_test/flutter_test.dart';\nimport 'package:sqflite_common_ffi/sqflite_ffi.dart';\n\nvoid main() {\n  late Database db;\n\n  setUpAll(() {\n    sqfliteFfiInit();\n    databaseFactory = databaseFactoryFfi;\n  });\n\n  setUp(() async {\n    db = await databaseFactory.openDatabase(inMemoryDatabasePath);\n    await criarSchemaDeTeste(db);\n  });\n\n  tearDown(() async {\n    await db.close();\n  });\n\n  test('Deve calcular o mesmo preço na listagem e no detalhe do produto', () async {\n    // Arrange, Act, Assert\n  });\n}\n```\n"
         },
         "dart_collect_coverage": {
-                "name": "Cobertura de Testes (LCOV)",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/dart-collect-coverage/SKILL.md",
-                "desc": "Cobertura de testes Flutter com relatório LCOV e gates de CI. Use ao medir cobertura do projeto ou exigir mínimo em pipeline.",
-                "rawMarkdown": "---\nname: dart-collect-coverage\ndescription: Cobertura de testes Flutter com relatório LCOV e gates de CI. Use ao medir cobertura do projeto ou exigir mínimo em pipeline.\n---\n\n# Skill: Cobertura de Testes (LCOV)\n\n> Adaptado de `dart-lang/skills` (time oficial do Dart, licença BSD-3-Clause).\n\n## 1. Coleta Rápida (Flutter)\n```bash\nflutter test --coverage\n```\nGera `coverage/lcov.info`. Para HTML navegável (exige `lcov` instalado):\n```bash\ngenhtml coverage/lcov.info -o coverage/html\n```\n\n## 2. Coleta Avançada (package:coverage)\n```bash\nflutter pub add dev:coverage\ndart run coverage:test_with_coverage\n```\nValida `coverage/coverage.json` + `coverage/lcov.info`. Em monorepo, passar os dirs de teste explicitamente.\n\n## 3. Diretivas de Exclusão\n- Linha: `// coverage:ignore-line` · Bloco: `ignore-start/end` · Arquivo: `// coverage:ignore-file`.\n- Usar para gerados e `UnimplementedError` de providers base; **nunca** para esconder regra de negócio sem teste.\n\n## 4. Gate de CI\n- `validate` do `mobile-cicd` pode extrair o percentual do `lcov.info` e falhar abaixo do mínimo do projeto (sugestão inicial: 70% em `lib/`, excluídos gerados).\n- Tendência > número absoluto: cobertura caindo em PR bloqueia merge.\n\n## 5. Workflow (checklist)\n- [ ] Rodar coleta e abrir relatório.\n- [ ] Arquivos críticos (domain, repositories) com cobertura total.\n- [ ] Adicionar testes onde a cobertura caiu antes de novas features.\n"
+          "name": "Cobertura de Testes (LCOV)",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/dart-collect-coverage/SKILL.md",
+          "desc": "Cobertura de testes Flutter com relatório LCOV e gates de CI. Use ao medir cobertura do projeto ou exigir mínimo em pipeline.",
+          "rawMarkdown": "---\nname: dart-collect-coverage\ndescription: Cobertura de testes Flutter com relatório LCOV e gates de CI. Use ao medir cobertura do projeto ou exigir mínimo em pipeline.\n---\n\n# Skill: Cobertura de Testes (LCOV)\n\n> Adaptado de `dart-lang/skills` (time oficial do Dart, licença BSD-3-Clause).\n\n## 1. Coleta Rápida (Flutter)\n```bash\nflutter test --coverage\n```\nGera `coverage/lcov.info`. Para HTML navegável (exige `lcov` instalado):\n```bash\ngenhtml coverage/lcov.info -o coverage/html\n```\n\n## 2. Coleta Avançada (package:coverage)\n```bash\nflutter pub add dev:coverage\ndart run coverage:test_with_coverage\n```\nValida `coverage/coverage.json` + `coverage/lcov.info`. Em monorepo, passar os dirs de teste explicitamente.\n\n## 3. Diretivas de Exclusão\n- Linha: `// coverage:ignore-line` · Bloco: `ignore-start/end` · Arquivo: `// coverage:ignore-file`.\n- Usar para gerados e `UnimplementedError` de providers base; **nunca** para esconder regra de negócio sem teste.\n\n## 4. Gate de CI\n- `validate` do `mobile-cicd` pode extrair o percentual do `lcov.info` e falhar abaixo do mínimo do projeto (sugestão inicial: 70% em `lib/`, excluídos gerados).\n- Tendência > número absoluto: cobertura caindo em PR bloqueia merge.\n\n## 5. Workflow (checklist)\n- [ ] Rodar coleta e abrir relatório.\n- [ ] Arquivos críticos (domain, repositories) com cobertura total.\n- [ ] Adicionar testes onde a cobertura caiu antes de novas features.\n"
         },
         "dart_use_pattern_matching": {
-                "name": "Dart 3 Pattern Matching & Modern Syntax",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/dart-use-pattern-matching/SKILL.md",
-                "desc": "Diretrizes canônicas e padrões arquiteturais para dart-use-pattern-matching.",
-                "rawMarkdown": "---\nname: dart-use-pattern-matching\ndescription: Uso avançado de Dart 3: Records, Sealed Classes, Switch Expressions exaustivas, Destructuring e If-Case para código seguro e conciso.\ncategory: Engenharia Mobile\n---\n\n# Skill: Dart 3 Pattern Matching & Modern Syntax\n\n## 1. Quando Usar\n- Substituir hierarquias verbosas de `if/else` por `switch` expressions exaustivas sobre `sealed class`.\n- Desestruturar JSONs ou tuplas retornadas de consultas combinadas usando `Records`.\n\n```dart\nWidget buildStatusBadge(StatusPedido status) {\n  return switch (status) {\n    PedidoRascunho() => const Chip(label: Text('Rascunho')),\n    PedidoSincronizando(:final progresso) => CircularProgressIndicator(value: progresso),\n    PedidoTransmitido(:final numeroErp) => Chip(label: Text('ERP #$numeroErp')),\n    PedidoComErro(:final motivo) => Tooltip(message: motivo, child: const Icon(Icons.error)),\n  };\n}\n```\n"
+          "name": "Dart 3 Pattern Matching & Modern Syntax",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/dart-use-pattern-matching/SKILL.md",
+          "desc": "Diretrizes canônicas e padrões arquiteturais para dart-use-pattern-matching.",
+          "rawMarkdown": "---\nname: dart-use-pattern-matching\ndescription: Uso avançado de Dart 3: Records, Sealed Classes, Switch Expressions exaustivas, Destructuring e If-Case para código seguro e conciso.\ncategory: Engenharia Mobile\n---\n\n# Skill: Dart 3 Pattern Matching & Modern Syntax\n\n## 1. Quando Usar\n- Substituir hierarquias verbosas de `if/else` por `switch` expressions exaustivas sobre `sealed class`.\n- Desestruturar JSONs ou tuplas retornadas de consultas combinadas usando `Records`.\n\n```dart\nWidget buildStatusBadge(StatusPedido status) {\n  return switch (status) {\n    PedidoRascunho() => const Chip(label: Text('Rascunho')),\n    PedidoSincronizando(:final progresso) => CircularProgressIndicator(value: progresso),\n    PedidoTransmitido(:final numeroErp) => Chip(label: Text('ERP #$numeroErp')),\n    PedidoComErro(:final motivo) => Tooltip(message: motivo, child: const Icon(Icons.error)),\n  };\n}\n```\n"
         },
         "flutter_add_integration_test": {
-                "name": "Testes de Integração (integration_test)",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/flutter-add-integration-test/SKILL.md",
-                "desc": "Testes de integração end-to-end (integration_test) com fluxos de usuário e profiling. Use ao automatizar jornadas críticas (login, checkout, onboarding) em device/emulador.",
-                "rawMarkdown": "---\nname: flutter-add-integration-test\ndescription: Testes de integração end-to-end (integration_test) com fluxos de usuário e profiling. Use ao automatizar jornadas críticas (login, checkout, onboarding) em device/emulador.\n---\n\n# Skill: Testes de Integração (integration_test)\n\n> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).\n> Foco mobile (Android/iOS); fluxos web/Chrome da fonte original foram removidos.\n\n## 1. Setup\n- `flutter pub add 'dev:integration_test:{\"sdk\":\"flutter\"}'`.\n- Diretório `integration_test/` na raiz; arquivos `<nome>_test.dart`.\n- `IntegrationTestWidgetsFlutterBinding.ensureInitialized()` no início do `main()`.\n- `ValueKey`s nos widgets críticos (botões, campos, itens de lista).\n\n## 2. Autoria\n- Carregar o app real: `await tester.pumpWidget(const MyApp())`.\n- Após cada interação (`tap`, `enterText`): `await tester.pumpAndSettle()`.\n- Asserções por `find.byKey(ValueKey('...'))` + `findsOneWidget`/`findsNothing`.\n- Listas: `scrollUntilVisible` antes de interagir com item fora da tela.\n\n## 3. Execução (device/emulador conectado)\n```bash\nflutter test integration_test/app_test.dart\n```\n- Para profiling com `binding.traceAction()`, usar driver dedicado (`test_driver/perf_driver.dart`).\n- `PumpAndSettleTimedOutException` → há animação infinita: isolar com `pump(duration)` ou desativar a animação no teste.\n\n## 4. Workflow (checklist)\n- [ ] Deps + `ValueKey`s nos alvos.\n- [ ] Escrever `integration_test/<fluxo>_test.dart` cobrindo o caminho feliz + 1 falha (ex.: login inválido).\n- [ ] Rodar em Android e iOS antes de considerar verde.\n- [ ] Falhou? Revisar saída → `scrollUntilVisible`/`pump` → reexecutar.\n\n## 5. Exemplo Mínimo\n\n```dart\nvoid main() {\n  IntegrationTestWidgetsFlutterBinding.ensureInitialized();\n\n  testWidgets('login válido abre a home', (tester) async {\n    await tester.pumpWidget(const MyApp());\n    await tester.enterText(find.byKey(const ValueKey('email')), 'user@mail.com');\n    await tester.enterText(find.byKey(const ValueKey('password')), 'Senha123');\n    await tester.tap(find.byKey(const ValueKey('login_button')));\n    await tester.pumpAndSettle();\n    expect(find.byKey(const ValueKey('home_screen')), findsOneWidget);\n  });\n}\n```\n"
+          "name": "Testes de Integração (integration_test)",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/flutter-add-integration-test/SKILL.md",
+          "desc": "Testes de integração end-to-end (integration_test) com fluxos de usuário e profiling. Use ao automatizar jornadas críticas (login, checkout, onboarding) em device/emulador.",
+          "rawMarkdown": "---\nname: flutter-add-integration-test\ndescription: Testes de integração end-to-end (integration_test) com fluxos de usuário e profiling. Use ao automatizar jornadas críticas (login, checkout, onboarding) em device/emulador.\n---\n\n# Skill: Testes de Integração (integration_test)\n\n> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).\n> Foco mobile (Android/iOS); fluxos web/Chrome da fonte original foram removidos.\n\n## 1. Setup\n- `flutter pub add 'dev:integration_test:{\"sdk\":\"flutter\"}'`.\n- Diretório `integration_test/` na raiz; arquivos `<nome>_test.dart`.\n- `IntegrationTestWidgetsFlutterBinding.ensureInitialized()` no início do `main()`.\n- `ValueKey`s nos widgets críticos (botões, campos, itens de lista).\n\n## 2. Autoria\n- Carregar o app real: `await tester.pumpWidget(const MyApp())`.\n- Após cada interação (`tap`, `enterText`): `await tester.pumpAndSettle()`.\n- Asserções por `find.byKey(ValueKey('...'))` + `findsOneWidget`/`findsNothing`.\n- Listas: `scrollUntilVisible` antes de interagir com item fora da tela.\n\n## 3. Execução (device/emulador conectado)\n```bash\nflutter test integration_test/app_test.dart\n```\n- Para profiling com `binding.traceAction()`, usar driver dedicado (`test_driver/perf_driver.dart`).\n- `PumpAndSettleTimedOutException` → há animação infinita: isolar com `pump(duration)` ou desativar a animação no teste.\n\n## 4. Workflow (checklist)\n- [ ] Deps + `ValueKey`s nos alvos.\n- [ ] Escrever `integration_test/<fluxo>_test.dart` cobrindo o caminho feliz + 1 falha (ex.: login inválido).\n- [ ] Rodar em Android e iOS antes de considerar verde.\n- [ ] Falhou? Revisar saída → `scrollUntilVisible`/`pump` → reexecutar.\n\n## 5. Exemplo Mínimo\n\n```dart\nvoid main() {\n  IntegrationTestWidgetsFlutterBinding.ensureInitialized();\n\n  testWidgets('login válido abre a home', (tester) async {\n    await tester.pumpWidget(const MyApp());\n    await tester.enterText(find.byKey(const ValueKey('email')), 'user@mail.com');\n    await tester.enterText(find.byKey(const ValueKey('password')), 'Senha123');\n    await tester.tap(find.byKey(const ValueKey('login_button')));\n    await tester.pumpAndSettle();\n    expect(find.byKey(const ValueKey('home_screen')), findsOneWidget);\n  });\n}\n```\n"
         },
         "flutter_add_widget_test": {
-                "name": "Flutter Widget Testing",
-                "category": "Qualidade & Testes",
-                "file": ".agents/skills/flutter-add-widget-test/SKILL.md",
-                "desc": "Criação de Widget Tests determinísticos em Flutter validando os 4 estados da UI, interações de toque, digitação e acessibilidade.",
-                "rawMarkdown": "---\nname: flutter-add-widget-test\ndescription: Criação de Widget Tests determinísticos em Flutter validando os 4 estados da UI, interações de toque, digitação e acessibilidade.\ncategory: Qualidade & Testes\n---\n\n# Skill: Flutter Widget Testing\n\n## 1. Diretrizes de Teste de Interface\n- Envolva o widget testado em `MaterialApp` (e `ProviderScope` se usar Riverpod) com overrides dos repositórios falsos (`FakeRepository`).\n- Teste explicitamente:\n  1. Renderização do estado de carregamento.\n  2. Renderização da lista preenchida e formatação correta de moeda (`R$`).\n  3. Renderização do estado vazio quando a busca não retorna itens.\n  4. Interação de clique (`tester.tap`) e abertura de modais/bottom sheets (`tester.pumpAndSettle`).\n"
+          "name": "Flutter Widget Testing",
+          "category": "Qualidade & Testes",
+          "file": ".agents/skills/flutter-add-widget-test/SKILL.md",
+          "desc": "Criação de Widget Tests determinísticos em Flutter validando os 4 estados da UI, interações de toque, digitação e acessibilidade.",
+          "rawMarkdown": "---\nname: flutter-add-widget-test\ndescription: Criação de Widget Tests determinísticos em Flutter validando os 4 estados da UI, interações de toque, digitação e acessibilidade.\ncategory: Qualidade & Testes\n---\n\n# Skill: Flutter Widget Testing\n\n## 1. Diretrizes de Teste de Interface\n- Envolva o widget testado em `MaterialApp` (e `ProviderScope` se usar Riverpod) com overrides dos repositórios falsos (`FakeRepository`).\n- Teste explicitamente:\n  1. Renderização do estado de carregamento.\n  2. Renderização da lista preenchida e formatação correta de moeda (`R$`).\n  3. Renderização do estado vazio quando a busca não retorna itens.\n  4. Interação de clique (`tester.tap`) e abertura de modais/bottom sheets (`tester.pumpAndSettle`).\n"
         },
         "flutter_apply_architecture_best_practices": {
-                "name": "Arquitetura Flutter em Camadas",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md",
-                "desc": "Arquitetura Flutter em camadas (UI, Lógica, Dados) com workflow de feature em 8 passos. Use ao estruturar um projeto novo ou refatorar para escalabilidade.",
-                "rawMarkdown": "---\nname: flutter-apply-architecture-best-practices\ndescription: Arquitetura Flutter em camadas (UI, Lógica, Dados) com workflow de feature em 8 passos. Use ao estruturar um projeto novo ou refatorar para escalabilidade.\n---\n\n# Skill: Arquitetura Flutter em Camadas\n\n> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).\n> Compatibilizado com este harness: pastas `core/` + `features/` (ver `.agents/rules/mobile.md`),\n> estado via Riverpod (`flutter-state-riverpod`) e TDD obrigatório (`clean-architecture`).\n\n## 1. Camadas (Separation of Concerns)\n\nNunca misture renderização de UI com regra de negócio ou acesso a dados.\n\n### UI (Presentation) — `features/<feature>/presentation/`\n- **Views:** widgets enxutos e reutilizáveis; só lógica de UI (animação, layout, navegação simples). Todo dado vem do state holder.\n- **State holders:** neste harness, o papel de ViewModel é do `AsyncNotifier` (Riverpod). Expõe `AsyncValue` (casa com os 4 estados de tela) e recebe repositórios por injeção (provider/construtor).\n\n### Dados — `features/<feature>/data/` (+ `core/database/`, `core/network/`)\n- **Services:** classes sem estado que envelopam APIs externas (HTTP, banco local, plugins). Retornam modelos crus.\n- **Repositories:** consomem um ou mais services, transformam em modelos de domínio, cuidam de cache, sync offline e retry. Expõem apenas modelos de domínio.\n\n### Lógica (Domain) — `features/<feature>/domain/` — opcional por feature\n- **Use cases:** só quando a lógica é complexa ou reutilizada entre telas; CRUD simples vai direto do state holder ao repositório.\n\n## 2. Estrutura de Projeto (padrão do harness)\n\n```text\nlib/\n├── core/\n│   ├── database/   # SQLite/Drift: migrations, DAOs\n│   ├── network/    # Clientes HTTP / Supabase\n│   └── theme/      # Design tokens\n└── features/\n    └── [feature_name]/\n        ├── data/          # Models crus, services, repositórios concretos\n        ├── domain/        # Entidades + contratos (Dart puro, sem Flutter)\n        └── presentation/  # Telas, widgets e Notifiers (Riverpod)\n```\n\n## 3. Workflow: Implementar uma Feature (8 passos + TDD)\n\nSiga em ordem; cada passo de código nasce de um teste (`clean-architecture`):\n\n- [ ] **1. Modelos de domínio:** entidades imutáveis em `domain/`.\n- [ ] **2. Contratos:** interfaces de repositório em `domain/` (é contra elas que os testes RED são escritos).\n- [ ] **3. Services:** acesso a API/banco em `data/` ou `core/`.\n- [ ] **4. Repositórios:** implementações concretas; cache, retry e mapeamento para o domínio.\n- [ ] **5. Lógica condicional:** use case em `domain/` se houver transformação complexa ou reuso; senão, pule.\n- [ ] **6. State holder:** `AsyncNotifier` (Riverpod) com repositórios injetados; estados via `AsyncValue`.\n- [ ] **7. View:** widget que observa o provider e renderiza os 4 estados (loading/empty/error/success).\n- [ ] **8. Validador:** `flutter test` + `dart analyze` verdes; corrija e reexecute até passar.\n\n## 4. Exemplo Mínimo (repositório + state holder)\n\n```dart\n// data: implementação contra o contrato do domínio\nclass UserRepositoryImpl implements UserRepository {\n  UserRepositoryImpl(this._api);\n  final ApiClient _api;\n  User? _cached;\n\n  @override\n  Future<User> getUser(String id) async {\n    final cached = _cached;\n    if (cached != null) return cached;\n    final raw = await _api.fetchUser(id);\n    return _cached = User(id: raw.id, name: raw.fullName);\n  }\n}\n\n// presentation: AsyncNotifier no lugar do ViewModel\nclass ProfileNotifier extends AsyncNotifier<User?> {\n  @override\n  FutureOr<User?> build() => null;\n\n  Future<void> load(String id) async {\n    state = const AsyncLoading();\n    state = await AsyncValue.guard(\n      () => ref.read(userRepositoryProvider).getUser(id),\n    );\n  }\n}\n```\n"
+          "name": "Arquitetura Flutter em Camadas",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/flutter-apply-architecture-best-practices/SKILL.md",
+          "desc": "Arquitetura Flutter em camadas (UI, Lógica, Dados) com workflow de feature em 8 passos. Use ao estruturar um projeto novo ou refatorar para escalabilidade.",
+          "rawMarkdown": "---\nname: flutter-apply-architecture-best-practices\ndescription: Arquitetura Flutter em camadas (UI, Lógica, Dados) com workflow de feature em 8 passos. Use ao estruturar um projeto novo ou refatorar para escalabilidade.\n---\n\n# Skill: Arquitetura Flutter em Camadas\n\n> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).\n> Compatibilizado com este harness: pastas `core/` + `features/` (ver `.agents/rules/mobile.md`),\n> estado via Riverpod (`flutter-state-riverpod`) e TDD obrigatório (`clean-architecture`).\n\n## 1. Camadas (Separation of Concerns)\n\nNunca misture renderização de UI com regra de negócio ou acesso a dados.\n\n### UI (Presentation) — `features/<feature>/presentation/`\n- **Views:** widgets enxutos e reutilizáveis; só lógica de UI (animação, layout, navegação simples). Todo dado vem do state holder.\n- **State holders:** neste harness, o papel de ViewModel é do `AsyncNotifier` (Riverpod). Expõe `AsyncValue` (casa com os 4 estados de tela) e recebe repositórios por injeção (provider/construtor).\n\n### Dados — `features/<feature>/data/` (+ `core/database/`, `core/network/`)\n- **Services:** classes sem estado que envelopam APIs externas (HTTP, banco local, plugins). Retornam modelos crus.\n- **Repositories:** consomem um ou mais services, transformam em modelos de domínio, cuidam de cache, sync offline e retry. Expõem apenas modelos de domínio.\n\n### Lógica (Domain) — `features/<feature>/domain/` — opcional por feature\n- **Use cases:** só quando a lógica é complexa ou reutilizada entre telas; CRUD simples vai direto do state holder ao repositório.\n\n## 2. Estrutura de Projeto (padrão do harness)\n\n```text\nlib/\n├── core/\n│   ├── database/   # SQLite/Drift: migrations, DAOs\n│   ├── network/    # Clientes HTTP / Supabase\n│   └── theme/      # Design tokens\n└── features/\n    └── [feature_name]/\n        ├── data/          # Models crus, services, repositórios concretos\n        ├── domain/        # Entidades + contratos (Dart puro, sem Flutter)\n        └── presentation/  # Telas, widgets e Notifiers (Riverpod)\n```\n\n## 3. Workflow: Implementar uma Feature (8 passos + TDD)\n\nSiga em ordem; cada passo de código nasce de um teste (`clean-architecture`):\n\n- [ ] **1. Modelos de domínio:** entidades imutáveis em `domain/`.\n- [ ] **2. Contratos:** interfaces de repositório em `domain/` (é contra elas que os testes RED são escritos).\n- [ ] **3. Services:** acesso a API/banco em `data/` ou `core/`.\n- [ ] **4. Repositórios:** implementações concretas; cache, retry e mapeamento para o domínio.\n- [ ] **5. Lógica condicional:** use case em `domain/` se houver transformação complexa ou reuso; senão, pule.\n- [ ] **6. State holder:** `AsyncNotifier` (Riverpod) com repositórios injetados; estados via `AsyncValue`.\n- [ ] **7. View:** widget que observa o provider e renderiza os 4 estados (loading/empty/error/success).\n- [ ] **8. Validador:** `flutter test` + `dart analyze` verdes; corrija e reexecute até passar.\n\n## 4. Exemplo Mínimo (repositório + state holder)\n\n```dart\n// data: implementação contra o contrato do domínio\nclass UserRepositoryImpl implements UserRepository {\n  UserRepositoryImpl(this._api);\n  final ApiClient _api;\n  User? _cached;\n\n  @override\n  Future<User> getUser(String id) async {\n    final cached = _cached;\n    if (cached != null) return cached;\n    final raw = await _api.fetchUser(id);\n    return _cached = User(id: raw.id, name: raw.fullName);\n  }\n}\n\n// presentation: AsyncNotifier no lugar do ViewModel\nclass ProfileNotifier extends AsyncNotifier<User?> {\n  @override\n  FutureOr<User?> build() => null;\n\n  Future<void> load(String id) async {\n    state = const AsyncLoading();\n    state = await AsyncValue.guard(\n      () => ref.read(userRepositoryProvider).getUser(id),\n    );\n  }\n}\n```\n"
         },
         "flutter_build_responsive_layout": {
-                "name": "Responsive & Adaptive Layouts em Flutter",
-                "category": "UI/UX & Frontend",
-                "file": ".agents/skills/flutter-build-responsive-layout/SKILL.md",
-                "desc": "Construção de layouts adaptativos e responsivos em Flutter para smartphones pequenos, grandes e tablets usando LayoutBuilder, MediaQuery.sizeOf e Slivers.",
-                "rawMarkdown": "---\nname: flutter-build-responsive-layout\ndescription: Construção de layouts adaptativos e responsivos em Flutter para smartphones pequenos, grandes e tablets usando LayoutBuilder, MediaQuery.sizeOf e Slivers.\ncategory: UI/UX & Frontend\n---\n\n# Skill: Responsive & Adaptive Layouts em Flutter\n\n## 1. Regras de Responsividade\n1. **Use `MediaQuery.sizeOf(context)`** em vez de `MediaQuery.of(context).size` para evitar rebuilds desnecessários quando o teclado abre.\n2. **Breakpoints Canônicos**:\n   - Compacto (Celular): `< 600dp` (Lista em 1 coluna, BottomNavigationBar).\n   - Médio (Tablet Vertical / Dobrável): `600dp – 839dp` (Grid de 2 colunas, NavigationRail).\n   - Expandido (Tablet Horizontal / Desktop): `>= 840dp` (Layout Master-Detail lado a lado).\n3. **Prevenção de Overflow em Modais/BottomSheets**: Todo `BottomSheet` com campos de texto deve envolver seu conteúdo em `SingleChildScrollView` + `Padding(padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom))`.\n"
+          "name": "Responsive & Adaptive Layouts em Flutter",
+          "category": "UI/UX & Frontend",
+          "file": ".agents/skills/flutter-build-responsive-layout/SKILL.md",
+          "desc": "Construção de layouts adaptativos e responsivos em Flutter para smartphones pequenos, grandes e tablets usando LayoutBuilder, MediaQuery.sizeOf e Slivers.",
+          "rawMarkdown": "---\nname: flutter-build-responsive-layout\ndescription: Construção de layouts adaptativos e responsivos em Flutter para smartphones pequenos, grandes e tablets usando LayoutBuilder, MediaQuery.sizeOf e Slivers.\ncategory: UI/UX & Frontend\n---\n\n# Skill: Responsive & Adaptive Layouts em Flutter\n\n## 1. Regras de Responsividade\n1. **Use `MediaQuery.sizeOf(context)`** em vez de `MediaQuery.of(context).size` para evitar rebuilds desnecessários quando o teclado abre.\n2. **Breakpoints Canônicos**:\n   - Compacto (Celular): `< 600dp` (Lista em 1 coluna, BottomNavigationBar).\n   - Médio (Tablet Vertical / Dobrável): `600dp – 839dp` (Grid de 2 colunas, NavigationRail).\n   - Expandido (Tablet Horizontal / Desktop): `>= 840dp` (Layout Master-Detail lado a lado).\n3. **Prevenção de Overflow em Modais/BottomSheets**: Todo `BottomSheet` com campos de texto deve envolver seu conteúdo em `SingleChildScrollView` + `Padding(padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom))`.\n"
         },
         "flutter_release": {
-                "name": "Release Flutter (test → version → build → ship)",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/flutter-release/SKILL.md",
-                "desc": "Diretrizes canônicas e padrões arquiteturais para flutter-release.",
-                "rawMarkdown": "---\nname: flutter-release\ndescription: Pipeline de release Flutter de ponta a ponta (verificar, versionar, buildar, entregar). Use ao fechar uma versão: valida gates, incrementa versão, gera artefatos e entrega aos canais.\n---\n\n# Skill: Release Flutter (test → version → build → ship)\n\nChecklist executado em ordem; qualquer etapa vermelha aborta as seguintes.\n\n## 0. Verificação de Projeto\n- `pubspec.yaml` existe; flavors `dev/stg/prod` configurados; segredos fora do repo.\n\n## 1. Portões de Qualidade (Gates)\n- `flutter test` verde + `dart analyze` com zero avisos na revisão exata a ser lançada.\n\n## 2. Versionamento\n- Incrementar `version: x.y.z+build` no `pubspec.yaml` (semver + build crescente); commit `chore(release): vX.Y.Z`.\n- Criar tag `vX.Y.Z` — é ela que dispara a lane `release` no CI.\n\n## 3. Build\n- Android: `flutter build appbundle --flavor prod --dart-define=...`.\n- iOS: `flutter build ipa --flavor prod --export-options-plist=...`.\n- Registrar checksums dos artefatos na nota de release.\n\n## 4. Entrega (Ship)\n- Beta: Firebase App Distribution / Play Internal / TestFlight interno com notas em pt-BR.\n- Produção: via `store-publishing` (staged rollout / phased release).\n- Pós-release: monitorar crash nas primeiras 24h antes de expandir o rollout.\n"
+          "name": "Release Flutter (test → version → build → ship)",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/flutter-release/SKILL.md",
+          "desc": "Diretrizes canônicas e padrões arquiteturais para flutter-release.",
+          "rawMarkdown": "---\nname: flutter-release\ndescription: Pipeline de release Flutter de ponta a ponta (verificar, versionar, buildar, entregar). Use ao fechar uma versão: valida gates, incrementa versão, gera artefatos e entrega aos canais.\n---\n\n# Skill: Release Flutter (test → version → build → ship)\n\nChecklist executado em ordem; qualquer etapa vermelha aborta as seguintes.\n\n## 0. Verificação de Projeto\n- `pubspec.yaml` existe; flavors `dev/stg/prod` configurados; segredos fora do repo.\n\n## 1. Portões de Qualidade (Gates)\n- `flutter test` verde + `dart analyze` com zero avisos na revisão exata a ser lançada.\n\n## 2. Versionamento\n- Incrementar `version: x.y.z+build` no `pubspec.yaml` (semver + build crescente); commit `chore(release): vX.Y.Z`.\n- Criar tag `vX.Y.Z` — é ela que dispara a lane `release` no CI.\n\n## 3. Build\n- Android: `flutter build appbundle --flavor prod --dart-define=...`.\n- iOS: `flutter build ipa --flavor prod --export-options-plist=...`.\n- Registrar checksums dos artefatos na nota de release.\n\n## 4. Entrega (Ship)\n- Beta: Firebase App Distribution / Play Internal / TestFlight interno com notas em pt-BR.\n- Produção: via `store-publishing` (staged rollout / phased release).\n- Pós-release: monitorar crash nas primeiras 24h antes de expandir o rollout.\n"
         },
         "flutter_setup_declarative_routing": {
-                "name": "Roteamento Declarativo (go_router + Deep Links)",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/flutter-setup-declarative-routing/SKILL.md",
-                "desc": "Roteamento declarativo com go_router (rotas, deep links Android/iOS, nested navigation). Use ao configurar navegação, receber links externos (push, e-mail) ou tabs com estado preservado.",
-                "rawMarkdown": "---\nname: flutter-setup-declarative-routing\ndescription: Roteamento declarativo com go_router (rotas, deep links Android/iOS, nested navigation). Use ao configurar navegação, receber links externos (push, e-mail) ou tabs com estado preservado.\n---\n\n# Skill: Roteamento Declarativo (go_router + Deep Links)\n\n> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).\n\n## 1. Conceitos\n- `GoRouter`: árvore de rotas; `GoRoute`: path → tela; `redirect`: guardas (ex.: sem sessão → `/login`).\n- `StatefulShellRoute`: shell persistente (ex.: `NavigationBar`) com estado por aba.\n- Navegação: `context.go` (substitui), `context.push` (empilha), `goNamed` + `pathParameters`, `pop`.\n\n## 2. Setup\n```bash\nflutter pub add go_router\n```\n- App usa `MaterialApp.router(routerConfig: _router)`.\n- Roteador vive em `lib/core/router/` (arquivo único por app, rotas por feature importadas).\n\n## 3. Deep Links (Android + iOS)\n- **Android** (`AndroidManifest.xml`): `intent-filter` com `autoVerify` + scheme/host; hospedar `assetlinks.json` em `/.well-known/`.\n- **iOS** (`Info.plist` + `Runner.entitlements`): `FlutterDeepLinkingEnabled` + `applinks:dominio`; hospedar `apple-app-site-association` em `/.well-known/`.\n- Validação: `adb shell am start -a VIEW -d \"<url>\" <package>`; `xcrun simctl openurl booted <url>`.\n- Links de e-mail (ex.: recuperação de senha da T01): rota `/reset?token=...` que valida o token antes de renderizar.\n\n## 4. Workflow (checklist)\n- [ ] `go_router` + `MaterialApp.router`.\n- [ ] Rotas por feature + `redirect` de auth + `errorBuilder` (tela 404 amigável pt-BR).\n- [ ] Tabs com `StatefulShellRoute` quando houver bottom nav.\n- [ ] Deep links nativos configurados e validados via adb/simctl.\n- [ ] Teste de widget navegando (pump + `go` + `pumpAndSettle` + `expect` da tela destino).\n\n## 5. Exemplo Mínimo (guarda de auth + deep link)\n\n```dart\nfinal router = GoRouter(\n  initialLocation: '/home',\n  redirect: (context, state) {\n    final logged = container.read(sessionProvider).isLogged;\n    if (!logged && state.matchedLocation != '/login') return '/login';\n    return null;\n  },\n  routes: [\n    GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),\n    GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),\n    GoRoute(\n      path: '/reset',\n      builder: (_, s) => ResetScreen(token: s.uri.queryParameters['token']),\n    ),\n  ],\n  errorBuilder: (_, _) => const NotFoundScreen(),\n);\n```\n"
+          "name": "Roteamento Declarativo (go_router + Deep Links)",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/flutter-setup-declarative-routing/SKILL.md",
+          "desc": "Roteamento declarativo com go_router (rotas, deep links Android/iOS, nested navigation). Use ao configurar navegação, receber links externos (push, e-mail) ou tabs com estado preservado.",
+          "rawMarkdown": "---\nname: flutter-setup-declarative-routing\ndescription: Roteamento declarativo com go_router (rotas, deep links Android/iOS, nested navigation). Use ao configurar navegação, receber links externos (push, e-mail) ou tabs com estado preservado.\n---\n\n# Skill: Roteamento Declarativo (go_router + Deep Links)\n\n> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).\n\n## 1. Conceitos\n- `GoRouter`: árvore de rotas; `GoRoute`: path → tela; `redirect`: guardas (ex.: sem sessão → `/login`).\n- `StatefulShellRoute`: shell persistente (ex.: `NavigationBar`) com estado por aba.\n- Navegação: `context.go` (substitui), `context.push` (empilha), `goNamed` + `pathParameters`, `pop`.\n\n## 2. Setup\n```bash\nflutter pub add go_router\n```\n- App usa `MaterialApp.router(routerConfig: _router)`.\n- Roteador vive em `lib/core/router/` (arquivo único por app, rotas por feature importadas).\n\n## 3. Deep Links (Android + iOS)\n- **Android** (`AndroidManifest.xml`): `intent-filter` com `autoVerify` + scheme/host; hospedar `assetlinks.json` em `/.well-known/`.\n- **iOS** (`Info.plist` + `Runner.entitlements`): `FlutterDeepLinkingEnabled` + `applinks:dominio`; hospedar `apple-app-site-association` em `/.well-known/`.\n- Validação: `adb shell am start -a VIEW -d \"<url>\" <package>`; `xcrun simctl openurl booted <url>`.\n- Links de e-mail (ex.: recuperação de senha da T01): rota `/reset?token=...` que valida o token antes de renderizar.\n\n## 4. Workflow (checklist)\n- [ ] `go_router` + `MaterialApp.router`.\n- [ ] Rotas por feature + `redirect` de auth + `errorBuilder` (tela 404 amigável pt-BR).\n- [ ] Tabs com `StatefulShellRoute` quando houver bottom nav.\n- [ ] Deep links nativos configurados e validados via adb/simctl.\n- [ ] Teste de widget navegando (pump + `go` + `pumpAndSettle` + `expect` da tela destino).\n\n## 5. Exemplo Mínimo (guarda de auth + deep link)\n\n```dart\nfinal router = GoRouter(\n  initialLocation: '/home',\n  redirect: (context, state) {\n    final logged = container.read(sessionProvider).isLogged;\n    if (!logged && state.matchedLocation != '/login') return '/login';\n    return null;\n  },\n  routes: [\n    GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),\n    GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),\n    GoRoute(\n      path: '/reset',\n      builder: (_, s) => ResetScreen(token: s.uri.queryParameters['token']),\n    ),\n  ],\n  errorBuilder: (_, _) => const NotFoundScreen(),\n);\n```\n"
         },
         "flutter_setup_localization": {
-                "name": "Localização (i18n/l10n)",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/flutter-setup-localization/SKILL.md",
-                "desc": "Internacionalização com flutter_localizations + intl (ARB, l10n.yaml, plurais). Use ao criar ou alterar qualquer texto visível — o harness exige pt-BR como idioma base.",
-                "rawMarkdown": "---\nname: flutter-setup-localization\ndescription: Internacionalização com flutter_localizations + intl (ARB, l10n.yaml, plurais). Use ao criar ou alterar qualquer texto visível — o harness exige pt-BR como idioma base.\n---\n\n# Skill: Localização (i18n/l10n)\n\n> Adaptado de `flutter/skills` (time oficial do Flutter, licença BSD-3-Clause).\n> Regra do harness: **nenhum texto hardcoded em inglês/português solto na UI** — toda string passa por ARB, com pt-BR como template base.\n\n## 1. Setup\n```bash\nflutter pub add flutter_localizations --sdk=flutter\nflutter pub add intl:any\n```\n- `pubspec.yaml`: `flutter: { generate: true }`.\n- `l10n.yaml` na raiz:\n```yaml\narb-dir: lib/l10n\ntemplate-arb-file: app_pt.arb\noutput-localization-file: app_localizations.dart\nsynthetic-package: true\n```\n- `MaterialApp`: delegates (`AppLocalizations.delegate` + globais) e `supportedLocales` (pt primeiro).\n\n## 2. Workflow\n- [ ] Nova string: adicionar ao template `app_pt.arb` **com `@description`**; replicar a chave nos demais `.arb`.\n- [ ] Editar string: atualizar **todos** os `.arb`, nunca só um.\n- [ ] Rodar `flutter pub get` para regenerar; corrigir erro de sintaxe ARB e repetir.\n- [ ] Consumir via `AppLocalizations.of(context)!.chave` — nunca `Text('literal')` em tela.\n- [ ] Teste de widget de cada tela com locale pt e (se suportado) en.\n\n## 3. Formatação Avançada (ARB)\n- Placeholders: `\"hello\": \"Olá {userName}\"` + bloco `@hello` com tipo/exemplo.\n- Plurais: `{count, plural, =0{...} =1{...} other{...}}` (`other` obrigatório).\n- Selects: `{gender, select, male{...} female{...} other{...}}`.\n\n## 4. Exemplo Mínimo\n\n```json\n// lib/l10n/app_pt.arb\n{\n  \"retry\": \"Tentar novamente\",\n  \"@retry\": { \"description\": \"Botão de retentativa do ErrorState\" }\n}\n```\n\n```dart\nText(AppLocalizations.of(context)!.retry)\n```\n"
+          "name": "Localização (i18n/l10n)",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/flutter-setup-localization/SKILL.md",
+          "desc": "Internacionalização com flutter_localizations + intl (ARB, l10n.yaml, plurais). Use ao criar ou alterar qualquer texto visível — o harness exige pt-BR como idioma base.",
+          "rawMarkdown": "---\nname: flutter-setup-localization\ndescription: Internacionalização com flutter_localizations + intl (ARB, l10n.yaml, plurais). Use ao criar ou alterar qualquer texto visível — o harness exige pt-BR como idioma base.\n---\n\n# Skill: Localização (i18n/l10n)\n\n> Adaptado de `flutter/skills` (time oficial do Flutter, licença BSD-3-Clause).\n> Regra do harness: **nenhum texto hardcoded em inglês/português solto na UI** — toda string passa por ARB, com pt-BR como template base.\n\n## 1. Setup\n```bash\nflutter pub add flutter_localizations --sdk=flutter\nflutter pub add intl:any\n```\n- `pubspec.yaml`: `flutter: { generate: true }`.\n- `l10n.yaml` na raiz:\n```yaml\narb-dir: lib/l10n\ntemplate-arb-file: app_pt.arb\noutput-localization-file: app_localizations.dart\nsynthetic-package: true\n```\n- `MaterialApp`: delegates (`AppLocalizations.delegate` + globais) e `supportedLocales` (pt primeiro).\n\n## 2. Workflow\n- [ ] Nova string: adicionar ao template `app_pt.arb` **com `@description`**; replicar a chave nos demais `.arb`.\n- [ ] Editar string: atualizar **todos** os `.arb`, nunca só um.\n- [ ] Rodar `flutter pub get` para regenerar; corrigir erro de sintaxe ARB e repetir.\n- [ ] Consumir via `AppLocalizations.of(context)!.chave` — nunca `Text('literal')` em tela.\n- [ ] Teste de widget de cada tela com locale pt e (se suportado) en.\n\n## 3. Formatação Avançada (ARB)\n- Placeholders: `\"hello\": \"Olá {userName}\"` + bloco `@hello` com tipo/exemplo.\n- Plurais: `{count, plural, =0{...} =1{...} other{...}}` (`other` obrigatório).\n- Selects: `{gender, select, male{...} female{...} other{...}}`.\n\n## 4. Exemplo Mínimo\n\n```json\n// lib/l10n/app_pt.arb\n{\n  \"retry\": \"Tentar novamente\",\n  \"@retry\": { \"description\": \"Botão de retentativa do ErrorState\" }\n}\n```\n\n```dart\nText(AppLocalizations.of(context)!.retry)\n```\n"
         },
         "flutter_state_riverpod": {
-                "name": "Reactive State Management com Riverpod",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/flutter-state-riverpod/SKILL.md",
-                "desc": "Gerenciamento de estado reativo, previsível e testável em Flutter usando Riverpod (Notifier, AsyncNotifier, paginação e descarte automático).",
-                "rawMarkdown": "---\nname: flutter-state-riverpod\ndescription: Gerenciamento de estado reativo, previsível e testável em Flutter usando Riverpod (Notifier, AsyncNotifier, paginação e descarte automático).\ncategory: Engenharia Mobile\n---\n\n# Skill: Reactive State Management com Riverpod\n\n## 1. Diretrizes Técnicas\n1. **Prefira `AsyncNotifier` e `Notifier`**: Evite `StateNotifierProvider` e `ChangeNotifierProvider` legados.\n2. **Imutabilidade**: O estado exposto deve ser imutável (`final` fields + método `copyWith`).\n3. **Sem Lógica de UI no Notifier**: Nunca passe `BuildContext`, `TextEditingController` ou `Navigator` para dentro de um Notifier.\n4. **Uso de `ref.watch` vs `ref.read`**:\n   - Dentro do método `build()`: use SEMPRE `ref.watch(provider)`.\n   - Dentro de callbacks (`onPressed`, `onSubmitted`): use SEMPRE `ref.read(provider.notifier).acao()`.\n\n## 2. Padrão Canônico de State Imutável\n```dart\nclass CatalogoState {\n  final List<ProdutoEntity> itens;\n  final bool carregandoMais;\n  final bool temMais;\n  final String termoBusca;\n\n  const CatalogoState({\n    this.itens = const [],\n    this.carregandoMais = false,\n    this.temMais = true,\n    this.termoBusca = '',\n  });\n\n  CatalogoState copyWith({\n    List<ProdutoEntity>? itens,\n    bool? carregandoMais,\n    bool? temMais,\n    String? termoBusca,\n  }) {\n    return CatalogoState(\n      itens: itens ?? this.itens,\n      carregandoMais: carregandoMais ?? this.carregandoMais,\n      temMais: temMais ?? this.temMais,\n      termoBusca: termoBusca ?? this.termoBusca,\n    );\n  }\n}\n```\n"
+          "name": "Reactive State Management com Riverpod",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/flutter-state-riverpod/SKILL.md",
+          "desc": "Gerenciamento de estado reativo, previsível e testável em Flutter usando Riverpod (Notifier, AsyncNotifier, paginação e descarte automático).",
+          "rawMarkdown": "---\nname: flutter-state-riverpod\ndescription: Gerenciamento de estado reativo, previsível e testável em Flutter usando Riverpod (Notifier, AsyncNotifier, paginação e descarte automático).\ncategory: Engenharia Mobile\n---\n\n# Skill: Reactive State Management com Riverpod\n\n## 1. Diretrizes Técnicas\n1. **Prefira `AsyncNotifier` e `Notifier`**: Evite `StateNotifierProvider` e `ChangeNotifierProvider` legados.\n2. **Imutabilidade**: O estado exposto deve ser imutável (`final` fields + método `copyWith`).\n3. **Sem Lógica de UI no Notifier**: Nunca passe `BuildContext`, `TextEditingController` ou `Navigator` para dentro de um Notifier.\n4. **Uso de `ref.watch` vs `ref.read`**:\n   - Dentro do método `build()`: use SEMPRE `ref.watch(provider)`.\n   - Dentro de callbacks (`onPressed`, `onSubmitted`): use SEMPRE `ref.read(provider.notifier).acao()`.\n\n## 2. Padrão Canônico de State Imutável\n```dart\nclass CatalogoState {\n  final List<ProdutoEntity> itens;\n  final bool carregandoMais;\n  final bool temMais;\n  final String termoBusca;\n\n  const CatalogoState({\n    this.itens = const [],\n    this.carregandoMais = false,\n    this.temMais = true,\n    this.termoBusca = '',\n  });\n\n  CatalogoState copyWith({\n    List<ProdutoEntity>? itens,\n    bool? carregandoMais,\n    bool? temMais,\n    String? termoBusca,\n  }) {\n    return CatalogoState(\n      itens: itens ?? this.itens,\n      carregandoMais: carregandoMais ?? this.carregandoMais,\n      temMais: temMais ?? this.temMais,\n      termoBusca: termoBusca ?? this.termoBusca,\n    );\n  }\n}\n```\n"
         },
         "flutter_use_http_package": {
-                "name": "Networking REST (package:http)",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/flutter-use-http-package/SKILL.md",
-                "desc": "Networking REST com package:http (GET/POST/PUT/DELETE, erros, parsing isolado). Use ao consumir APIs remotas em services/repositórios da camada Data.",
-                "rawMarkdown": "---\nname: flutter-use-http-package\ndescription: Networking REST com package:http (GET/POST/PUT/DELETE, erros, parsing isolado). Use ao consumir APIs remotas em services/repositórios da camada Data.\n---\n\n# Skill: Networking REST (package:http)\n\n> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).\n> Regra do harness: HTTP vive em services (`data/` ou `core/network/`), nunca em widgets/Notifiers.\n\n## 1. Setup e Permissões\n```bash\nflutter pub add http\n```\n- Android: `<uses-permission android:name=\"android.permission.INTERNET\" />` no `AndroidManifest.xml`.\n- Token/keys via `--dart-define`, nunca no código.\n\n## 2. Execução e Erros\n- URLs sempre com `Uri.parse`; headers de auth/content-type no parâmetro `headers`.\n- POST/PUT com `jsonEncode`; sucesso = 200 (GET/PUT/DELETE) ou 201 (POST).\n- **Falha nunca retorna null**: lança exceção de domínio (ex.: `NetworkFailure`) — o `AsyncValue.error` vira ErrorState na UI.\n- Desserializa com `fromJson` tipado; listas grandes via `compute()` (isolate) para não derrubar frames.\n\n## 3. Workflow (checklist)\n- [ ] Model + `fromJson`.\n- [ ] Método no service retornando `Future<Model>`.\n- [ ] `statusCode` validado + exceção em falha.\n- [ ] Teste unitário do service com cliente mockado (sucesso + 4xx/5xx + timeout).\n- [ ] Repositório consome o service e expõe modelo de domínio.\n\n## 4. Exemplo Mínimo (service + parsing isolado)\n\n```dart\nimport 'dart:convert';\n\nimport 'package:flutter/foundation.dart';\nimport 'package:http/http.dart' as http;\n\nList<Item> parseItems(String body) => (jsonDecode(body) as List)\n    .map((e) => Item.fromJson(e as Map<String, dynamic>))\n    .toList();\n\nclass ItemApi {\n  ItemApi(this._client, this._base);\n  final http.Client _client;\n  final Uri _base;\n\n  Future<List<Item>> fetchAll(String token) async {\n    final res = await _client.get(\n      _base.replace(path: '/items'),\n      headers: {'Authorization': 'Bearer $token'},\n    );\n    if (res.statusCode != 200) throw NetworkFailure();\n    return compute(parseItems, res.body);\n  }\n}\n```\n"
+          "name": "Networking REST (package:http)",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/flutter-use-http-package/SKILL.md",
+          "desc": "Networking REST com package:http (GET/POST/PUT/DELETE, erros, parsing isolado). Use ao consumir APIs remotas em services/repositórios da camada Data.",
+          "rawMarkdown": "---\nname: flutter-use-http-package\ndescription: Networking REST com package:http (GET/POST/PUT/DELETE, erros, parsing isolado). Use ao consumir APIs remotas em services/repositórios da camada Data.\n---\n\n# Skill: Networking REST (package:http)\n\n> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).\n> Regra do harness: HTTP vive em services (`data/` ou `core/network/`), nunca em widgets/Notifiers.\n\n## 1. Setup e Permissões\n```bash\nflutter pub add http\n```\n- Android: `<uses-permission android:name=\"android.permission.INTERNET\" />` no `AndroidManifest.xml`.\n- Token/keys via `--dart-define`, nunca no código.\n\n## 2. Execução e Erros\n- URLs sempre com `Uri.parse`; headers de auth/content-type no parâmetro `headers`.\n- POST/PUT com `jsonEncode`; sucesso = 200 (GET/PUT/DELETE) ou 201 (POST).\n- **Falha nunca retorna null**: lança exceção de domínio (ex.: `NetworkFailure`) — o `AsyncValue.error` vira ErrorState na UI.\n- Desserializa com `fromJson` tipado; listas grandes via `compute()` (isolate) para não derrubar frames.\n\n## 3. Workflow (checklist)\n- [ ] Model + `fromJson`.\n- [ ] Método no service retornando `Future<Model>`.\n- [ ] `statusCode` validado + exceção em falha.\n- [ ] Teste unitário do service com cliente mockado (sucesso + 4xx/5xx + timeout).\n- [ ] Repositório consome o service e expõe modelo de domínio.\n\n## 4. Exemplo Mínimo (service + parsing isolado)\n\n```dart\nimport 'dart:convert';\n\nimport 'package:flutter/foundation.dart';\nimport 'package:http/http.dart' as http;\n\nList<Item> parseItems(String body) => (jsonDecode(body) as List)\n    .map((e) => Item.fromJson(e as Map<String, dynamic>))\n    .toList();\n\nclass ItemApi {\n  ItemApi(this._client, this._base);\n  final http.Client _client;\n  final Uri _base;\n\n  Future<List<Item>> fetchAll(String token) async {\n    final res = await _client.get(\n      _base.replace(path: '/items'),\n      headers: {'Authorization': 'Bearer $token'},\n    );\n    if (res.statusCode != 200) throw NetworkFailure();\n    return compute(parseItems, res.body);\n  }\n}\n```\n"
         },
         "harness_evolver": {
-                "name": "Google Harness² Recursive Self-Improvement",
-                "category": "Meta-Otimização",
-                "file": ".agents/skills/harness-evolver/SKILL.md",
-                "desc": "Ciclo recursivo Propose-Probe-Compose do Google Research Harness² para atualizar automaticamente as skills e regras após resolução de bugs complexos.",
-                "rawMarkdown": "---\nname: harness-evolver\ndescription: Ciclo recursivo Propose-Probe-Compose do Google Research Harness² para atualizar automaticamente as skills e regras após resolução de bugs complexos.\ncategory: Meta-Otimização\n---\n\n# Skill: Google Harness² Recursive Self-Improvement\n\n## 1. Protocolo Propose–Probe–Compose\nSempre que uma tarefa reprovar no Gate Humano ou exigir mais de 1 tentativa de autorreparo no `qa_self_healer`:\n1. **PROPOSE**: Identifique qual lacuna de instrução permitiu que o erro acontecesse (ex: faltou uma regra sobre lock de banco ou conversão de tipo nulo).\n2. **PROBE**: Valide a correção no código e confirme que todos os testes passam.\n3. **COMPOSE**: Adicione uma subseção `## Armadilhas Conhecidas (Learned Guardrails)` no final da `SKILL.md` correspondente ou em `.agents/PROJECT_BRAIN.md`, documentando o antipadrão evitado.\n"
+          "name": "Google Harness² Recursive Self-Improvement",
+          "category": "Meta-Otimização",
+          "file": ".agents/skills/harness-evolver/SKILL.md",
+          "desc": "Ciclo recursivo Propose-Probe-Compose do Google Research Harness² para atualizar automaticamente as skills e regras após resolução de bugs complexos.",
+          "rawMarkdown": "---\nname: harness-evolver\ndescription: Ciclo recursivo Propose-Probe-Compose do Google Research Harness² para atualizar automaticamente as skills e regras após resolução de bugs complexos.\ncategory: Meta-Otimização\n---\n\n# Skill: Google Harness² Recursive Self-Improvement\n\n## 1. Protocolo Propose–Probe–Compose\nSempre que uma tarefa reprovar no Gate Humano ou exigir mais de 1 tentativa de autorreparo no `qa_self_healer`:\n1. **PROPOSE**: Identifique qual lacuna de instrução permitiu que o erro acontecesse (ex: faltou uma regra sobre lock de banco ou conversão de tipo nulo).\n2. **PROBE**: Valide a correção no código e confirme que todos os testes passam.\n3. **COMPOSE**: Adicione uma subseção `## Armadilhas Conhecidas (Learned Guardrails)` no final da `SKILL.md` correspondente ou em `.agents/PROJECT_BRAIN.md`, documentando o antipadrão evitado.\n"
         },
         "local_first_data": {
-                "name": "Local-First SQLite & High-Performance Sync",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/local-first-data/SKILL.md",
-                "desc": "Diretrizes canônicas e padrões arquiteturais para local-first-data.",
-                "rawMarkdown": "---\nname: local-first-data\ndescription: Engenharia Offline-First com SQLite em Flutter: indexação composta, buscas paginadas sem travamento de UI, debounce e sincronização em lote (Batch).\ncategory: Dados & Offline\n---\n\n# Skill: Local-First SQLite & High-Performance Sync\n\n## 1. Quando Acionar Esta Skill\nAcione ao criar ou otimizar tabelas SQLite locais, implementar barras de pesquisa em catálogos grandes (> 5.000 itens), processar cargas offline (arquivos FTP/ZIP/JSON) ou resolver lentidão de leitura.\n\n## 2. Regras de Ouro de Performance SQLite\n1. **Zero Full Table Scan**: Toda coluna utilizada em `WHERE`, `JOIN` ou `ORDER BY` deve ter índice criado na migração (`CREATE INDEX IF NOT EXISTS`).\n2. **Paginação Obrigatória**: Nunca carregue milhares de linhas na memória RAM do aparelho. Use sempre `LIMIT :limit OFFSET :offset` (padrão: 30 a 50 itens por página).\n3. **Projeção Enxuta**: Nas listagens e buscas, selecione apenas as colunas visíveis no card (`SELECT id, nome, preco, estoque`). Deixe campos pesados (observações longas, metadados fiscais) para a query de detalhes do item.\n4. **Inserção em Lote (Batch Transaction)**: Ao sincronizar dados recebidos do servidor, nunca execute `await db.insert()` dentro de um `for` simples. Use `db.transaction` com `batch.insert` e `batch.commit(noResult: true)`.\n\n## 3. Padrão Canônico de Índices e Query Paginada\n```dart\n// 1. Criação de Índices na abertura/migração do banco\nFuture<void> ensurePerformanceIndexes(Database db) async {\n  await db.execute('''\n    CREATE INDEX IF NOT EXISTS idx_produtos_busca \n    ON cadpro00 (pro00_descri, pro00_codbar, pro00_codfab);\n  ''');\n  await db.execute('''\n    CREATE INDEX IF NOT EXISTS idx_estoque_filial_prod \n    ON estpro00 (pro00_codfil, pro00_codpro);\n  ''');\n}\n\n// 2. Busca Paginada Rápida com Filtro Parametrizado\nFuture<List<Map<String, Object?>>> buscarProdutosPaginado({\n  required Database db,\n  required int codFilial,\n  required String termo,\n  int limit = 30,\n  int offset = 0,\n}) async {\n  final filtro = '%${termo.trim()}%';\n  return db.rawQuery('''\n    SELECT \n      p.pro00_codigo,\n      p.pro00_descri,\n      p.pro00_codbar,\n      p.pro00_mulemb,\n      COALESCE(e.pro00_qtdest - e.pro00_qtdpen, 0) AS estoque_disponivel\n    FROM cadpro00 p\n    LEFT JOIN estpro00 e \n      ON e.pro00_codpro = p.pro00_codigo AND e.pro00_codfil = ?\n    WHERE p.pro00_descri LIKE ? \n       OR p.pro00_codbar LIKE ? \n       OR CAST(p.pro00_codigo AS TEXT) = ?\n    ORDER BY p.pro00_descri ASC\n    LIMIT ? OFFSET ?\n  ''', [codFilial, filtro, filtro, termo.trim(), limit, offset]);\n}\n```\n\n## 4. Debounce na Camada de Apresentação\nNunca dispare query no SQLite a cada tecla pressionada (`onChanged`). Aplique um Debouncer de 300ms a 350ms e cancele requisições obsoletas.\n"
+          "name": "Local-First SQLite & High-Performance Sync",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/local-first-data/SKILL.md",
+          "desc": "Diretrizes canônicas e padrões arquiteturais para local-first-data.",
+          "rawMarkdown": "---\nname: local-first-data\ndescription: Engenharia Offline-First com SQLite em Flutter: indexação composta, buscas paginadas sem travamento de UI, debounce e sincronização em lote (Batch).\ncategory: Dados & Offline\n---\n\n# Skill: Local-First SQLite & High-Performance Sync\n\n## 1. Quando Acionar Esta Skill\nAcione ao criar ou otimizar tabelas SQLite locais, implementar barras de pesquisa em catálogos grandes (> 5.000 itens), processar cargas offline (arquivos FTP/ZIP/JSON) ou resolver lentidão de leitura.\n\n## 2. Regras de Ouro de Performance SQLite\n1. **Zero Full Table Scan**: Toda coluna utilizada em `WHERE`, `JOIN` ou `ORDER BY` deve ter índice criado na migração (`CREATE INDEX IF NOT EXISTS`).\n2. **Paginação Obrigatória**: Nunca carregue milhares de linhas na memória RAM do aparelho. Use sempre `LIMIT :limit OFFSET :offset` (padrão: 30 a 50 itens por página).\n3. **Projeção Enxuta**: Nas listagens e buscas, selecione apenas as colunas visíveis no card (`SELECT id, nome, preco, estoque`). Deixe campos pesados (observações longas, metadados fiscais) para a query de detalhes do item.\n4. **Inserção em Lote (Batch Transaction)**: Ao sincronizar dados recebidos do servidor, nunca execute `await db.insert()` dentro de um `for` simples. Use `db.transaction` com `batch.insert` e `batch.commit(noResult: true)`.\n\n## 3. Padrão Canônico de Índices e Query Paginada\n```dart\n// 1. Criação de Índices na abertura/migração do banco\nFuture<void> ensurePerformanceIndexes(Database db) async {\n  await db.execute('''\n    CREATE INDEX IF NOT EXISTS idx_produtos_busca \n    ON cadpro00 (pro00_descri, pro00_codbar, pro00_codfab);\n  ''');\n  await db.execute('''\n    CREATE INDEX IF NOT EXISTS idx_estoque_filial_prod \n    ON estpro00 (pro00_codfil, pro00_codpro);\n  ''');\n}\n\n// 2. Busca Paginada Rápida com Filtro Parametrizado\nFuture<List<Map<String, Object?>>> buscarProdutosPaginado({\n  required Database db,\n  required int codFilial,\n  required String termo,\n  int limit = 30,\n  int offset = 0,\n}) async {\n  final filtro = '%${termo.trim()}%';\n  return db.rawQuery('''\n    SELECT \n      p.pro00_codigo,\n      p.pro00_descri,\n      p.pro00_codbar,\n      p.pro00_mulemb,\n      COALESCE(e.pro00_qtdest - e.pro00_qtdpen, 0) AS estoque_disponivel\n    FROM cadpro00 p\n    LEFT JOIN estpro00 e \n      ON e.pro00_codpro = p.pro00_codigo AND e.pro00_codfil = ?\n    WHERE p.pro00_descri LIKE ? \n       OR p.pro00_codbar LIKE ? \n       OR CAST(p.pro00_codigo AS TEXT) = ?\n    ORDER BY p.pro00_descri ASC\n    LIMIT ? OFFSET ?\n  ''', [codFilial, filtro, filtro, termo.trim(), limit, offset]);\n}\n```\n\n## 4. Debounce na Camada de Apresentação\nNunca dispare query no SQLite a cada tecla pressionada (`onChanged`). Aplique um Debouncer de 300ms a 350ms e cancele requisições obsoletas.\n"
         },
         "mobile_cicd": {
-                "name": "CI/CD Mobile (Fastlane + GitHub Actions)",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/mobile-cicd/SKILL.md",
-                "desc": "Pipeline CI/CD mobile com Fastlane + GitHub Actions (lanes beta e produção). Use ao configurar builds automatizados, gating por testes ou deploy contínuo para Firebase App Distribution, Play interna e TestFlight.",
-                "rawMarkdown": "---\nname: mobile-cicd\ndescription: Pipeline CI/CD mobile com Fastlane + GitHub Actions (lanes beta e produção). Use ao configurar builds automatizados, gating por testes ou deploy contínuo para Firebase App Distribution, Play interna e TestFlight.\n---\n\n# Skill: CI/CD Mobile (Fastlane + GitHub Actions)\n\n## 1. Estrutura de Lanes (por plataforma, em `android/fastlane` e `ios/fastlane`)\n- `beta`: `flutter test` + `dart analyze` verdes → build → distribui em canal interno (Play Internal / TestFlight) a cada merge na `main`.\n- `release`: exige tag `v*` → build com flavor `prod` → sobe para Play (track configurável) / App Store.\n- Versionamento: `build_number` derivado do número do run do CI; `version_name` lido do `pubspec.yaml`.\n\n## 2. Segredos (nunca no repo)\n- Android: keystore em base64 + `key.properties` via GitHub Secrets.\n- iOS: `fastlane match` (repositório privado de certificados) + App Store Connect API Key via Secrets.\n- Supabase/URLs: via `--dart-define` a partir de Secrets por ambiente.\n\n## 3. Template de Workflow (`.github/workflows/mobile-ci.yml`)\n```yaml\nname: mobile-ci\non:\n  push:\n    branches: [main]\n  pull_request:\njobs:\n  validate:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: subosito/flutter-action@v2\n        with: { channel: stable }\n      - run: flutter pub get\n      - run: dart analyze\n      - run: flutter test\n  beta-android:\n    needs: validate\n    if: github.ref == 'refs/heads/main'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: subosito/flutter-action@v2\n        with: { channel: stable }\n      - run: cd android && bundle exec fastlane beta\n        env:\n          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}\n```\n\n## 4. Gates\n- PR não mergeia com `validate` vermelho (branch protection).\n- Lane `release` nunca roda sem tag; build iOS exige runner `macos`.\n"
+          "name": "CI/CD Mobile (Fastlane + GitHub Actions)",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/mobile-cicd/SKILL.md",
+          "desc": "Pipeline CI/CD mobile com Fastlane + GitHub Actions (lanes beta e produção). Use ao configurar builds automatizados, gating por testes ou deploy contínuo para Firebase App Distribution, Play interna e TestFlight.",
+          "rawMarkdown": "---\nname: mobile-cicd\ndescription: Pipeline CI/CD mobile com Fastlane + GitHub Actions (lanes beta e produção). Use ao configurar builds automatizados, gating por testes ou deploy contínuo para Firebase App Distribution, Play interna e TestFlight.\n---\n\n# Skill: CI/CD Mobile (Fastlane + GitHub Actions)\n\n## 1. Estrutura de Lanes (por plataforma, em `android/fastlane` e `ios/fastlane`)\n- `beta`: `flutter test` + `dart analyze` verdes → build → distribui em canal interno (Play Internal / TestFlight) a cada merge na `main`.\n- `release`: exige tag `v*` → build com flavor `prod` → sobe para Play (track configurável) / App Store.\n- Versionamento: `build_number` derivado do número do run do CI; `version_name` lido do `pubspec.yaml`.\n\n## 2. Segredos (nunca no repo)\n- Android: keystore em base64 + `key.properties` via GitHub Secrets.\n- iOS: `fastlane match` (repositório privado de certificados) + App Store Connect API Key via Secrets.\n- Supabase/URLs: via `--dart-define` a partir de Secrets por ambiente.\n\n## 3. Template de Workflow (`.github/workflows/mobile-ci.yml`)\n```yaml\nname: mobile-ci\non:\n  push:\n    branches: [main]\n  pull_request:\njobs:\n  validate:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: subosito/flutter-action@v2\n        with: { channel: stable }\n      - run: flutter pub get\n      - run: dart analyze\n      - run: flutter test\n  beta-android:\n    needs: validate\n    if: github.ref == 'refs/heads/main'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: subosito/flutter-action@v2\n        with: { channel: stable }\n      - run: cd android && bundle exec fastlane beta\n        env:\n          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}\n```\n\n## 4. Gates\n- PR não mergeia com `validate` vermelho (branch protection).\n- Lane `release` nunca roda sem tag; build iOS exige runner `macos`.\n"
         },
         "mobile_ux": {
-                "name": "Mobile UX, Ergonomia & Design Systems",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/mobile-ux/SKILL.md",
-                "desc": "Diretrizes canônicas e padrões arquiteturais para mobile-ux.",
-                "rawMarkdown": "---\nname: mobile-ux\ndescription: Engenharia de Experiência do Usuário Mobile em Flutter: Material 3, Design Tokens, 4 estados obrigatórios de tela, ergonomia de toque (48dp) e micro-interações.\ncategory: UI/UX & Frontend\n---\n\n# Skill: Mobile UX, Ergonomia & Design Systems\n\n## 1. Os 4 Estados Obrigatórios de Qualquer Tela ou BottomSheet\nNenhuma tela está pronta se apenas o caminho feliz foi desenhado. Implemente obrigatoriamente:\n1. **Estado Loading**: Skeleton / Shimmer que preserva a geometria do card real, evitando saltos de layout (Layout Shift).\n2. **Estado Empty (Vazio)**: Ícone semântico, título claro (\"Nenhum produto encontrado para 'X'\") e botão para limpar filtros.\n3. **Estado Error (Falha)**: Card informativo com o motivo claro e botão de retentativa (`onRetry`).\n4. **Estado Success (Dados)**: Hierarquia tipográfica clara (Título em destaque, código/embalagem secundários, preço final em evidência e badge de estoque colorido).\n\n## 2. Checklist de Ergonomia e Acessibilidade\n- [ ] Alvos de toque (`IconButton`, `InkWell`, chips) possuem no mínimo `48x48dp`.\n- [ ] Campos numéricos (quantidade, desconto, preço) abrem teclado numérico apropriado (`TextInputType.numberWithOptions(decimal: true)`) e selecionam o texto ao receber foco.\n- [ ] Listas com scroll fecham o teclado automaticamente ao arrastar (`keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag`).\n- [ ] Textos dinâmicos usam `maxLines` e `TextOverflow.ellipsis` dentro de `Expanded`/`Flexible` para jamais causar erro de faixa amarela/preta (`RenderFlex overflowed`).\n"
+          "name": "Mobile UX, Ergonomia & Design Systems",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/mobile-ux/SKILL.md",
+          "desc": "Diretrizes canônicas e padrões arquiteturais para mobile-ux.",
+          "rawMarkdown": "---\nname: mobile-ux\ndescription: Engenharia de Experiência do Usuário Mobile em Flutter: Material 3, Design Tokens, 4 estados obrigatórios de tela, ergonomia de toque (48dp) e micro-interações.\ncategory: UI/UX & Frontend\n---\n\n# Skill: Mobile UX, Ergonomia & Design Systems\n\n## 1. Os 4 Estados Obrigatórios de Qualquer Tela ou BottomSheet\nNenhuma tela está pronta se apenas o caminho feliz foi desenhado. Implemente obrigatoriamente:\n1. **Estado Loading**: Skeleton / Shimmer que preserva a geometria do card real, evitando saltos de layout (Layout Shift).\n2. **Estado Empty (Vazio)**: Ícone semântico, título claro (\"Nenhum produto encontrado para 'X'\") e botão para limpar filtros.\n3. **Estado Error (Falha)**: Card informativo com o motivo claro e botão de retentativa (`onRetry`).\n4. **Estado Success (Dados)**: Hierarquia tipográfica clara (Título em destaque, código/embalagem secundários, preço final em evidência e badge de estoque colorido).\n\n## 2. Checklist de Ergonomia e Acessibilidade\n- [ ] Alvos de toque (`IconButton`, `InkWell`, chips) possuem no mínimo `48x48dp`.\n- [ ] Campos numéricos (quantidade, desconto, preço) abrem teclado numérico apropriado (`TextInputType.numberWithOptions(decimal: true)`) e selecionam o texto ao receber foco.\n- [ ] Listas com scroll fecham o teclado automaticamente ao arrastar (`keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag`).\n- [ ] Textos dinâmicos usam `maxLines` e `TextOverflow.ellipsis` dentro de `Expanded`/`Flexible` para jamais causar erro de faixa amarela/preta (`RenderFlex overflowed`).\n"
         },
         "skill_creator": {
-                "name": "Canonical Skill Creator & Scaffolding",
-                "category": "Meta-Engenharia & Scaffolding",
-                "file": ".agents/skills/skill-creator/SKILL.md",
-                "desc": "Criação, auditoria e otimização de novas skills para o Antigravity Harness. Use quando o usuário pedir para criar, formalizar ou refatorar uma habilidade técnica, workflow de engenharia ou diretriz de arquitetura.",
-                "rawMarkdown": "---\nname: skill-creator\ndescription: \"Criação, auditoria e otimização de novas skills para o Antigravity Harness. Use quando o usuário pedir para criar, formalizar ou refatorar uma habilidade técnica, workflow de engenharia ou diretriz de arquitetura.\"\ncategory: \"Meta-Engenharia & Scaffolding\"\n---\n\n# Skill: Canonical Skill Creator & Scaffolding\n\n## 1. Quando Acionar Esta Skill\n- Sempre que uma nova tecnologia, biblioteca ou regra de negócio precisar ser padronizada no repositório.\n- Quando o usuário solicitar explicitamente: \"crie uma skill para X\", \"adicione suporte a Y\".\n- Durante o ciclo `harness-evolver` para registrar aprendizados obtidos após resolução de bugs complexos.\n\n## 2. Princípios de Redação Canônica (Padrão Anthropic / Google Harness²)\n1. **Critérios Estritos de Ativação (Triggering)**:\n   - A descrição no frontmatter YAML deve declarar explicitamente **O QUE** a skill faz e **QUANDO** deve ser acionada, além de quando **NÃO** deve ser usada, prevenindo falsos positivos (*over-triggering*).\n2. **Densa e Autocontida**:\n   - Uma skill não deve se resumir a conselhos genéricos. Ela deve conter topologia de pastas, guardrails estritos, código canônico em Dart 3 / Flutter e lista de antipadrões proibidos.\n3. **Persistência Imediata no Ecossistema**:\n   - Toda skill criada deve ser salva em `.agents/skills/<folder>/SKILL.md` e registrada em `.agents/harness.yaml` sob `skills_registry`.\n\n## 3. Template Canônico Obrigatório\n\n```markdown\n---\nname: [identificador-kebab-case]\ndescription: [Gatilhos específicos: O QUE faz e QUANDO usar com verbos de ação]\ncategory: [Categoria Técnica]\n---\n\n# Skill: [Nome da Habilidade]\n\n## 1. Quando Acionar Esta Skill\n- [Gatilho 1]\n- [Gatilho 2]\n- NÃO acione quando: [Contra-indicação explícita]\n\n## 2. Arquitetura e Diretrizes Técnicas\n- [Regra de isolamento de camadas]\n- [Regras de dependências e imports permitidos]\n\n## 3. Código Canônico (Dart 3 / Flutter)\n```dart\n// Exemplo real, completo e compilável sem ações\n\n4. Antipadrões Proibidos\n❌ [Antipadrão 1 e por que quebra o sistema]\n❌ [Antipadrão 2]\n\n## 4. Procedimento de Registro no Harness\nApós gerar o arquivo `SKILL.md`:\n1. Grave o arquivo em `.agents/skills/<id>/SKILL.md`.\n2. Adicione a chave correspondente em `.agents/harness.yaml` em `skills_registry: <id>: \".agents/skills/<id>/SKILL.md\"`.\n3. Associe a skill aos agentes competentes (relação 1:N)."
+          "name": "Canonical Skill Creator & Scaffolding",
+          "category": "Meta-Engenharia & Scaffolding",
+          "file": ".agents/skills/skill-creator/SKILL.md",
+          "desc": "Criação, auditoria e otimização de novas skills para o Antigravity Harness. Use quando o usuário pedir para criar, formalizar ou refatorar uma habilidade técnica, workflow de engenharia ou diretriz de arquitetura.",
+          "rawMarkdown": "---\nname: skill-creator\ndescription: \"Criação, auditoria e otimização de novas skills para o Antigravity Harness. Use quando o usuário pedir para criar, formalizar ou refatorar uma habilidade técnica, workflow de engenharia ou diretriz de arquitetura.\"\ncategory: \"Meta-Engenharia & Scaffolding\"\n---\n\n# Skill: Canonical Skill Creator & Scaffolding\n\n## 1. Quando Acionar Esta Skill\n- Sempre que uma nova tecnologia, biblioteca ou regra de negócio precisar ser padronizada no repositório.\n- Quando o usuário solicitar explicitamente: \"crie uma skill para X\", \"adicione suporte a Y\".\n- Durante o ciclo `harness-evolver` para registrar aprendizados obtidos após resolução de bugs complexos.\n\n## 2. Princípios de Redação Canônica (Padrão Anthropic / Google Harness²)\n1. **Critérios Estritos de Ativação (Triggering)**:\n   - A descrição no frontmatter YAML deve declarar explicitamente **O QUE** a skill faz e **QUANDO** deve ser acionada, além de quando **NÃO** deve ser usada, prevenindo falsos positivos (*over-triggering*).\n2. **Densa e Autocontida**:\n   - Uma skill não deve se resumir a conselhos genéricos. Ela deve conter topologia de pastas, guardrails estritos, código canônico em Dart 3 / Flutter e lista de antipadrões proibidos.\n3. **Persistência Imediata no Ecossistema**:\n   - Toda skill criada deve ser salva em `.agents/skills/<folder>/SKILL.md` e registrada em `.agents/harness.yaml` sob `skills_registry`.\n\n## 3. Template Canônico Obrigatório\n\n```markdown\n---\nname: [identificador-kebab-case]\ndescription: [Gatilhos específicos: O QUE faz e QUANDO usar com verbos de ação]\ncategory: [Categoria Técnica]\n---\n\n# Skill: [Nome da Habilidade]\n\n## 1. Quando Acionar Esta Skill\n- [Gatilho 1]\n- [Gatilho 2]\n- NÃO acione quando: [Contra-indicação explícita]\n\n## 2. Arquitetura e Diretrizes Técnicas\n- [Regra de isolamento de camadas]\n- [Regras de dependências e imports permitidos]\n\n## 3. Código Canônico (Dart 3 / Flutter)\n```dart\n// Exemplo real, completo e compilável sem ações\n\n4. Antipadrões Proibidos\n❌ [Antipadrão 1 e por que quebra o sistema]\n❌ [Antipadrão 2]\n\n## 4. Procedimento de Registro no Harness\nApós gerar o arquivo `SKILL.md`:\n1. Grave o arquivo em `.agents/skills/<id>/SKILL.md`.\n2. Adicione a chave correspondente em `.agents/harness.yaml` em `skills_registry: <id>: \".agents/skills/<id>/SKILL.md\"`.\n3. Associe a skill aos agentes competentes (relação 1:N)."
         },
         "spec_discovery": {
-                "name": "Spec-Driven Discovery & Architecture Contract",
-                "category": "Arquitetura & Produto",
-                "file": ".agents/skills/spec-discovery/SKILL.md",
-                "desc": "Descoberta técnica estruturada e geração de PRD/Spec com mapeamento de contratos de dados, regras fiscais/comerciais e critérios de aceitação Gherkin.",
-                "rawMarkdown": "---\nname: spec-discovery\ndescription: Descoberta técnica estruturada e geração de PRD/Spec com mapeamento de contratos de dados, regras fiscais/comerciais e critérios de aceitação Gherkin.\ncategory: Arquitetura & Produto\n---\n\n# Skill: Spec-Driven Discovery & Architecture Contract\n\n## 1. Estrutura Obrigatória de Toda Spec (`_specs/features/<nome>.md`)\nToda especificação gerada pelo `master_orchestrator` deve conter:\n1. **Contexto e Problema Real**: O que está quebrado, lento ou faltando.\n2. **Arquivos e Tabelas Impactadas**: Lista mapeada via `graft_ast`.\n3. **Contrato de Domínio / Fórmula**: Fórmulas matemáticas ou regras de negócio explícitas.\n4. **Os 4 Estados Visuais**: Como a tela se comporta em Loading, Empty, Error e Success.\n5. **Cenários de Teste (Dado / Quando / Então)**: Lista objetiva que o `tdd_specialist` transformará em testes automatizados.\n"
+          "name": "Spec-Driven Discovery & Architecture Contract",
+          "category": "Arquitetura & Produto",
+          "file": ".agents/skills/spec-discovery/SKILL.md",
+          "desc": "Descoberta técnica estruturada e geração de PRD/Spec com mapeamento de contratos de dados, regras fiscais/comerciais e critérios de aceitação Gherkin.",
+          "rawMarkdown": "---\nname: spec-discovery\ndescription: Descoberta técnica estruturada e geração de PRD/Spec com mapeamento de contratos de dados, regras fiscais/comerciais e critérios de aceitação Gherkin.\ncategory: Arquitetura & Produto\n---\n\n# Skill: Spec-Driven Discovery & Architecture Contract\n\n## 1. Estrutura Obrigatória de Toda Spec (`_specs/features/<nome>.md`)\nToda especificação gerada pelo `master_orchestrator` deve conter:\n1. **Contexto e Problema Real**: O que está quebrado, lento ou faltando.\n2. **Arquivos e Tabelas Impactadas**: Lista mapeada via `graft_ast`.\n3. **Contrato de Domínio / Fórmula**: Fórmulas matemáticas ou regras de negócio explícitas.\n4. **Os 4 Estados Visuais**: Como a tela se comporta em Loading, Empty, Error e Success.\n5. **Cenários de Teste (Dado / Quando / Então)**: Lista objetiva que o `tdd_specialist` transformará em testes automatizados.\n"
         },
         "store_publishing": {
-                "name": "Publicação em Lojas (Play + App Store)",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/store-publishing/SKILL.md",
-                "desc": "Publicação na Play Store e App Store (tracks, TestFlight, review, screenshots). Use ao preparar releases, configurar fichas de loja ou responder a rejeições.",
-                "rawMarkdown": "---\nname: store-publishing\ndescription: Publicação na Play Store e App Store (tracks, TestFlight, review, screenshots). Use ao preparar releases, configurar fichas de loja ou responder a rejeições.\n---\n\n# Skill: Publicação em Lojas (Play + App Store)\n\n## 1. Google Play\n- Artefato: `.aab` assinado com upload key; `versionCode` sempre crescente.\n- Trilhos em ordem: Internal → Closed → Open → Production com **staged rollout** (ex.: 10% → 50% → 100%), pausando em crash acima do baseline.\n- Ficha: título, descrição curta/longa em pt-BR, screenshots por formato (telefone, tablet 7\"/10\"), ícone 512px e feature graphic 1024×500.\n\n## 2. App Store\n- Artefato: `.ipa` via Xcode Cloud/Fastlane; upload com App Store Connect API Key.\n- Fluxo: build → TestFlight (grupo interno, depois externo com revisão beta) → App Store com **phased release**.\n- Revisão: declarar permissões sensíveis (câmera, localização, biometria) com `NS*UsageDescription` em pt-BR claro; conta demo se houver login.\n\n## 3. Screenshots Promocionais\n- Gerar a partir de frames reais do app (golden tests ou device frames), nos tamanhos exigidos por cada loja; nunca mock desatualizado da UI.\n\n## 4. Rejeições\n- Registrar motivo + correção como aprendizado no `ai-memory`; re-submeter só após reproduzir a correção em build interno.\n"
+          "name": "Publicação em Lojas (Play + App Store)",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/store-publishing/SKILL.md",
+          "desc": "Publicação na Play Store e App Store (tracks, TestFlight, review, screenshots). Use ao preparar releases, configurar fichas de loja ou responder a rejeições.",
+          "rawMarkdown": "---\nname: store-publishing\ndescription: Publicação na Play Store e App Store (tracks, TestFlight, review, screenshots). Use ao preparar releases, configurar fichas de loja ou responder a rejeições.\n---\n\n# Skill: Publicação em Lojas (Play + App Store)\n\n## 1. Google Play\n- Artefato: `.aab` assinado com upload key; `versionCode` sempre crescente.\n- Trilhos em ordem: Internal → Closed → Open → Production com **staged rollout** (ex.: 10% → 50% → 100%), pausando em crash acima do baseline.\n- Ficha: título, descrição curta/longa em pt-BR, screenshots por formato (telefone, tablet 7\"/10\"), ícone 512px e feature graphic 1024×500.\n\n## 2. App Store\n- Artefato: `.ipa` via Xcode Cloud/Fastlane; upload com App Store Connect API Key.\n- Fluxo: build → TestFlight (grupo interno, depois externo com revisão beta) → App Store com **phased release**.\n- Revisão: declarar permissões sensíveis (câmera, localização, biometria) com `NS*UsageDescription` em pt-BR claro; conta demo se houver login.\n\n## 3. Screenshots Promocionais\n- Gerar a partir de frames reais do app (golden tests ou device frames), nos tamanhos exigidos por cada loja; nunca mock desatualizado da UI.\n\n## 4. Rejeições\n- Registrar motivo + correção como aprendizado no `ai-memory`; re-submeter só após reproduzir a correção em build interno.\n"
         },
         "supabase_flutter": {
-                "name": "Supabase Fullstack & RLS Architecture",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/supabase-flutter/SKILL.md",
-                "desc": "Diretrizes canônicas e padrões arquiteturais para supabase-flutter.",
-                "rawMarkdown": "---\nname: supabase-flutter\ndescription: Arquitetura segura com Supabase em Flutter: Auth, políticas Row Level Security (RLS), sincronização offline/online, RPCs e Storage.\ncategory: Backend & Cloud\n---\n\n# Skill: Supabase Fullstack & RLS Architecture\n\n## 1. Guardrails Obrigatórios\n1. **RLS Sempre Ativo**: Nenhuma tabela no schema `public` pode existir sem `ALTER TABLE ... ENABLE ROW LEVEL SECURITY;`.\n2. **Operações Atômicas via RPC**: Para operações financeiras ou fechamento de pedidos que alteram múltiplas tabelas, crie uma PostgreSQL Function (`rpc`) transacional em vez de fazer várias requisições seguidas pelo cliente mobile.\n3. **Sincronização Incremental**: Use colunas `updated_at` indexadas para puxar apenas os registros modificados desde o último timestamp de sincronização (`gt('updated_at', lastSyncIso)`).\n"
+          "name": "Supabase Fullstack & RLS Architecture",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/supabase-flutter/SKILL.md",
+          "desc": "Diretrizes canônicas e padrões arquiteturais para supabase-flutter.",
+          "rawMarkdown": "---\nname: supabase-flutter\ndescription: Arquitetura segura com Supabase em Flutter: Auth, políticas Row Level Security (RLS), sincronização offline/online, RPCs e Storage.\ncategory: Backend & Cloud\n---\n\n# Skill: Supabase Fullstack & RLS Architecture\n\n## 1. Guardrails Obrigatórios\n1. **RLS Sempre Ativo**: Nenhuma tabela no schema `public` pode existir sem `ALTER TABLE ... ENABLE ROW LEVEL SECURITY;`.\n2. **Operações Atômicas via RPC**: Para operações financeiras ou fechamento de pedidos que alteram múltiplas tabelas, crie uma PostgreSQL Function (`rpc`) transacional em vez de fazer várias requisições seguidas pelo cliente mobile.\n3. **Sincronização Incremental**: Use colunas `updated_at` indexadas para puxar apenas os registros modificados desde o último timestamp de sincronização (`gt('updated_at', lastSyncIso)`).\n"
         },
         "web_performance_seo": {
-                "name": "Performance Web e SEO Técnico",
-                "category": "Engenharia Mobile",
-                "file": ".agents/skills/web-performance-seo/SKILL.md",
-                "desc": "Otimização de Core Web Vitals, renderização no servidor e SEO técnico em aplicações React/Next.js. Use ao criar rotas, componentes pesados ou revisar performance, indexação e acessibilidade do web.",
-                "rawMarkdown": "---\nname: web-performance-seo\ndescription: Otimização de Core Web Vitals, renderização no servidor e SEO técnico em aplicações React/Next.js. Use ao criar rotas, componentes pesados ou revisar performance, indexação e acessibilidade do web.\n---\n\n# Skill: Performance Web e SEO Técnico\n\nEsta skill orienta a construção e a revisão de aplicações web em `apps/web/` e `apps/landing/`, sempre subordinada às regras de `.agents/rules/web.md` e `.agents/rules/global.md`.\n\n## 1. Gatilho de Ativação\nAcione quando:\n- Uma nova rota, layout ou landing page for criada.\n- Houver regressão de Core Web Vitals ou aumento do bundle.\n- For necessário revisar indexação, metadata ou dados estruturados.\n\n## 2. Fluxo de Trabalho\n1. **Medir antes de otimizar**:\n   - Execute o build de produção e registre `LCP`, `INP` e `CLS` (p75 mobile).\n   - Identifique o maior contribuinte do bundle com análise de build.\n2. **Corrigir a causa raiz**:\n   - Dados buscados em Server Components quando não houver interatividade.\n   - `dynamic import` para bibliotecas pesadas; `next/image` e `next/font` sempre.\n   - Elimine dependências duplicadas e código de cliente desnecessário.\n3. **Validar SEO técnico**:\n   - `metadata` por rota, `canonical`, `sitemap.ts` e `robots.ts` presentes.\n   - Conteúdo principal renderizado no servidor; um único `h1`.\n4. **Revalidar**:\n   - Rebuild + nova medição; compare com a linha de base registrada.\n   - `npm run lint` e `npm test` verdes antes de encerrar.\n\n## 3. Checklist de Aceitação\n- [ ] `LCP` ≤ 2,5 s, `INP` ≤ 200 ms e `CLS` ≤ 0,1 no p75 mobile.\n- [ ] Nenhum segredo ou chave privada no bundle do cliente.\n- [ ] Rotas commetadata única e canônica; `sitemap` e `robots` atualizados.\n- [ ] Imagens com dimensões explícitas e formatos modernos.\n- [ ] Navegação por teclado e contraste AA preservados.\n\n## 4. Anti-Padrões\n- `\"use client\"` no topo de árvores inteiras sem necessidade real.\n- `fetch` em componente de apresentação ou acesso direto a SDK no cliente.\n- Otimização baseada em percepção, sem medição antes/depois.\n"
+          "name": "Performance Web e SEO Técnico",
+          "category": "Engenharia Mobile",
+          "file": ".agents/skills/web-performance-seo/SKILL.md",
+          "desc": "Otimização de Core Web Vitals, renderização no servidor e SEO técnico em aplicações React/Next.js. Use ao criar rotas, componentes pesados ou revisar performance, indexação e acessibilidade do web.",
+          "rawMarkdown": "---\nname: web-performance-seo\ndescription: Otimização de Core Web Vitals, renderização no servidor e SEO técnico em aplicações React/Next.js. Use ao criar rotas, componentes pesados ou revisar performance, indexação e acessibilidade do web.\n---\n\n# Skill: Performance Web e SEO Técnico\n\nEsta skill orienta a construção e a revisão de aplicações web em `apps/web/` e `apps/landing/`, sempre subordinada às regras de `.agents/rules/web.md` e `.agents/rules/global.md`.\n\n## 1. Gatilho de Ativação\nAcione quando:\n- Uma nova rota, layout ou landing page for criada.\n- Houver regressão de Core Web Vitals ou aumento do bundle.\n- For necessário revisar indexação, metadata ou dados estruturados.\n\n## 2. Fluxo de Trabalho\n1. **Medir antes de otimizar**:\n   - Execute o build de produção e registre `LCP`, `INP` e `CLS` (p75 mobile).\n   - Identifique o maior contribuinte do bundle com análise de build.\n2. **Corrigir a causa raiz**:\n   - Dados buscados em Server Components quando não houver interatividade.\n   - `dynamic import` para bibliotecas pesadas; `next/image` e `next/font` sempre.\n   - Elimine dependências duplicadas e código de cliente desnecessário.\n3. **Validar SEO técnico**:\n   - `metadata` por rota, `canonical`, `sitemap.ts` e `robots.ts` presentes.\n   - Conteúdo principal renderizado no servidor; um único `h1`.\n4. **Revalidar**:\n   - Rebuild + nova medição; compare com a linha de base registrada.\n   - `npm run lint` e `npm test` verdes antes de encerrar.\n\n## 3. Checklist de Aceitação\n- [ ] `LCP` ≤ 2,5 s, `INP` ≤ 200 ms e `CLS` ≤ 0,1 no p75 mobile.\n- [ ] Nenhum segredo ou chave privada no bundle do cliente.\n- [ ] Rotas commetadata única e canônica; `sitemap` e `robots` atualizados.\n- [ ] Imagens com dimensões explícitas e formatos modernos.\n- [ ] Navegação por teclado e contraste AA preservados.\n\n## 4. Anti-Padrões\n- `\"use client\"` no topo de árvores inteiras sem necessidade real.\n- `fetch` em componente de apresentação ou acesso direto a SDK no cliente.\n- Otimização baseada em percepção, sem medição antes/depois.\n"
         }
-},
+      },
       agents: {
         master_orchestrator: {
           role: "Master Orchestrator & Principal Architect",
@@ -735,7 +1163,7 @@
       const saved = localStorage.getItem("antigravity_studio_v3");
       let st = null;
       if (saved) {
-        try { st = JSON.parse(saved); } catch (e) {}
+        try { st = JSON.parse(saved); } catch (e) { }
       }
       if (!st) {
         st = JSON.parse(JSON.stringify(DEFAULT_STATE));
@@ -767,7 +1195,7 @@
     // =========================================================================
     // AUTO-SAVE DIRETO NOS ARQUIVOS DO PROJETO (FILE SYSTEM ACCESS API)
     // =========================================================================
-        // Parser inteligente do _specs/task-board.md gerido pela IA
+    // Parser inteligente do _specs/task-board.md gerido pela IA
     function parseTaskBoardMarkdown(md) {
       if (!md) return null;
       const tasks = [];
@@ -863,7 +1291,7 @@
                 const fileHandle = await handle.getFileHandle('SKILL.md');
                 const file = await fileHandle.getFile();
                 const text = await file.text();
-                
+
                 const descMatch = text.match(/description:\s*["']?([^"'\n\r]+)["']?/i);
                 const nameMatch = text.match(/#\s*(?:Skill:)?\s*([^\n\r]+)/i);
                 const catMatch = text.match(/category:\s*["']?([^"'\n\r]+)["']?/i);
@@ -948,7 +1376,7 @@
         dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
         document.getElementById("fs-dot").classList.add("online");
         document.getElementById("fs-text").innerText = `Conectado: ${dirHandle.name}`;
-        
+
         // Lê todas as pastas reais que estão no VS Code e carrega na interface
         await syncFromDisk(dirHandle);
       } catch (err) {
@@ -1056,10 +1484,10 @@
       localStorage.setItem("antigravity_active_view", view);
       document.querySelectorAll(".view-pane").forEach(p => p.classList.remove("active"));
       document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-      
+
       const pane = document.getElementById("view-" + view);
       if (pane) pane.classList.add("active");
-      
+
       if (btn) {
         btn.classList.add("active");
       } else {
@@ -1109,8 +1537,8 @@
             </div>
             <div>
               ${colTasks.map(t => {
-                const ag = state.agents[t.agent];
-                return `
+          const ag = state.agents[t.agent];
+          return `
                   <div class="task-card" onclick="openTaskModal('${t.id}')">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                       <span class="task-id">${t.id}</span>
@@ -1131,7 +1559,7 @@
                     ` : ''}
                   </div>
                 `;
-              }).join('')}
+        }).join('')}
             </div>
           </div>
         `;
@@ -1152,7 +1580,7 @@
             <div class="entity-body">${a.persona}</div>
           </div>
           <div>
-            <div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:6px; font-weight:700;">SKILLS ATRIBUÍDAS (${(a.skills||[]).length}):</div>
+            <div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:6px; font-weight:700;">SKILLS ATRIBUÍDAS (${(a.skills || []).length}):</div>
             <div class="tag-row" style="margin-bottom:10px;">
               ${(a.skills || []).map(sk => `<span class="chip chip-skill">⚡ ${state.skills[sk] ? state.skills[sk].name : sk}</span>`).join('')}
             </div>
@@ -1606,9 +2034,9 @@ INSTRUÇÕES OBRIGATÓRIAS:
           <div class="form-field">
             <label>Complexidade</label>
             <select id="m-task-comp">
-              <option value="Baixa" ${t.complexity==='Baixa'?'selected':''}>Baixa</option>
-              <option value="Média" ${t.complexity==='Média'?'selected':''}>Média</option>
-              <option value="Alta" ${t.complexity==='Alta'?'selected':''}>Alta</option>
+              <option value="Baixa" ${t.complexity === 'Baixa' ? 'selected' : ''}>Baixa</option>
+              <option value="Média" ${t.complexity === 'Média' ? 'selected' : ''}>Média</option>
+              <option value="Alta" ${t.complexity === 'Alta' ? 'selected' : ''}>Alta</option>
             </select>
           </div>
         </div>
@@ -1811,4 +2239,5 @@ ${createdTasks.map(ct => `   - [${ct.id}] ${ct.title}
     switchView(initialView);
   </script>
 </body>
+
 </html>
