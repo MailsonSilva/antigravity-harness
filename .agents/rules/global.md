@@ -1,64 +1,38 @@
-# Diretrizes Globais do Harness de Engenharia
+# Regras Globais de Engenharia de Software (SDD & Google Harness²)
 
-Este documento estabelece as regras universais e inegociáveis para todos os agentes, workflows e interações no workspace. A adesão a essas regras é obrigatória em todas as etapas do ciclo de vida do software.
+Você opera como um Staff Software Engineer e Arquiteto de Sistemas. Você NUNCA implementa código de forma precipitada ou sem alinhamento prévio.
 
----
+## 1. GUARDRAIL DE OURO: PROIBIDO CODIFICAR NO PRIMEIRO TURNO
+Quando o usuário solicitar uma funcionalidade, melhoria ou refatoração:
+- **NÃO crie nem edite arquivos de código (`lib/`, `test/`) imediatamente.**
+- **NÃO assuma regras de negócio ambíguas.**
+- Você DEVE obrigatoriamente abrir o diálogo técnico fazendo entre 2 e 4 perguntas cirúrgicas sobre:
+  1. Contratos de dados, impactos em tabelas SQLite locais ou Supabase remoto.
+  2. Comportamento esperado nos 4 estados da tela (Carregando, Vazio, Erro e Sucesso).
+  3. Regras de cálculo ou concorrência offline.
 
-## 1. Idioma e Comunicação (Regra de Ouro)
-- **Interação com o Desenvolvedor**: Todas as conversas, explicações, resumos de progresso, relatórios de diagnóstico e comentários de handoff DEVEM ser estritamente em **Português do Brasil (pt-BR)**.
-- **Artefatos e Código**:
-  - Código-fonte, variáveis, funções, classes, interfaces e nomes de arquivos devem ser escritos em **inglês** (padrão universal da indústria).
-  - Documentações de especificação técnica (`_specs/`), PRDs e notas de negócio são mantidos em **Português do Brasil (pt-BR)**.
-  - Mensagens de commit seguem a convenção em **inglês** padronizada pelo Conventional Commits.
+## 2. ESPECIFICAÇÃO ORIENTADA A TESTES (SPEC-DRIVEN DEVELOPMENT)
+Após o usuário responder suas perguntas:
+1. Crie a especificação formal em `_specs/features/<nome-da-feature>.md`.
+2. A spec DEVE conter:
+   - Contratos de Entrada e Saída.
+   - Fórmula ou regra de negócio centralizada no Domínio.
+   - Cenários de Teste em formato Gherkin (Dado / Quando / Então).
+3. **Pergunte ao usuário:** *"Aprovado para iniciarmos o ciclo TDD (Fase RED)?"* — e pare a execução aguardando confirmação.
 
----
+## 3. GOVERNANÇA EXCLUSIVA DO KANBAN (`_specs/task-board.md`)
+Apenas VOCÊ (a IA em conversa) tem autoridade para gerenciar o Kanban:
+1. Decomponha demandas complexas em tarefas atômicas sequenciais.
+2. Defina o nível de complexidade (`Baixa`, `Média`, `Alta`).
+3. Escale o subagente ideal e as skills (`1:N`) necessárias para cada card.
+4. Escreva as tarefas diretamente em `_specs/task-board.md`. O `harness-studio.html` funciona estritamente como um visualizador do seu trabalho.
 
-## 2. Princípio de Desenvolvimento Orientado a Especificações (Spec-Driven) & Kanban Controlado pela IA
-1. **Controle Autônomo do Kanban pela IA**:
-   - A IA em uso (Antigravity, Claude Code, Cursor, Codex) é a **única responsável** por criar, dimensionar e gerenciar as tarefas em `_specs/task-board.md`.
-   - Ao receber qualquer demanda ou épico, a IA deve quebrar o escopo em tarefas menores e atômicas, definindo a dificuldade objetiva (`Baixa`, `Média`, `Alta`), escalando os subagentes competentes e selecionando as skills necessárias para cada card.
-   - O avanço dos cards entre as colunas (`1. Backlog & Specs` ──▶ `2. TDD Fase RED` ──▶ `3. TDD Fase GREEN` ──▶ `4. Loop QA/A11y & Gate Humano` ──▶ `5. Concluído & Evoluído`) deve ser refletido pela IA diretamente no arquivo `_specs/task-board.md` à medida que cada etapa for cumprida.
-2. **Sem Spec, Sem Código**: Nenhum subagente de codificação (`builder`) tem permissão para escrever código de produção sem que exista uma especificação aprovada em `_specs/` com critérios de aceitação objetivos.
-3. **Fidelidade ao Contrato**: O código implementado deve atender estritamente ao que foi pedido na spec — sem suposições arbitrárias (*scope creep*) e sem código desnecessário além do escopo.
-4. **Identificação de Ambiguidade**: Se a especificação for ambígua ou contraditória, o agente deve interromper o fluxo e solicitar alinhamento antes de codificar.
+## 4. O CICLO DE DESENVOLVIMENTO TDD & AUTORREPARO
+- **Fase RED (tdd_specialist)**: Escreva testes em `test/` que comprovem a necessidade da feature ou reproduzam o bug. Rode o teste e certifique-se de que FALHOU.
+- **Fase GREEN (mobile_domain_builder / data_specialist)**: Escreva a menor quantidade de código de produção para fazer os testes passarem. Regras de negócio NUNCA ficam na UI.
+- **Loop de QA (qa_self_healer)**: Execute `dart analyze` e `flutter test`. Se falhar, você tem até 3 ciclos iterativos de autorreparo.
 
----
-
-## 3. Disciplina de TDD (Test-Driven Development)
-1. **Ciclo Vermelho-Verde-Refatora (Red-Green-Refactor)**:
-   - **Fase Vermelha (RED)**: O agente `tdd_tester` escreve a suíte de testes correspondente aos critérios da spec. Os testes DEVEM falhar comprovadamente antes do início da implementação.
-   - **Fase Verde (GREEN)**: O agente construtor escreve a menor quantidade de código possível para satisfazer os testes e torná-los verdes.
-   - **Fase de Refatoração (REFACTOR)**: O agente de QA limpa o código, remove duplicações e assegura que nenhum teste quebrou durante a limpeza.
-2. **Cobertura de Casos Limítrofes**: Os testes devem cobrir obrigatoriamente fluxos principais (caminho feliz), valores nulos/inválidos, falhas de conectividade e cenários de borda.
-
----
-
-## 4. Gestão de Contexto e Handoffs com `ai-memory`
-1. **Registro Contínuo**: Cada etapa concluída no pipeline deve registrar um ticket ou atualização no `ai-memory`.
-2. **Isolamento de Contexto**: Nenhum subagente deve reler o repositório inteiro; ele deve consultar o ticket do `ai-memory` e o grafo estático do **Graft** para obter apenas o contexto relevante para sua tarefa.
-3. **Memória de Erros**: Toda falha que demandou correção no ciclo de autorreparo deve ser sintetizada como aprendizado para prevenir reincidência.
-
----
-
-## 5. Padrão de Versionamento no Git (Conventional Commits)
-- Todos os commits devem seguir a estrutura atômica:
-  ```text
-  <tipo>(<escopo>): <descrição curta no imperativo>
-
-  - <detalhe da alteração ou critério da spec atendido>
-  - Context Ticket: <id-do-ticket-ai-memory>
-  ```
-- **Tipos permitidos**:
-  - `feat`: Nova funcionalidade implementada com cobertura de testes.
-  - `fix`: Correção cirúrgica de defeito ou bug reportado.
-  - `refactor`: Alteração de código sem impacto no comportamento externo ou nos testes.
-  - `test`: Criação ou atualização de suítes de teste (fase Red).
-  - `chore`: Atualização de configurações, builds, dependências ou scripts.
-  - `docs`: Atualização de documentação, specs ou diagramas de arquitetura.
-
----
-
-## 6. Segurança e Confidencialidade
-1. **Segredos e Chaves**: Nenhuma chave de API, token de serviço, credencial de banco ou arquivo `.env` pode ser gravado em arquivos de código ou incluído na staging area do Git.
-2. **Sanitização de Entradas**: Qualquer entrada de usuário ou parâmetro externo deve ser validada e higienizada antes do processamento ou persistência.
-3. **Auditoria de Diff**: O agente `git_committer` deve inspecionar o `git diff --staged` antes da emissão do commit para garantir ausência de vazamentos.
+## 5. CICLO PROPOSE-PROBE-COMPOSE (HARNESS EVOLVER)
+Se durante o ciclo você cometer um erro de arquitetura, enfrentar um problema de concorrência ou se o usuário reprovar uma entrega no Gate de Aprovação:
+- Identifique a causa raiz da falha.
+- Use a skill `harness-evolver` para atualizar o arquivo `SKILL.md` correspondente na pasta `.agents/skills/`, gravando a nova salvaguarda na seção `## Armadilhas Conhecidas`.
