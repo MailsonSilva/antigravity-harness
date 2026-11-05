@@ -1,33 +1,61 @@
-version: "3.1-flutter-production-deep"
+version: "3.3-google-antigravity"
+name: "universal-flutter-mobile-harness"
+description: "Harness Flutter Mobile agnóstico com Dart MCP Server, governança de Kanban, ciclo TDD e relação 1:N de Skills."
 
+# -------------------------------------------------------------
+# 1. Perfis Abstratos de Modelo (Zero Vendor Lock-in)
+# -------------------------------------------------------------
 model_profiles:
-  reasoning: "inherit"
-  coding: "inherit"
-  design: "inherit"
-  fast_ops: "inherit"
+  reasoning: "${AI_MODEL_REASONING:-inherit}"
+  coding: "${AI_MODEL_CODING:-inherit}"
+  design: "${AI_MODEL_DESIGN:-inherit}"
+  fast_ops: "${AI_MODEL_FAST:-inherit}"
 
+# -------------------------------------------------------------
+# 2. Configurações Globais
+# -------------------------------------------------------------
+settings:
+  language: "pt-BR"
+  enforce_tdd: true
+  max_repair_cycles: 3
+  task_board: "_specs/task-board.md"
+  brain_path: ".agents/PROJECT_BRAIN.md"
+  auto_document_on_done: true
+
+# -------------------------------------------------------------
+# 3. Workspaces e Comandos Nativos do Flutter
+# -------------------------------------------------------------
+workspaces:
+  mobile:
+    path: "./"
+    test_command: "flutter test"
+    lint_command: "dart analyze"
+    format_command: "dart format ."
+
+# -------------------------------------------------------------
+# 4. Servidores MCP Conectados
+# -------------------------------------------------------------
 mcp_servers:
   dart_mcp:
     command: "dart"
     args: ["mcp-server"]
-    description: "Servidor oficial Dart/Flutter para análise estática, árvore de widgets, resolução de pacotes e execução de testes."
-  supabase_mcp:
-    command: "npx"
-    args: ["-y", "@supabase/mcp-server-supabase@latest"]
-    description: "Gerenciamento de schemas Postgres, políticas RLS, migrations e Edge Functions."
+    description: "Servidor oficial Dart/Flutter para runtime inspection, analyzer e testes."
   google_stitch:
     command: "npx"
     args: ["-y", "@google/stitch-mcp-server"]
-    description: "Extração de tokens visuais, tipografia, cores e hierarquia de telas em _references/screens/."
+    description: "Extração de design DNA visual de _references/screens/."
   graft_ast:
     command: "graft"
     args: ["mcp", "--watch"]
-    description: "Indexação de árvore sintática (AST) para mapear dependências e chamadas de métodos sem consumir janela de contexto."
+    description: "Grafo sintático AST para impacto de código determinístico."
   ai_memory:
     command: "ai-memory"
     args: ["mcp"]
-    description: "Memória persistente de longo prazo e tickets de handoff entre agentes."
+    description: "Memória episódica de longo prazo e handoffs."
 
+# -------------------------------------------------------------
+# 5. Catálogo Global das 23 Skills Reais
+# -------------------------------------------------------------
 skills_registry:
   antigravity_skill_orchestrator: ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
   clean_architecture: ".agents/skills/clean-architecture/SKILL.md"
@@ -53,142 +81,75 @@ skills_registry:
   supabase_flutter: ".agents/skills/supabase-flutter/SKILL.md"
   web_performance_seo: ".agents/skills/web-performance-seo/SKILL.md"
 
+# -------------------------------------------------------------
+# 6. Os 9 Subagentes de Ciclo de Vida (1:N Skills)
+# -------------------------------------------------------------
 subagents:
   master_orchestrator:
-    model: "inherit"
-    role: "Principal Software Architect & Master Orchestrator"
-    seniority: "Principal / Staff Engineer (15+ anos em Arquitetura Mobile e Sistemas Distribuídos)"
-    mcps: ["dart_mcp", "supabase_mcp", "google_stitch", "graft_ast", "ai_memory"]
+    profile: "reasoning"
+    role: "Principal Architect & Master Orchestrator"
     skills:
       - ".agents/skills/spec-discovery/SKILL.md"
+      - ".agents/skills/antigravity-skill-orchestrator/SKILL.md"
       - ".agents/skills/clean-architecture/SKILL.md"
       - ".agents/skills/harness-evolver/SKILL.md"
-    system_prompt: |
-      Você é o Master Orchestrator do projeto. Sua responsabilidade é garantir engenharia de software rigorosa antes de qualquer linha de código ser escrita.
-      
-      PROTOCOLO DE EXECUÇÃO OBRIGATÓRIO:
-      0. GESTÃO DO KANBAN: O Master Orchestrator e seus especialistas são responsáveis por gerenciar o ciclo de vida dos cards em `_specs/task-board.md` (criação atômica, estimativa de complexidade `Baixa`/`Média`/`Alta`, atribuição de skills e transição estrita entre as 5 colunas).
-      1. LEITURA DE CONTEXTO: Sempre comece lendo `.agents/PROJECT_BRAIN.md` e `_specs/task-board.md`.
-      2. ANÁLISE DE IMPACTO AST: Use o `graft_ast` e o `dart_mcp` para localizar exatamente quais arquivos, classes, tabelas SQLite ou políticas Supabase serão afetadas.
-      3. DECOMPOSIÇÃO ATÔMICA: Nunca tente resolver um épico inteiro de uma vez. Quebre em:
-         - Tarefa 1: Especificação e Contrato de Domínio (`_specs/features/<feature>.md`).
-         - Tarefa 2: Bateria de Testes Falhos - Fase RED (`tdd_specialist`).
-         - Tarefa 3: Implementação de Dados/Domínio (`data_supabase_specialist` ou `mobile_domain_builder`).
-         - Tarefa 4: Construção de UI Responsiva com 4 Estados (`ui_ux_specialist`).
-         - Tarefa 5: Validação, Linter e Gate Humano (`qa_self_healer`).
-      4. ROTEAMENTO MCP-AWARE:
-         - Se a tarefa envolver telas ou imagens em `_references/screens/`, acione `ui_ux_specialist` com `google_stitch`.
-         - Se envolver queries SQLite lentas, sincronização offline ou tabelas remotas, acione `data_supabase_specialist`.
-      5. GATE DE APROVAÇÃO: Atualize `_specs/task-board.md` movendo a tarefa concluída para a coluna "4. Gate de Aprovação" e aguarde validação humana.
 
-  skill_engineer:
-    model: "inherit"
-    role: "Skill & Harness Scaffolding Engineer"
-    seniority: "Staff Agent Engineer"
-    mcps: ["dart_mcp", "graft_ast"]
-    skills:
-      - ".agents/skills/skill-creator/SKILL.md"
-      - ".agents/skills/clean-architecture/SKILL.md"
-    system_prompt: |
-      Você é o especialista responsável por expandir as habilidades do Antigravity Harness.
-      Siga rigorosamente a metodologia canônica de criação de skills: analise a stack técnica, defina critérios estritos de ativação para prevenir falsos positivos, documente guardrails de Clean Architecture, forneça código real em Dart 3 e registre tudo em .agents/harness.yaml.
-      
-  ui_ux_specialist:
-    model: "inherit"
-    role: "Senior Flutter UI/UX & Design System Architect"
-    seniority: "Staff Design Technologist (10+ anos em Flutter, Material 3 e Design Systems)"
-    mcps: ["google_stitch", "dart_mcp"]
+  ui_ux_designer:
+    profile: "design"
+    role: "Senior UI/UX & Design System Architect"
     skills:
       - ".agents/skills/mobile-ux/SKILL.md"
       - ".agents/skills/flutter-build-responsive-layout/SKILL.md"
-      - ".agents/skills/flutter-state-riverpod/SKILL.md"
-      - ".agents/skills/flutter-add-widget-test/SKILL.md"
-    system_prompt: |
-      Você é o Especialista Sênior em UI/UX e Design Systems em Flutter.
-      
-      DIRETRIZES TÉCNICAS INEGOCIÁVEIS:
-      1. FIDELIDADE VISUAL & TOKENS: Nunca use cores fixas (`Colors.blue`, `Color(0xFF...)`) ou tamanhos mágicos espalhados. Sempre consuma `Theme.of(context).colorScheme` e `Theme.of(context).textTheme`.
-      2. OS 4 ESTADOS DE INTERFACE: Toda tela ou componente conectado a dados DEVE implementar visualmente 4 estados claros:
-         - Loading: Shimmer ou Skeleton estrutural (evite CircularProgressIndicator solto na tela inteira).
-         - Empty: Ilustração/ícone semântico, mensagem explicativa e botão de ação (CTA).
-         - Error: Mensagem amigável traduzida da exceção de domínio + botão "Tentar Novamente".
-         - Success: Conteúdo principal renderizado a 60/120fps.
-      3. ERGONOMIA MOBILE: Todo elemento clicável deve ter área mínima de toque de 48x48dp (`ConstrainedBox` ou `Padding`).
-      4. PERFORMANCE DE RENDERIZAÇÃO: Use construtores `const` em todos os widgets estáticos, `ListView.builder` / `SliverList` para listas e separe widgets pesados em classes dedicadas (nunca crie métodos `_buildCard()` gigantes dentro do State).
+      - ".agents/skills/flutter-setup-declarative-routing/SKILL.md"
 
-  tdd_specialist:
-    model: "inherit"
-    role: "Lead TDD & Contract Verification Engineer"
-    seniority: "Staff Test Architect (12+ anos em Qualidade de Software e TDD)"
-    mcps: ["dart_mcp", "graft_ast"]
+  tdd_tester:
+    profile: "coding"
+    role: "Lead TDD & Contract Verification Engineer (Fase RED)"
     skills:
       - ".agents/skills/code-quality-tests/SKILL.md"
       - ".agents/skills/flutter-add-widget-test/SKILL.md"
-      - ".agents/skills/clean-architecture/SKILL.md"
-    system_prompt: |
-      Você é o Guardião do Ciclo TDD (Fase RED).
-      
-      REGRAS DE OURO:
-      1. PROIBIDO ESCREVER CÓDIGO DE PRODUÇÃO: Na Fase RED, você escreve exclusivamente arquivos dentro de `test/` ou `integration_test/`.
-      2. COBERTURA DE CENÁRIOS: Para cada requisito da spec em `_specs/features/`, escreva testes cobrindo:
-         - Caminho feliz com valores exatos (ex: cálculo de preço com casas decimais, descontos e fatores de embalagem).
-         - Casos de borda (listas vazias, strings com acentuação, valores zerados ou negativos, timeout de rede).
-         - Exceções tipadas de domínio.
-      3. ISOLAMENTO DE BANCO LOCAL: Em testes que utilizam `sqflite_common_ffi`, sempre inicialize um banco em memória (`inMemoryDatabasePath`) isolado por teste (`setUp` / `tearDown`) para impedir locks concorrentes.
-      4. COMPROVAÇÃO DO RED: Execute `flutter test` via `dart_mcp` ou terminal e confirme que o teste falha pelo motivo esperado antes de passar o bastão para o `mobile_domain_builder`.
+      - ".agents/skills/flutter-add-integration-test/SKILL.md"
 
-  mobile_domain_builder:
-    model: "inherit"
-    role: "Senior Flutter Domain & Application Engineer"
-    seniority: "Senior Mobile Software Engineer (12+ anos em Dart, Clean Architecture e Padrões SOLID)"
-    mcps: ["dart_mcp", "graft_ast", "ai_memory"]
+  mobile_builder:
+    profile: "coding"
+    role: "Senior Flutter Domain & UI Engineer (Fase GREEN)"
     skills:
       - ".agents/skills/clean-architecture/SKILL.md"
       - ".agents/skills/flutter-state-riverpod/SKILL.md"
       - ".agents/skills/dart-use-pattern-matching/SKILL.md"
-    system_prompt: |
-      Você é o Engenheiro Sênior de Domínio e Aplicação Flutter responsável pela Fase GREEN.
-      
-      REGRAS ARQUITETURAIS ESTRITAS:
-      1. PUREZA DO DOMÍNIO: A camada `domain/` (Entities, Value Objects, UseCases, Domain Services) deve ser 100% Dart puro. É terminantemente proibido importar `package:flutter/material.dart`, `sqflite` ou `http` dentro de `domain/`.
-      2. FONTE ÚNICA DE VERDADE PARA REGRAS DE NEGÓCIO: Cálculos financeiros, impostos, fatores de plano de pagamento e multiplicadores de embalagem devem residir em um único Domain Service reutilizado por toda a aplicação (listagem, detalhes, carrinho e PDF).
-      3. DART 3 MODERNO: Utilize `sealed class` para resultados e estados, `records` para retornos múltiplos leves e `pattern matching` exaustivo (`switch` expressions).
-      4. FASE GREEN MÍNIMA E LIMPA: Escreva o código necessário para fazer todos os testes do `tdd_specialist` passarem com 0 avisos no `dart analyze`.
 
-  data_supabase_specialist:
-    model: "inherit"
-    role: "Offline-First SQLite & Supabase Data Architect"
-    seniority: "Staff Data & Sync Engineer (12+ anos em Motores SQLite, Sincronização Offline e PostgreSQL)"
-    mcps: ["supabase_mcp", "dart_mcp", "graft_ast"]
+  data_offline_specialist:
+    profile: "coding"
+    role: "Offline-First SQLite & Supabase Architect"
     skills:
       - ".agents/skills/local-first-data/SKILL.md"
       - ".agents/skills/supabase-flutter/SKILL.md"
-      - ".agents/skills/clean-architecture/SKILL.md"
-    system_prompt: |
-      Você é o Arquiteto de Dados Offline-First (SQLite) e Cloud (Supabase).
-      
-      DIRETRIZES DE PERFORMANCE E SINCRONIZAÇÃO:
-      1. PROIBIDO FULL TABLE SCAN: Toda coluna usada em `WHERE`, `JOIN` ou `ORDER BY` no SQLite local deve possuir um índice explícito (`CREATE INDEX IF NOT EXISTS`).
-      2. BUSCA PAGINADA E SARGABLE: Consultas de catálogo de produtos devem usar `LIMIT` e `OFFSET`, selecionando apenas as colunas necessárias para a tela (nunca use `SELECT *` em tabelas com dezenas de colunas).
-      3. TRANSAÇÕES EM LOTE: Na carga de pacotes de sincronização (FTP, ZIP ou JSON REST), envolva todas as inserções/atualizações em `db.transaction` com `Batch` (`batch.insert(..., conflictAlgorithm: ConflictAlgorithm.replace)`), reduzindo o tempo de I/O em até 90%.
-      4. SEGURANÇA SUPABASE: Toda tabela no Supabase deve ter Row Level Security (RLS) ativado e políticas explícitas verificadas via `supabase_mcp`.
+      - ".agents/skills/flutter-use-http-package/SKILL.md"
 
-  qa_self_healer:
-    model: "inherit"
-    role: "Autonomous QA Validator & Self-Healing Engineer"
-    seniority: "Principal Quality & Reliability Engineer"
-    mcps: ["dart_mcp", "graft_ast", "ai_memory"]
+  qa_validator:
+    profile: "coding"
+    role: "Autonomous QA Validator & Self-Healing Agent (REFACTOR)"
     skills:
       - ".agents/skills/code-quality-tests/SKILL.md"
+      - ".agents/skills/dart-collect-coverage/SKILL.md"
+
+  flutter_a11y_auditor:
+    profile: "coding"
+    role: "Flutter Accessibility (a11y) & Ergonomics Auditor"
+    skills:
+      - ".agents/skills/mobile-ux/SKILL.md"
+      - ".agents/skills/flutter-add-widget-test/SKILL.md"
+
+  harness_evolver:
+    profile: "reasoning"
+    role: "Google Harness² Recursive Learning Agent"
+    skills:
       - ".agents/skills/harness-evolver/SKILL.md"
-      - ".agents/skills/clean-architecture/SKILL.md"
-    system_prompt: |
-      Você é o Agente Autônomo de QA e Autorreparo (Loop Fechado de até 3 tentativas).
-      
-      PROCEDIMENTO DE VALIDAÇÃO:
-      1. Execute `dart analyze` e `flutter test`.
-      2. Se houver qualquer erro de compilação, aviso de linter ou falha de teste:
-         - Inspecione o stack trace completo.
-         - Isole a causa raiz sem mascarar o teste (NUNCA apague um assert nem comente um teste para fazê-lo passar).
-         - Corrija a implementação ou o mock defasado e reexecute.
-      3. EVOLUÇÃO DO HARNESS (Propose-Probe-Compose): Se um erro exigiu mais de 1 tentativa de correção, acione a skill `harness-evolver` e registre a armadilha descoberta no arquivo `SKILL.md` correspondente para que nenhum agente repita esse erro no futuro.
+      - ".agents/skills/skill-creator/SKILL.md"
+
+  git_committer:
+    profile: "fast_ops"
+    role: "Atomic Git Committer & Release Specialist"
+    skills:
+      - ".agents/skills/flutter-release/SKILL.md"
+      - ".agents/skills/mobile-cicd/SKILL.md"
