@@ -3,180 +3,379 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antigravity Studio v3.3 — SDD & Kanban Viewer</title>
+  <title>Antigravity Studio — Kanban & OS</title>
   <style>
     :root {
-      --bg: #090d16; --surface: #111726; --elevated: #192237; --border: #232f48;
+      --bg: #090d16; --surface: #111726; --elevated: #182238; --border: #232f48;
       --primary: #38bdf8; --text: #f1f5f9; --muted: #94a3b8; --green: #10b981;
       --red: #f43f5e; --amber: #f59e0b; --purple: #c084fc;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-    .sidebar { width: 280px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .sidebar { width: 280px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 14px; flex-shrink: 0; }
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
     .viewport { flex: 1; overflow-y: auto; padding: 24px; }
-    .nav-btn { width: 100%; text-align: left; padding: 10px 14px; background: transparent; border: 1px solid transparent; color: var(--muted); border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 4px; }
-    .nav-btn.active { background: rgba(56,189,248,0.12); color: var(--primary); border-color: rgba(56,189,248,0.3); }
-    .kanban-grid { display: grid; grid-template-columns: repeat(5, minmax(260px, 1fr)); gap: 16px; min-height: 80vh; overflow-x: auto; }
+    .kanban-grid { display: grid; grid-template-columns: repeat(5, minmax(280px, 1fr)); gap: 16px; min-height: 82vh; overflow-x: auto; padding-bottom: 20px; }
     .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; }
-    .card { background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: pointer; }
-    .card:hover { border-color: var(--primary); }
-    .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(56,189,248,0.15); color: var(--primary); }
+    .card { background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: pointer; transition: all 0.15s; }
+    .card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .badge { font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; background: rgba(56,189,248,0.15); color: var(--primary); font-weight: 600; }
     .btn { padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--elevated); color: var(--text); }
-    .btn-primary { background: var(--primary); color: #050b14; border: none; }
+    .btn-primary { background: var(--primary); color: #04101e; border: none; font-weight: 700; }
+    .btn-green { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid #10b981; }
+    .btn-red { background: rgba(244,63,94,0.2); color: #fb7185; border: 1px solid #f43f5e; }
+    
+    /* MODAL ESTRUTURADO */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(3,6,12,0.85); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; background: #070a12; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.9rem; }
   </style>
 </head>
 <body>
 
   <aside class="sidebar">
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-      <div style="width:32px; height:32px; background:linear-gradient(135deg,var(--primary),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#000;">A²</div>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+      <div style="width:34px; height:34px; background:linear-gradient(135deg,var(--primary),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#000;">A²</div>
       <div>
         <h2 style="font-size:0.95rem;">Antigravity Studio</h2>
-        <span style="font-size:0.72rem; color:var(--primary);">SDD & Kanban Viewer</span>
+        <span style="font-size:0.72rem; color:var(--primary);">Harness Native Kanban</span>
       </div>
     </div>
 
-    <button type="button" class="nav-btn active" onclick="showTab('kanban')">📋 Kanban do Projeto</button>
-    <button type="button" class="nav-btn" onclick="showTab('guide')">📐 Fluxo SDD & IA</button>
+    <div style="font-size:0.8rem; color:var(--muted); line-height:1.4; background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; border:1px solid var(--border);">
+      💡 As tarefas são criadas e movimentadas pelo <strong>Orquestrador</strong> no chat da sua IDE. Este painel reflete o arquivo <code>_specs/task-board.md</code> em tempo real.
+    </div>
 
     <div style="margin-top:auto; display:flex; flex-direction:column; gap:8px;">
-      <button type="button" class="btn btn-primary" onclick="connectDirectory()">🔗 Conectar Pasta do Projeto</button>
-      <button type="button" class="btn" onclick="reloadTaskBoard()">🔄 Recarregar task-board.md</button>
-      <span id="sync-status" style="font-size:0.75rem; color:var(--muted); text-align:center;">Não conectado</span>
+      <button type="button" class="btn btn-primary" id="btn-connect" onclick="connectDirectory()">🔗 Conectar Pasta do Projeto</button>
+      <button type="button" class="btn" onclick="manualReload()">🔄 Forçar Leitura do task-board.md</button>
+      <span id="sync-status" style="font-size:0.75rem; color:var(--muted); text-align:center;">Verificando conexão...</span>
     </div>
   </aside>
 
   <main class="main">
     <header class="topbar">
-      <h2 id="topbar-title">📋 Kanban do Projeto (Sincronizado com a IA)</h2>
-      <span style="font-size:0.8rem; color:var(--muted);">As tarefas são criadas e movidas exclusivamente pela conversa com a IA na IDE</span>
+      <h2>📋 Quadro de Engenharia (Sincronizado)</h2>
+      <span style="font-size:0.8rem; color:var(--muted);" id="last-sync-time">Aguardando conexão...</span>
     </header>
 
     <div class="viewport">
-      <!-- ABA KANBAN -->
-      <div id="tab-kanban">
-        <div class="kanban-grid" id="kanban-board">
-          <!-- Colunas geradas dinamicamente via task-board.md -->
-        </div>
-      </div>
-
-      <!-- ABA GUIA SDD -->
-      <div id="tab-guide" style="display:none; max-width:800px; line-height:1.6;">
-        <h3 style="margin-bottom:12px;">Como trabalhar com a IA no modelo Spec-Driven Development:</h3>
-        <ol style="padding-left:20px; color:var(--muted); display:flex; flex-direction:column; gap:12px;">
-          <li><strong style="color:#fff;">Envie a demanda no chat da IDE:</strong> Descreva o que você precisa em alto nível.</li>
-          <li><strong style="color:#fff;">A IA fará perguntas obrigatórias:</strong> Ela questionará regras de negócio, dados, layouts e cenários de erro antes de programar.</li>
-          <li><strong style="color:#fff;">Aprovação da Spec:</strong> A IA grava a especificação em <code>_specs/features/</code> e preenche o Kanban em <code>_specs/task-board.md</code>.</li>
-          <li><strong style="color:#fff;">Ciclo TDD:</strong> A IA gera os testes falhos (RED), implementa o código mínimo (GREEN) e roda os linters.</li>
-          <li><strong style="color:#fff;">Gate de Aprovação:</strong> O card aparece na coluna "Gate de Aprovação" deste Studio para sua validação final.</li>
-        </ol>
-      </div>
+      <div class="kanban-grid" id="kanban-board"></div>
     </div>
   </main>
 
+  <!-- MODAL DE INSPEÇÃO E APROVAÇÃO -->
+  <div class="modal-backdrop" id="task-modal" onclick="if(event.target===this) closeModal()">
+    <div class="modal">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+        <div>
+          <span class="badge" id="m-task-id" style="font-size:0.8rem;">TASK</span>
+          <h3 id="m-title-display" style="font-size:1.15rem; margin-top:6px; color:#fff;"></h3>
+        </div>
+        <button class="btn" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Status / Coluna</label>
+        <select id="m-task-col">
+          <option value="backlog">1. Backlog & Specs</option>
+          <option value="red">2. Fase RED (TDD)</option>
+          <option value="green">3. Fase GREEN (Código)</option>
+          <option value="review">4. Gate de Aprovação (Aguardando Você)</option>
+          <option value="done">5. Concluído</option>
+        </select>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label>Agente Designado</label>
+          <input type="text" id="m-task-agent">
+        </div>
+        <div class="form-group">
+          <label>Skills Ativadas</label>
+          <input type="text" id="m-task-skills">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Título da Tarefa</label>
+        <input type="text" id="m-task-title">
+      </div>
+
+      <div class="form-group">
+        <label>Especificação Técnica & Critérios de Aceitação</label>
+        <textarea id="m-task-desc" rows="5"></textarea>
+      </div>
+
+      <div class="form-group" id="group-feedback" style="display:none;">
+        <label style="color:#fb7185;">⚠️ Feedback de Reprovação (Instrução para a IA corrigir)</label>
+        <input type="text" id="m-task-feedback" placeholder="Informe o que ficou errado ou incompleto...">
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:14px; border-top:1px solid var(--border);">
+        <button type="button" class="btn btn-red" onclick="deleteCurrentTask()">Excluir</button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-red" id="btn-reject-task" onclick="rejectTaskAction()">✖ Reprovar com Feedback</button>
+          <button type="button" class="btn btn-green" id="btn-approve-task" onclick="approveTaskAction()">✔ Aprovar Entrega</button>
+          <button type="button" class="btn btn-primary" onclick="saveTaskModal()">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    let dirHandle = null;
-    let tasks = [];
     const COLUMNS = [
-      { id: "backlog", title: "1. Backlog & Specs" },
-      { id: "red", title: "2. Fase RED (TDD)" },
-      { id: "green", title: "3. Fase GREEN (Código)" },
-      { id: "review", title: "4. Gate de Aprovação" },
-      { id: "done", title: "5. Concluído" }
+      { id: "backlog", title: "1. Backlog & Specs", color: "#94a3b8" },
+      { id: "red", title: "2. Fase RED (TDD)", color: "#f43f5e" },
+      { id: "green", title: "3. Fase GREEN (Código)", color: "#38bdf8" },
+      { id: "review", title: "4. Gate de Aprovação", color: "#f59e0b" },
+      { id: "done", title: "5. Concluído", color: "#10b981" }
     ];
 
-    function showTab(tab) {
-      document.getElementById('tab-kanban').style.display = tab === 'kanban' ? 'block' : 'none';
-      document.getElementById('tab-guide').style.display = tab === 'guide' ? 'block' : 'none';
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
+    let dirHandle = null;
+    let tasks = [];
+    let selectedTaskId = null;
+
+    // PERSISTÊNCIA DA PASTA VIA INDEXEDDB
+    const DB_NAME = "AntigravityStudioDB";
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => req.result.createObjectStore("handles");
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
     }
+
+    async function saveHandle(handle) {
+      const db = await openDB();
+      const tx = db.transaction("handles", "readwrite");
+      tx.objectStore("handles").put(handle, "project_dir");
+    }
+
+    async function getSavedHandle() {
+      const db = await openDB();
+      return new Promise(resolve => {
+        const req = db.transaction("handles").objectStore("handles").get("project_dir");
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const saved = await getSavedHandle();
+        if (saved) {
+          const opts = { mode: "readwrite" };
+          if ((await saved.queryPermission(opts)) === "granted" || (await saved.requestPermission(opts)) === "granted") {
+            dirHandle = saved;
+            onConnected();
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("Auto-reconexão falhou, necessário clique manual:", e);
+      }
+      document.getElementById("sync-status").innerText = "Pasta não conectada";
+    });
 
     async function connectDirectory() {
       try {
         dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
-        document.getElementById('sync-status').innerText = `Conectado: ${dirHandle.name}`;
-        await reloadTaskBoard();
-        // Polling a cada 4 segundos para ler alterações que a IA fizer em task-board.md
-        setInterval(reloadTaskBoard, 4000);
-      } catch (err) {
-        console.warn("Conexão cancelada:", err);
+        await saveHandle(dirHandle);
+        onConnected();
+      } catch (e) {
+        console.warn("Seleção cancelada:", e);
       }
     }
 
-    async function reloadTaskBoard() {
+    function onConnected() {
+      document.getElementById("btn-connect").innerText = `📁 ${dirHandle.name}`;
+      document.getElementById("sync-status").innerText = `Conectado: ${dirHandle.name}`;
+      loadFromTaskBoard();
+      setInterval(loadFromTaskBoard, 3000); // Polling silencioso
+    }
+
+    async function loadFromTaskBoard() {
       if (!dirHandle) return;
       try {
-        const specsDir = await dirHandle.getDirectoryHandle('_specs');
-        const fileHandle = await specsDir.getFileHandle('task-board.md');
+        const specs = await dirHandle.getDirectoryHandle("_specs");
+        const fileHandle = await specs.getFileHandle("task-board.md");
         const file = await fileHandle.getFile();
         const text = await file.text();
-        parseTaskBoardMarkdown(text);
+        parseMarkdown(text);
         renderKanban();
-      } catch (err) {
-        console.warn("Erro ao ler task-board.md:", err);
+        document.getElementById("last-sync-time").innerText = `Última sincronização: ${new Date().toLocaleTimeString()}`;
+      } catch (e) {
+        console.warn("Erro lendo task-board.md:", e);
       }
     }
 
-    function parseTaskBoardMarkdown(md) {
+    function parseMarkdown(md) {
       tasks = [];
       let currentCol = "backlog";
-      const lines = md.split('\n');
+      const lines = md.split("\n");
 
       lines.forEach(line => {
         const lower = line.toLowerCase();
         if (lower.includes("## 1.") || lower.includes("backlog")) currentCol = "backlog";
         else if (lower.includes("## 2.") || lower.includes("red")) currentCol = "red";
         else if (lower.includes("## 3.") || lower.includes("green")) currentCol = "green";
-        else if (lower.includes("## 4.") || lower.includes("aprovação") || lower.includes("gate")) currentCol = "review";
+        else if (lower.includes("## 4.") || lower.includes("aprovação") || lower.includes("review")) currentCol = "review";
         else if (lower.includes("## 5.") || lower.includes("concluído") || lower.includes("done")) currentCol = "done";
 
-        if (line.trim().startsWith('- **[')) {
+        if (line.trim().startsWith("- **[")) {
           const idMatch = line.match(/\[(.*?)\]/);
           const titleMatch = line.match(/\]\s*(.*?)(?:—|\*|$)/);
           const agentMatch = line.match(/Agente:\s*`([^`]+)`/i);
           const skillsMatch = line.match(/Skills:\s*`([^`]+)`/i);
+          const diffMatch = line.match(/Dificuldade:\s*`([^`]+)`/i);
 
           tasks.push({
             id: idMatch ? idMatch[1] : "TASK",
             title: titleMatch ? titleMatch[1].trim() : line,
+            agent: agentMatch ? agentMatch[1] : "master_orchestrator",
+            skills: skillsMatch ? skillsMatch[1] : "",
+            difficulty: diffMatch ? diffMatch[1] : "Média",
             column: currentCol,
-            agent: agentMatch ? agentMatch[1] : "Orchestrator",
-            skills: skillsMatch ? skillsMatch[1] : ""
+            desc: ""
           });
+        } else if (tasks.length > 0 && line.trim().startsWith("- ") && !line.trim().startsWith("- **[")) {
+          tasks[tasks.length - 1].desc += line.trim().replace(/^-\s*/, "") + "\n";
         }
       });
     }
 
     function renderKanban() {
-      const container = document.getElementById('kanban-board');
+      const container = document.getElementById("kanban-board");
       container.innerHTML = COLUMNS.map(col => {
         const colTasks = tasks.filter(t => t.column === col.id);
         return `
           <div class="kanban-col">
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.85rem; font-weight:700;">
-              <span>${col.title}</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <span style="font-weight:700; font-size:0.85rem; color:${col.color};">● ${col.title}</span>
               <span class="badge">${colTasks.length}</span>
             </div>
             <div>
               ${colTasks.map(t => `
-                <div class="card">
-                  <span style="font-family:monospace; font-size:0.75rem; color:var(--primary); font-weight:700;">${t.id}</span>
-                  <div style="font-size:0.9rem; font-weight:600; margin:6px 0;">${t.title}</div>
+                <div class="card" onclick="openTaskModal('${t.id}')">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="badge" style="background:#070a12;">${t.id}</span>
+                    <span style="font-size:0.7rem; color:var(--muted);">${t.difficulty}</span>
+                  </div>
+                  <div style="font-size:0.92rem; font-weight:600; margin:8px 0 6px; color:#fff;">${t.title}</div>
                   <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
                     <span class="badge" style="background:rgba(192,132,252,0.15); color:var(--purple);">🤖 ${t.agent}</span>
-                    ${t.skills ? `<span class="badge">⚡ ${t.skills}</span>` : ''}
+                    ${t.skills ? `<span class="badge">⚡ ${t.skills}</span>` : ""}
                   </div>
                 </div>
-              `).join('')}
-              ${colTasks.length === 0 ? `<div style="font-size:0.75rem; color:var(--muted); text-align:center; padding:20px;">Nenhuma tarefa</div>` : ''}
+              `).join("")}
+              ${colTasks.length === 0 ? `<div style="font-size:0.75rem; color:var(--muted); text-align:center; padding:30px 10px;">Nenhuma tarefa</div>` : ""}
             </div>
           </div>
         `;
-      }).join('');
+      }).join("");
     }
+
+    function openTaskModal(id) {
+      selectedTaskId = id;
+      const t = tasks.find(x => x.id === id);
+      if (!t) return;
+
+      document.getElementById("m-task-id").innerText = t.id;
+      document.getElementById("m-title-display").innerText = t.title;
+      document.getElementById("m-task-col").value = t.column;
+      document.getElementById("m-task-agent").value = t.agent;
+      document.getElementById("m-task-skills").value = t.skills;
+      document.getElementById("m-task-title").value = t.title;
+      document.getElementById("m-task-desc").value = t.desc.trim();
+
+      const isReview = t.column === "review";
+      document.getElementById("btn-approve-task").style.display = isReview ? "inline-block" : "none";
+      document.getElementById("btn-reject-task").style.display = isReview ? "inline-block" : "none";
+      document.getElementById("group-feedback").style.display = isReview ? "block" : "none";
+
+      document.getElementById("task-modal").classList.add("open");
+    }
+
+    function closeModal() {
+      document.getElementById("task-modal").classList.remove("open");
+      selectedTaskId = null;
+    }
+
+    async function writeTaskBoardToDisk() {
+      if (!dirHandle) return;
+      let md = `# 📋 Quadro de Tarefas do Projeto (Kanban)\n\n> Sincronizado automaticamente via Antigravity Studio\n\n`;
+      COLUMNS.forEach(col => {
+        md += `## ${col.title}\n`;
+        const colList = tasks.filter(t => t.column === col.id);
+        if (colList.length === 0) {
+          md += `- *(Nenhuma tarefa ativa)*\n\n`;
+        } else {
+          colList.forEach(t => {
+            md += `- **[${t.id}] ${t.title}** — *Agente:* \`${t.agent}\` | *Skills:* \`${t.skills}\` | *Dificuldade:* \`${t.difficulty || "Média"}\`\n`;
+            if (t.desc && t.desc.trim()) {
+              t.desc.trim().split("\n").forEach(d => { md += `  - ${d}\n`; });
+            }
+          });
+          md += `\n`;
+        }
+      });
+
+      const specs = await dirHandle.getDirectoryHandle("_specs");
+      const fileHandle = await specs.getFileHandle("task-board.md", { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(md);
+      await writable.close();
+      renderKanban();
+    }
+
+    async function saveTaskModal() {
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (!t) return;
+      t.column = document.getElementById("m-task-col").value;
+      t.agent = document.getElementById("m-task-agent").value;
+      t.skills = document.getElementById("m-task-skills").value;
+      t.title = document.getElementById("m-task-title").value;
+      t.desc = document.getElementById("m-task-desc").value;
+      closeModal();
+      await writeTaskBoardToDisk();
+    }
+
+    async function approveTaskAction() {
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (t) {
+        t.column = "done";
+        t.desc += "\n✔ Aprovado pelo Engenheiro no Gate Humano.";
+        closeModal();
+        await writeTaskBoardToDisk();
+      }
+    }
+
+    async function rejectTaskAction() {
+      const t = tasks.find(x => x.id === selectedTaskId);
+      const fb = document.getElementById("m-task-feedback").value.trim();
+      if (!fb) return alert("Informe o motivo da reprovação para orientar a IA no ajuste.");
+      if (t) {
+        t.column = "red";
+        t.desc += `\n⚠️ Reprovado no Gate Humano: ${fb}`;
+        closeModal();
+        await writeTaskBoardToDisk();
+      }
+    }
+
+    async function deleteCurrentTask() {
+      if (!confirm("Deseja realmente remover esta tarefa do quadro?")) return;
+      tasks = tasks.filter(t => t.id !== selectedTaskId);
+      closeModal();
+      await writeTaskBoardToDisk();
+    }
+
+    function manualReload() { loadFromTaskBoard(); }
   </script>
 </body>
 </html>
