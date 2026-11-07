@@ -1757,7 +1757,7 @@ steps:
 EOF
 
 # ------------------------------------------------------------------------------
-# 8.1 harness-studio.html (Kanban, matriz 1:N, ciclo TDD e analisador de spec)
+# 8.1 harness-studio.html (Kanban nativo com drag & drop e edição cirúrgica do task-board)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > harness-studio.html
 <!DOCTYPE html>
@@ -1765,1352 +1765,577 @@ cat << 'EOF' > harness-studio.html
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antigravity Studio v3.0 — AI Software Engineering OS</title>
+  <title>Antigravity Studio — Kanban & OS</title>
   <style>
     :root {
-      --bg-base: #07090e;
-      --bg-surface: #0f131d;
-      --bg-elevated: #161c2a;
-      --bg-glass: rgba(22, 28, 42, 0.78);
-      --border: #222b3d;
-      --border-hover: #384866;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --primary: #38bdf8;
-      --primary-glow: rgba(56, 189, 248, 0.16);
-      --indigo: #818cf8;
-      --emerald: #10b981;
-      --amber: #f59e0b;
-      --rose: #f43f5e;
-      --purple: #c084fc;
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
+      --bg: #090d16; --surface: #111726; --elevated: #182238; --border: #232f48;
+      --primary: #38bdf8; --text: #f1f5f9; --muted: #94a3b8; --green: #10b981;
+      --red: #f43f5e; --amber: #f59e0b; --purple: #c084fc;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-base); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 270px;
-      background: var(--bg-surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 20px 14px;
-      flex-shrink: 0;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 6px 10px 20px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 16px;
-    }
-    .brand-logo {
-      width: 34px; height: 34px; border-radius: 9px;
-      background: linear-gradient(135deg, var(--primary), var(--indigo));
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; color: #050811; font-size: 1.1rem;
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
-    }
-    .brand-text h1 { font-size: 0.98rem; font-weight: 700; letter-spacing: -0.02em; }
-    .brand-text span { font-size: 0.72rem; color: var(--primary); font-family: monospace; }
-
-    .nav-group-label {
-      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
-      color: var(--text-dim); font-weight: 700; padding: 10px 10px 6px;
-    }
-    .nav-btn {
-      display: flex; align-items: center; justify-content: space-between;
-      width: 100%; background: transparent; border: 1px solid transparent;
-      color: var(--text-muted); padding: 10px 12px; border-radius: var(--radius-md);
-      font-size: 0.86rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
-      margin-bottom: 4px; text-align: left;
-    }
-    .nav-btn:hover { background: var(--bg-elevated); color: var(--text-main); }
-    .nav-btn.active {
-      background: var(--primary-glow); border-color: rgba(56, 189, 248, 0.35);
-      color: var(--primary); font-weight: 600;
-    }
-    .nav-pill {
-      font-size: 0.7rem; background: var(--bg-base); color: var(--text-muted);
-      padding: 2px 7px; border-radius: 999px; border: 1px solid var(--border);
-    }
-
-    .sidebar-footer {
-      margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .fs-status {
-      font-size: 0.75rem; padding: 10px; border-radius: var(--radius-md);
-      background: var(--bg-base); border: 1px solid var(--border);
-      display: flex; align-items: center; gap: 8px; color: var(--text-muted);
-    }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
-    .dot.online { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
-
-    /* MAIN AREA */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+    .sidebar { width: 280px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 14px; flex-shrink: 0; }
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar {
-      height: 64px; background: var(--bg-surface); border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 28px;
-      flex-shrink: 0;
-    }
-    .topbar-left { display: flex; align-items: center; gap: 14px; }
-    .topbar-title { font-size: 1.1rem; font-weight: 700; }
-    .mcp-strip { display: flex; align-items: center; gap: 6px; }
-    .mcp-chip {
-      font-size: 0.72rem; padding: 4px 9px; border-radius: 999px;
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      color: var(--text-muted); display: flex; align-items: center; gap: 5px; cursor: pointer;
-    }
-    .mcp-chip.active { border-color: rgba(16, 185, 129, 0.4); color: #a7f3d0; background: rgba(16, 185, 129, 0.1); }
-
-    .topbar-actions { display: flex; align-items: center; gap: 10px; }
-    .btn {
-      padding: 8px 14px; border-radius: var(--radius-sm); font-size: 0.82rem;
-      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
-      background: var(--bg-elevated); color: var(--text-main); transition: all 0.15s;
-      display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn:hover { border-color: var(--border-hover); background: #1e2638; }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), #0284c7);
-      color: #04101c; border-color: transparent; font-weight: 700;
-    }
-    .btn-primary:hover { filter: brightness(1.08); }
-    .btn-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.35); }
-    .btn-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; border-color: rgba(244, 63, 94, 0.35); }
-
-    /* VIEWPORT CONTENT */
-    .viewport { flex: 1; overflow-y: auto; padding: 24px 28px; }
-    .view-pane { display: none; }
-    .view-pane.active { display: block; }
-
-    /* KANBAN */
-    .kanban-grid {
-      display: grid; grid-template-columns: repeat(5, minmax(260px, 1fr));
-      gap: 16px; align-items: start; overflow-x: auto; padding-bottom: 16px;
-    }
-    .kanban-col {
-      background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 14px; min-height: 72vh;
-      display: flex; flex-direction: column;
-    }
-    .col-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
-    }
-    .col-header h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: flex; align-items: center; gap: 7px; }
-    .task-card {
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px;
-      cursor: pointer; transition: all 0.16s; position: relative;
-    }
-    .task-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
-    .task-id { font-family: monospace; font-size: 0.7rem; color: var(--primary); font-weight: 700; }
-    .task-title { font-size: 0.9rem; font-weight: 600; margin: 5px 0 6px; color: var(--text-main); line-height: 1.35; }
-    .task-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
-    .task-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .chip { font-size: 0.68rem; padding: 2px 7px; border-radius: 4px; background: var(--bg-base); border: 1px solid var(--border); color: var(--text-muted); }
-    .chip-agent { color: var(--indigo); border-color: rgba(129, 140, 248, 0.3); background: rgba(129, 140, 248, 0.1); }
-    .chip-skill { color: var(--primary); border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.08); }
-    .gate-box {
-      margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border);
-      display: flex; gap: 6px;
-    }
-    .gate-box button { flex: 1; padding: 6px; font-size: 0.74rem; border-radius: 5px; cursor: pointer; font-weight: 700; border: none; }
-
-    /* CARDS GRID (AGENTS, SKILLS, MCPS) */
-    .section-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
-    .entity-card {
-      background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 20px; cursor: pointer;
-      transition: all 0.16s; display: flex; flex-direction: column; justify-content: space-between;
-    }
-    .entity-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
-    .entity-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-    .entity-title { font-size: 1.02rem; font-weight: 700; color: var(--text-main); }
-    .entity-sub { font-size: 0.76rem; color: var(--primary); font-family: monospace; margin-bottom: 8px; }
-    .entity-body { font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
-    .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; }
-
-    /* ORCHESTRATOR CONSOLE */
-    .orch-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
-    .panel { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; }
-    .panel h3 { font-size: 1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-    .panel p.sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; }
-    .form-field { margin-bottom: 14px; }
-    .form-field label { display: block; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
-    .form-field input, .form-field textarea, .form-field select {
-      width: 100%; background: var(--bg-base); border: 1px solid var(--border);
-      color: var(--text-main); padding: 10px 12px; border-radius: var(--radius-sm); font-size: 0.86rem;
-    }
-    .form-field input:focus, .form-field textarea:focus { outline: none; border-color: var(--primary); }
-
-    /* MODAL */
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(3, 6, 12, 0.82);
-      backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center;
-      z-index: 1000; padding: 20px;
-    }
+    .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .viewport { flex: 1; overflow-y: auto; padding: 24px; }
+    .kanban-grid { display: grid; grid-template-columns: repeat(5, minmax(280px, 1fr)); gap: 16px; min-height: 82vh; overflow-x: auto; padding-bottom: 20px; }
+    .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; transition: background 0.2s; }
+    .kanban-col.drag-over { background: rgba(56, 189, 248, 0.05); border-color: var(--primary); }
+    .card { background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: grab; transition: all 0.15s; }
+    .card:active { cursor: grabbing; }
+    .card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .badge { font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; background: rgba(56,189,248,0.15); color: var(--primary); font-weight: 600; }
+    .btn { padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--elevated); color: var(--text); }
+    .btn-primary { background: var(--primary); color: #04101e; border: none; font-weight: 700; }
+    .btn-green { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid #10b981; }
+    .btn-red { background: rgba(244,63,94,0.2); color: #fb7185; border: 1px solid #f43f5e; }
+    
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(3,6,12,0.85); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .modal-backdrop.open { display: flex; }
-    .modal {
-      background: var(--bg-surface); border: 1px solid var(--border-hover);
-      border-radius: var(--radius-lg); width: 100%; max-width: 720px;
-      max-height: 90vh; overflow-y: auto; padding: 26px; box-shadow: var(--shadow);
-    }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 18px; }
-    .checkbox-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 8px; background: var(--bg-base); padding: 12px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); max-height: 210px; overflow-y: auto;
-    }
-    .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-main); cursor: pointer; padding: 4px; border-radius: 4px; }
-    .check-item:hover { background: var(--bg-elevated); }
-
-    /* TOAST */
-    #toast {
-      position: fixed; bottom: 22px; right: 22px; background: var(--bg-elevated);
-      border: 1px solid var(--primary); color: var(--text-main); padding: 12px 18px;
-      border-radius: var(--radius-md); font-size: 0.84rem; font-weight: 600;
-      box-shadow: var(--shadow); transform: translateY(120%); opacity: 0;
-      transition: all 0.25s; z-index: 2000;
-    }
-    #toast.show { transform: translateY(0); opacity: 1; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; background: #070a12; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.9rem; }
   </style>
 </head>
 <body>
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-logo">A²</div>
-      <div class="brand-text">
-        <h1>Antigravity Studio</h1>
-        <span>v3.0 • Harness² OS</span>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+      <div style="width:34px; height:34px; background:linear-gradient(135deg,var(--primary),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#000;">A²</div>
+      <div>
+        <h2 style="font-size:0.95rem;">Antigravity Studio</h2>
+        <span style="font-size:0.72rem; color:var(--primary);">Kanban Nativo com Drag & Drop</span>
       </div>
     </div>
 
-    <div class="nav-group-label">Engenharia & Fluxo</div>
-    <button class="nav-btn active" onclick="switchView('orchestrator', this)">
-      <span>🧠 Master Orchestrator</span>
-      <span class="nav-pill">IA</span>
-    </button>
-    <button class="nav-btn" onclick="switchView('kanban', this)">
-      <span>📋 Kanban & Gates</span>
-      <span class="nav-pill" id="nav-count-tasks">0</span>
-    </button>
+    <div style="font-size:0.8rem; color:var(--muted); line-height:1.4; background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; border:1px solid var(--border);">
+      💡 Você pode <strong>arrastar os cards</strong> entre as colunas ou clicar neles para inspecionar, aprovar e reprovar. Excluir um card remove apenas ele — as demais tarefas ficam exatamente onde estão.
+    </div>
 
-    <div class="nav-group-label">Arquitetura Modular (1:N)</div>
-    <button class="nav-btn" onclick="switchView('agents', this)">
-      <span>🤖 Especialistas (Agentes)</span>
-      <span class="nav-pill" id="nav-count-agents">0</span>
-    </button>
-    <button class="nav-btn" onclick="switchView('skills', this)">
-      <span>⚡ Catálogo de Skills</span>
-      <span class="nav-pill" id="nav-count-skills">0</span>
-    </button>
-    <button class="nav-btn" onclick="switchView('mcps', this)">
-      <span>🔌 Servidores MCP</span>
-      <span class="nav-pill" id="nav-count-mcps">0</span>
-    </button>
-
-    <div class="sidebar-footer">
-      <div class="fs-status" id="fs-indicator">
-        <span class="dot" id="fs-dot"></span>
-        <span id="fs-text">Modo Memória Local (Conecte a pasta p/ Auto-Save real)</span>
-      </div>
-      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="connectRepositoryFolder()">
-        🔗 Conectar Pasta do Projeto
-      </button>
-      <button class="btn" style="width:100%; justify-content:center;" onclick="downloadHarnessBundle()">
-        ⬇ Baixar harness.yaml
-      </button>
+    <div style="margin-top:auto; display:flex; flex-direction:column; gap:8px;">
+      <button type="button" class="btn btn-primary" id="btn-connect" onclick="connectDirectory()">📁 Conectar Pasta do Projeto</button>
+      <button type="button" class="btn" onclick="manualReload()">🔄 Recarregar task-board.md</button>
+      <span id="sync-status" style="font-size:0.75rem; color:var(--muted); text-align:center;">Verificando conexão...</span>
     </div>
   </aside>
 
-  <!-- MAIN -->
-  <div class="main">
+  <main class="main">
     <header class="topbar">
-      <div class="topbar-left">
-        <h2 class="topbar-title" id="view-title">🧠 Master Orchestrator & Planejamento</h2>
-        <div class="mcp-strip" id="topbar-mcps"></div>
-      </div>
-      <div class="topbar-actions">
-        <button class="btn" onclick="openSkillModal()">+ Nova Skill</button>
-        <button class="btn" onclick="openAgentModal()">+ Novo Agente</button>
-        <button class="btn btn-primary" onclick="openTaskModal()">+ Nova Tarefa</button>
-      </div>
+      <h2>📋 Quadro de Engenharia</h2>
+      <span style="font-size:0.8rem; color:var(--muted);" id="last-sync-time">Aguardando conexão...</span>
     </header>
 
-    <main class="viewport">
+    <div class="viewport">
+      <div class="kanban-grid" id="kanban-board"></div>
+    </div>
+  </main>
 
-      <!-- VIEW 1: MASTER ORCHESTRATOR -->
-      <section id="view-orchestrator" class="view-pane active">
-        <div class="orch-layout">
-          <div class="panel">
-            <h3>🎯 Despacho Inteligente de Feature / Bugfix</h3>
-            <p class="sub">O Master Orchestrator analisa o <code>PROJECT_BRAIN.md</code>, detecta os MCPs ativos (Supabase, Stitch, Dart, Graft) e decompõe a demanda atribuindo o melhor Agente e suas Skills.</p>
-            
-            <div class="form-field">
-              <label>Título da Demanda / Épico</label>
-              <input type="text" id="orch-title" placeholder="Ex: Implementar Checkout Offline com Sincronização Supabase e UI Material 3">
-            </div>
-            <div class="form-field">
-              <label>Descrição Técnica, Regras de Negócio e Restrições</label>
-              <textarea id="orch-desc" rows="5" placeholder="Descreva o que precisa ser feito. Ex: O preço deve ser centralizado no domínio (PrecoService), tela com 4 estados obrigatórios, persistência SQLite com índices e sincronização Supabase RLS..."></textarea>
-            </div>
-            <div class="form-field">
-              <label>Complexidade Estimada</label>
-              <select id="orch-complexity">
-                <option value="Alta (Decompor em Múltiplas Tarefas TDD)">Alta — Decompor em Spec + UI + TDD RED + GREEN + Auditoria</option>
-                <option value="Média (Fluxo Padrão TDD)">Média — Fluxo Padrão TDD</option>
-                <option value="Baixa (Correção Cirúrgica)">Baixa — Correção Cirúrgica Direta</option>
-              </select>
-            </div>
-            <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary" onclick="orchestrateDemand()">⚡ Analisar, Decompor no Kanban & Gerar Prompt</button>
-            </div>
-          </div>
-
-          <div class="panel">
-            <h3>📋 Prompt Canônico Gerado para o Chat da IDE</h3>
-            <p class="sub">Copie e cole no Antigravity, Claude Code, Cursor ou Codex após decompor a demanda:</p>
-            <div class="form-field">
-              <textarea id="orch-output" rows="13" readonly style="font-family:monospace; font-size:0.79rem; color:#a5f3fc;"></textarea>
-            </div>
-            <button class="btn" onclick="copyOrchestratorPrompt()">📋 Copiar Prompt para o Agente</button>
-          </div>
+  <!-- MODAL DE INSPEÇÃO -->
+  <div class="modal-backdrop" id="task-modal" onclick="if(event.target===this) closeModal()">
+    <div class="modal">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+        <div>
+          <span class="badge" id="m-task-id" style="font-size:0.8rem;">TASK</span>
+          <h3 id="m-title-display" style="font-size:1.15rem; margin-top:6px; color:#fff;"></h3>
         </div>
-      </section>
+        <button class="btn" onclick="closeModal()">✕</button>
+      </div>
 
-      <!-- VIEW 2: KANBAN -->
-      <section id="view-kanban" class="view-pane">
-        <div class="section-bar">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer card para inspecionar, editar agente/skills, mudar coluna ou aprovar no Gate Humano.</p>
+      <div class="form-group">
+        <label>Status / Coluna</label>
+        <select id="m-task-col">
+          <option value="backlog">1. Backlog & Specs</option>
+          <option value="red">2. Fase RED (TDD)</option>
+          <option value="green">3. Fase GREEN (Código)</option>
+          <option value="review">4. Gate de Aprovação</option>
+          <option value="done">5. Concluído</option>
+        </select>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label>Agente Designado</label>
+          <input type="text" id="m-task-agent">
         </div>
-        <div class="kanban-grid" id="kanban-container"></div>
-      </section>
-
-      <!-- VIEW 3: AGENTES -->
-      <section id="view-agents" class="view-pane">
-        <div class="section-bar">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Clique em qualquer Agente para editar sua persona, senioridade, MCPs permitidos e selecionar suas Skills (1:N).</p>
-          <button class="btn btn-primary" onclick="openAgentModal()">+ Criar Novo Agente</button>
+        <div class="form-group">
+          <label>Skills Ativadas</label>
+          <input type="text" id="m-task-skills">
         </div>
-        <div class="cards-grid" id="agents-grid"></div>
-      </section>
+      </div>
 
-      <!-- VIEW 4: SKILLS -->
-      <section id="view-skills" class="view-pane">
-        <div class="section-bar">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Catálogo global desacoplado. Ao criar ou editar uma Skill, ela é gravada em <code>.agents/skills/&lt;id&gt;/SKILL.md</code> e fica disponível para qualquer Agente.</p>
-          <button class="btn btn-primary" onclick="openSkillModal()">+ Criar Nova Skill</button>
+      <div class="form-group">
+        <label>Título da Tarefa</label>
+        <input type="text" id="m-task-title">
+      </div>
+
+      <div class="form-group">
+        <label>Especificação Técnica & Critérios</label>
+        <textarea id="m-task-desc" rows="5"></textarea>
+      </div>
+
+      <div class="form-group" id="group-feedback">
+        <label style="color:#fb7185;">⚠️ Feedback de Reprovação (Instrução para a IA corrigir)</label>
+        <input type="text" id="m-task-feedback" placeholder="Informe o motivo da reprovação...">
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:14px; border-top:1px solid var(--border);">
+        <button type="button" class="btn btn-red" onclick="deleteCurrentTask()">Excluir</button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-red" onclick="rejectTaskAction()">✖ Reprovar (Vai para RED)</button>
+          <button type="button" class="btn btn-green" onclick="approveTaskAction()">✔ Aprovar (Vai para Concluído)</button>
+          <button type="button" class="btn btn-primary" onclick="saveTaskModal()">Salvar Alterações</button>
         </div>
-        <div class="cards-grid" id="skills-grid"></div>
-      </section>
-
-      <!-- VIEW 5: MCPS -->
-      <section id="view-mcps" class="view-pane">
-        <div class="section-bar">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Servidores Model Context Protocol reconhecidos pelo Orquestrador e pelos Especialistas (sincronizado com <code>.agents/mcp.json</code>).</p>
-        </div>
-        <div class="cards-grid" id="mcps-grid"></div>
-      </section>
-
-    </main>
+      </div>
+    </div>
   </div>
-
-  <!-- MODAL GENÉRICO DE INSPEÇÃO E EDIÇÃO -->
-  <div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this) closeModal()">
-    <div class="modal" id="modal-content"></div>
-  </div>
-
-  <div id="toast">Salvo automaticamente no Harness!</div>
 
   <script>
     // =========================================================================
-    // ESTADO PADRÃO COMPLETO (COM AGENTES, SKILLS E MCPS PRÉ-CARREGADOS)
+    // REGRAS DE PARSING DO task-board.md
+    //
+    // 1. A coluna de uma tarefa é definida SOMENTE pelo cabeçalho da seção
+    //    ("## 1. ...", "## 2. ..."). Nada de procurar "red"/"backlog" no meio
+    //    de títulos ou descrições (isso movia cards sem querer).
+    // 2. O formato aceito é flexível: "- **[T01] ...**" e
+    //    "- [ ] **[T01] ...**" (backlog) ou "- [x] **[T01] ...**" (concluído).
+    // 3. Toda mutação é cirúrgica: excluir/mover/editar altera apenas o bloco
+    //    da tarefa alvo e preserva o restante do arquivo byte a byte.
     // =========================================================================
-    const DEFAULT_STATE = {
-      version: "3.0-google-harness2-modular",
-      mcps: {
-        dart_mcp: {
-          name: "Official Dart & Flutter MCP",
-          command: "dart",
-          args: ["mcp-server"],
-          active: true,
-          desc: "Inspeção da árvore de widgets em runtime, resolução de símbolos, pubspec e execução assistida de testes Flutter."
-        },
-        supabase_mcp: {
-          name: "Supabase MCP Server",
-          command: "npx",
-          args: ["-y", "@supabase/mcp-server-supabase@latest"],
-          active: true,
-          desc: "Inspeção de schema Postgres, criação de migrations, políticas RLS, Edge Functions e geração de tipos."
-        },
-        google_stitch: {
-          name: "Google Stitch Visual MCP",
-          command: "npx",
-          args: ["-y", "@google/stitch-mcp-server"],
-          active: true,
-          env: {
-            STITCH_REFERENCES_DIR: "./_references/screens",
-            STITCH_OUTPUT_DIR: "./_specs"
-          },
-          desc: "Extração de Design Tokens, hierarquia de componentes e fidelidade visual a partir de telas em _references/screens/."
-        },
-        graft_ast: {
-          name: "Graft AST Code Indexer",
-          command: "graft",
-          args: ["mcp", "--watch"],
-          active: true,
-          desc: "Navegação cirúrgica em árvore sintática (AST) para localizar chamadas e impactos sem estourar janela de contexto."
-        },
-        ai_memory: {
-          name: "AI Memory & Handoff DB",
-          command: "ai-memory",
-          args: ["mcp"],
-          active: true,
-          env: {
-            AI_MEMORY_DB_PATH: "./.agents/memory/context.db"
-          },
-          desc: "Memória episódica de decisões arquiteturais e passagem de tickets atômicos entre subagentes."
-        }
-      },
-      skills: {
-        spec_discovery: {
-          name: "Spec-Driven Discovery & PRD",
-          category: "Arquitetura & Produto",
-          file: ".agents/skills/spec-discovery/SKILL.md",
-          desc: "Transforma requisitos vagos em contratos técnicos estritos, mapeando casos de borda e os 4 estados de tela (Loading, Empty, Error, Success).",
-          rules: "Nunca autorize codificação sem critérios de aceitação verificáveis e contratos de entrada/saída documentados."
-        },
-        clean_architecture: {
-          name: "Clean Architecture & Domain Purity",
-          category: "Engenharia de Software",
-          file: ".agents/skills/clean-architecture/SKILL.md",
-          desc: "Separação estrita entre Presentation, Domain (Services/Entities puros) e Data (Repositories/DTOs). Centralização de regras críticas.",
-          rules: "Proibido colocar SQL, chamadas HTTP ou regras de negócio dentro de Widgets ou Controllers de UI."
-        },
-        mobile_ux_design_system: {
-          name: "Mobile UX & Design Systems",
-          category: "UI/UX & Frontend",
-          file: ".agents/skills/mobile-ux/SKILL.md",
-          desc: "Design Tokens semânticos, alvos de toque mínimos de 48x48dp, micro-interações fluidas 60/120fps, Material 3 e responsividade adaptativa.",
-          rules: "Consuma tokens via Theme.of(context). Garanta feedback visual imediato e estados vazios informativos."
-        },
-        stitch_visual_ingest: {
-          name: "Google Stitch Visual Ingestion",
-          category: "UI/UX & Frontend",
-          file: ".agents/skills/flutter-build-responsive-layout/SKILL.md",
-          desc: "Leitura de protótipos e imagens em _references/screens/ via Stitch MCP para extração de espaçamentos, tipografia e componentes.",
-          rules: "Sempre cruze os prints de referência com o Design System antes de construir novos Widgets."
-        },
-        supabase_fullstack: {
-          name: "Supabase Auth, RLS & Edge",
-          category: "Backend & Cloud",
-          file: ".agents/skills/supabase-flutter/SKILL.md",
-          desc: "Integração segura com Supabase, políticas Row Level Security (RLS), sincronização incremental e funções serverless.",
-          rules: "Toda tabela exposta deve possuir política RLS explícita e tipagem forte validada."
-        },
-        local_first_sqlite: {
-          name: "Local-First SQLite & Performance",
-          category: "Dados & Offline",
-          file: ".agents/skills/local-first-data/SKILL.md",
-          desc: "Modelagem SQLite local de alta performance, índices compostos (CREATE INDEX), paginação (LIMIT/OFFSET), debounce de busca e fila offline.",
-          rules: "Evite Full Table Scans em catálogos grandes; exija paginação e índices em colunas de filtro textual."
-        },
-        tdd_red_green: {
-          name: "Strict TDD (Red-Green-Refactor)",
-          category: "Qualidade & Testes",
-          file: ".agents/skills/code-quality-tests/SKILL.md",
-          desc: "Desenvolvimento guiado por testes determinísticos: criação do teste que falha (RED) antes da implementação mínima (GREEN).",
-          rules: "Em testes concorrentes de banco local, isole instâncias em memória para evitar locks."
-        },
-        flutter_riverpod_state: {
-          name: "Reactive State Management (Riverpod)",
-          category: "Engenharia Mobile",
-          file: ".agents/skills/flutter-state-riverpod/SKILL.md",
-          desc: "Gerenciamento de estado previsível, imutável e reativo usando Notifiers/AsyncNotifiers com descarte seguro de recursos.",
-          rules: "Evite mutações diretas de estado durante o ciclo de build; use estados assíncronos tipados."
-        },
-        harness_evolver: {
-          name: "Google Harness² Recursive Evolver",
-          category: "Meta-Otimização",
-          file: ".agents/skills/harness-evolver/SKILL.md",
-          desc: "Ciclo Propose–Probe–Compose do Google Research Harness²: analisa falhas de QA ou reprovações no Kanban e atualiza as Skills automaticamente.",
-          rules: "Quando uma tarefa exigir mais de 1 tentativa de reparo, sintetize a causa raiz na respectiva SKILL.md."
-        }
-      },
-      agents: {
-        master_orchestrator: {
-          role: "Master Orchestrator & Principal Architect",
-          seniority: "Principal / Staff Engineer (15+ anos)",
-          persona: "Conhece profundamente todo o PROJECT_BRAIN.md, a arquitetura do repositório, os contratos de domínio e o status dos servidores MCP conectados. Decompõe épicos em tarefas menores por complexidade e escala o especialista exato.",
-          skills: ["spec_discovery", "clean_architecture", "harness_evolver"],
-          mcps: ["dart_mcp", "supabase_mcp", "google_stitch", "graft_ast", "ai_memory"]
-        },
-        ui_ux_specialist: {
-          role: "Senior UI/UX & Design System Engineer",
-          seniority: "Senior Product Designer & Frontend Architect (10+ anos)",
-          persona: "Especialista em Design Systems escaláveis, Material 3, acessibilidade WCAG, micro-interações e conversão de layouts do Google Stitch em componentes Flutter responsivos.",
-          skills: ["mobile_ux_design_system", "stitch_visual_ingest", "flutter_riverpod_state"],
-          mcps: ["google_stitch", "dart_mcp"]
-        },
-        tdd_specialist: {
-          role: "Lead TDD & Contract Verification Engineer",
-          seniority: "Senior QA & Test Architect (10+ anos)",
-          persona: "Guardião da Fase RED. Escreve testes unitários, de widget e de contrato de performance antes que qualquer código de produção exista.",
-          skills: ["tdd_red_green", "clean_architecture"],
-          mcps: ["dart_mcp", "graft_ast"]
-        },
-        mobile_domain_builder: {
-          role: "Senior Flutter & Domain Engineer",
-          seniority: "Senior Mobile Software Engineer (12+ anos)",
-          persona: "Implementa a Fase GREEN com código limpo, serviços de domínio desacoplados (ex: PrecoService) e gerenciamento de estado reativo.",
-          skills: ["clean_architecture", "flutter_riverpod_state", "mobile_ux_design_system"],
-          mcps: ["dart_mcp", "graft_ast", "ai_memory"]
-        },
-        data_supabase_specialist: {
-          role: "Offline-First SQLite & Supabase Architect",
-          seniority: "Senior Data & Cloud Engineer (12+ anos)",
-          persona: "Especialista em motores de busca SQLite ultrarrápidos (índices, paginação, sincronização FTP/REST) e backends Supabase com RLS e Edge Functions.",
-          skills: ["local_first_sqlite", "supabase_fullstack", "clean_architecture"],
-          mcps: ["supabase_mcp", "dart_mcp", "graft_ast"]
-        },
-        qa_self_healer: {
-          role: "Autonomous QA Validator & Self-Healing Agent",
-          seniority: "Staff Quality & Reliability Engineer",
-          persona: "Executa linters, testes automatizados e auditoria de regressão em loop fechado (até 3 tentativas) e aciona o Harness Evolver para registrar aprendizados.",
-          skills: ["tdd_red_green", "harness_evolver", "clean_architecture"],
-          mcps: ["dart_mcp", "graft_ast", "ai_memory"]
-        }
-      },
-      tasks: [
-        {
-          id: "T01",
-          title: "Recuperação de Senha",
-          desc: "Fluxo completo de reset de senha com Supabase Auth, deep link e os 4 estados de tela. Spec: _specs/tasks/T01-recuperacao-senha.md",
-          column: "backlog",
-          agent: "mobile_domain_builder",
-          skills: ["spec_discovery", "clean_architecture"],
-          complexity: "Média",
-          feedback: ""
-        },
-        {
-          id: "T02",
-          title: "Dashboard Gerencial",
-          desc: "Painel responsivo com Design Tokens, gráficos e estados de carregamento. Spec: _specs/tasks/T02-dashboard-gerencial.md",
-          column: "backlog",
-          agent: "ui_ux_specialist",
-          skills: ["mobile_ux_design_system", "stitch_visual_ingest"],
-          complexity: "Alta",
-          feedback: ""
-        },
-        {
-          id: "T03",
-          title: "Push Notifications",
-          desc: "Notificações com fila offline, permissões e deep link para a tela de destino. Spec: _specs/tasks/T03-push-notifications.md",
-          column: "backlog",
-          agent: "mobile_domain_builder",
-          skills: ["flutter_riverpod_state", "clean_architecture"],
-          complexity: "Média",
-          feedback: ""
-        },
-        {
-          id: "T04",
-          title: "In-App Purchases",
-          desc: "Compra de assinatura com validação de recibo e restauração de compras. Spec: _specs/tasks/T04-in-app-purchases.md",
-          column: "backlog",
-          agent: "mobile_domain_builder",
-          skills: ["clean_architecture", "flutter_riverpod_state"],
-          complexity: "Alta",
-          feedback: ""
-        },
-        {
-          id: "T05",
-          title: "Backend Alternativo / Sync",
-          desc: "Sincronização incremental Supabase + cache local SQLite com políticas RLS. Spec: _specs/tasks/T05-firebase-alternativo.md",
-          column: "backlog",
-          agent: "data_supabase_specialist",
-          skills: ["supabase_fullstack", "local_first_sqlite"],
-          complexity: "Alta",
-          feedback: ""
-        },
-        {
-          id: "T00",
-          title: "Unificação do Harness v2.1 com Dart MCP Server e Matriz 1:N",
-          desc: "Base do Flutter Mobile Harness v2.1 consolidada, validada e commitada.",
-          column: "done",
-          agent: "master_orchestrator",
-          skills: ["spec_discovery", "clean_architecture"],
-          complexity: "Alta",
-          feedback: "Aprovado e commitado."
-        }
-      ]
-    };
-
     const COLUMNS = [
-      {
-        id: "backlog",
-        title: "1. Backlog & Specs",
-        gate: "PRD/spec aprovada, critérios de aceitação objetivos e skills 1:N definidas.",
-        color: "#94a3b8"
-      },
-      {
-        id: "red",
-        title: "2. TDD Fase RED (Testes Falhos)",
-        gate: "Suíte criada e executada com falha comprovada pelo motivo correto (RED).",
-        color: "#f43f5e"
-      },
-      {
-        id: "green",
-        title: "3. TDD Fase GREEN (Implementação)",
-        gate: "Menor código possível para a suíte ficar verde; `dart analyze` sem erros.",
-        color: "#38bdf8"
-      },
-      {
-        id: "review",
-        title: "4. Loop QA/A11y & Gate Humano",
-        gate: "Até 3 ciclos de autorreparo, cobertura mínima, Semantics/contraste/touch targets validados.",
-        color: "#f59e0b"
-      },
-      {
-        id: "done",
-        title: "5. Concluído & Evoluído",
-        gate: "Commit semântico atômico, Kanban atualizado e PROJECT_BRAIN.md com o aprendizado.",
-        color: "#10b981"
-      }
+      { id: "backlog", title: "1. Backlog & Specs", color: "#94a3b8" },
+      { id: "red", title: "2. Fase RED (TDD)", color: "#f43f5e" },
+      { id: "green", title: "3. Fase GREEN (Código)", color: "#38bdf8" },
+      { id: "review", title: "4. Gate de Aprovação", color: "#f59e0b" },
+      { id: "done", title: "5. Concluído", color: "#10b981" }
     ];
 
-    let state = loadState();
+    const COLUMN_BY_NUMBER = { "1": "backlog", "2": "red", "3": "green", "4": "review", "5": "done" };
+    const COLUMN_KEYWORDS = [
+      ["backlog", /backlog/i],
+      ["red", /\bred\b/i],
+      ["green", /\bgreen\b/i],
+      ["review", /aprova|review|gate|\bqa\b/i],
+      ["done", /conclu|done|finaliz/i]
+    ];
+
+    // - [ ] **[T-101] Título** | Agente: `x` | Dificuldade: `Alta` | Skills: `a, b`
+    const TASK_LINE_RE = /^(\s*)-\s*(?:\[([ xX])\]\s*)?\*\*\[([^\]]+)\]\s*(.*?)\*\*(.*)$/;
+    const EMPTY_RE = /^\s*(?:[-*]\s*)?\*{0,2}\(?(?:nenhuma|sem)\s+tarefa/i;
+
     let dirHandle = null;
+    let tasks = [];
+    let selectedTaskId = null;
+    let syncTimer = null;
 
-    function loadState() {
-      const saved = localStorage.getItem("antigravity_studio_v3");
-      if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
-      }
-      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    const DB_NAME = "AntigravityStudioDB";
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => req.result.createObjectStore("handles");
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
     }
 
-    async function persistState(toastMsg = "Alterações salvas automaticamente no Harness!") {
-      localStorage.setItem("antigravity_studio_v3", JSON.stringify(state));
-      renderAll();
-      if (dirHandle) {
-        await writeFilesToDisk();
-        showToast("💾 " + toastMsg + " (Gravado no disco)");
-      } else {
-        showToast("⚡ " + toastMsg);
-      }
+    async function saveHandle(handle) {
+      const db = await openDB();
+      const tx = db.transaction("handles", "readwrite");
+      tx.objectStore("handles").put(handle, "project_dir");
     }
 
-    function showToast(msg) {
-      const t = document.getElementById("toast");
-      t.innerText = msg;
-      t.classList.add("show");
-      setTimeout(() => t.classList.remove("show"), 2600);
+    async function getSavedHandle() {
+      const db = await openDB();
+      return new Promise(resolve => {
+        const req = db.transaction("handles").objectStore("handles").get("project_dir");
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
     }
 
-    // =========================================================================
-    // AUTO-SAVE DIRETO NOS ARQUIVOS DO PROJETO (FILE SYSTEM ACCESS API)
-    // =========================================================================
-    async function connectRepositoryFolder() {
-      if (!window.showDirectoryPicker) {
-        alert("Seu navegador não suporta File System Access API direta. Use Chrome/Edge ou o botão 'Baixar harness.yaml'.");
-        return;
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const saved = await getSavedHandle();
+        if (saved) {
+          const opts = { mode: "readwrite" };
+          if ((await saved.queryPermission(opts)) === "granted" || (await saved.requestPermission(opts)) === "granted") {
+            dirHandle = saved;
+            onConnected();
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("Auto-reconexão falhou:", e);
       }
+      document.getElementById("sync-status").innerText = "Pasta não conectada";
+    });
+
+    async function connectDirectory() {
       try {
         dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
-        document.getElementById("fs-dot").classList.add("online");
-        document.getElementById("fs-text").innerText = `Conectado: ${dirHandle.name} (Auto-Save Ativo)`;
-        await writeFilesToDisk();
-        showToast("Conectado! .agents/harness.yaml, skills e task-board.md sincronizados.");
-      } catch (err) {
-        console.warn("Conexão cancelada:", err);
+        await saveHandle(dirHandle);
+        onConnected();
+      } catch (e) {
+        console.warn("Seleção cancelada:", e);
       }
     }
 
-    async function writeFileByPath(rootHandle, pathParts, content) {
-      let current = rootHandle;
-      for (let i = 0; i < pathParts.length - 1; i++) {
-        current = await current.getDirectoryHandle(pathParts[i], { create: true });
-      }
-      const fileHandle = await current.getFileHandle(pathParts[pathParts.length - 1], { create: true });
-      const writable = await fileHandle.createWritable();
-      await writable.write(content);
-      await writable.close();
+    function onConnected() {
+      document.getElementById("btn-connect").innerText = `📁 ${dirHandle.name}`;
+      document.getElementById("sync-status").innerText = `Conectado: ${dirHandle.name}`;
+      loadFromTaskBoard();
+      if (syncTimer) clearInterval(syncTimer);
+      // Não recarrega enquanto o modal está aberto para não atropelar a edição.
+      syncTimer = setInterval(() => { if (!selectedTaskId) loadFromTaskBoard(); }, 3500);
     }
 
-    async function writeFilesToDisk() {
+    async function loadFromTaskBoard() {
       if (!dirHandle) return;
-      // 1. Gravar .agents/harness.yaml
-      await writeFileByPath(dirHandle, [".agents", "harness.yaml"], generateHarnessYAML());
-      // 2. Gravar .agents/mcp.json
-      await writeFileByPath(dirHandle, [".agents", "mcp.json"], generateMcpJSON());
-      // 3. Gravar cada Skill em .agents/skills/<id>/SKILL.md
-      for (const [id, sk] of Object.entries(state.skills)) {
-        const folderName = id.replace(/_/g, "-");
-        const skillMd = `---\nname: ${folderName}\ndescription: "${sk.desc.replace(/"/g, '\\"')}"\ncategory: "${sk.category}"\n---\n\n# Skill: ${sk.name}\n\n## Objetivo\n${sk.desc}\n\n## Regras e Guardrails\n${sk.rules || "Seguir os padrões de Clean Architecture e TDD do projeto."}\n`;
-        await writeFileByPath(dirHandle, [".agents", "skills", folderName, "SKILL.md"], skillMd);
+      try {
+        const specs = await dirHandle.getDirectoryHandle("_specs");
+        const fileHandle = await specs.getFileHandle("task-board.md");
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+        parseMarkdown(text);
+        renderKanban();
+        document.getElementById("last-sync-time").innerText = `Sincronizado: ${new Date().toLocaleTimeString()}`;
+      } catch (e) {
+        console.warn("Erro lendo task-board.md:", e);
       }
-      // 4. Gravar _specs/task-board.md
-      await writeFileByPath(dirHandle, ["_specs", "task-board.md"], generateTaskBoardMarkdown());
     }
 
-    function generateHarnessYAML() {
-      let y = `# Antigravity Harness v3.0 — Catálogo desacoplado de Agentes & Skills\n# Gerado automaticamente pelo Harness Studio (harness-studio.html)\nversion: "${state.version}"\n\nmodel_profiles:\n  reasoning: "inherit"\n  coding: "inherit"\n  design: "inherit"\n  fast_ops: "inherit"\n\nmcp_servers:\n`;
-      Object.entries(state.mcps).forEach(([id, m]) => {
-        y += `  ${id}:\n    enabled: ${m.active}\n    command: "${m.command}"\n    args: [${m.args.map(a => `"${a}"`).join(', ')}]\n`;
-        if (m.env && Object.keys(m.env).length) {
-          y += `    env:\n`;
-          Object.entries(m.env).forEach(([k, v]) => { y += `      ${k}: "${v}"\n`; });
-        }
-      });
-      y += `\nskills_registry:\n`;
-      Object.entries(state.skills).forEach(([id, s]) => {
-        y += `  ${id}:\n    name: "${s.name}"\n    category: "${s.category}"\n    file: "${s.file}"\n    description: "${s.desc.replace(/"/g, '\\"')}"\n`;
-      });
-      y += `\nsubagents:\n`;
-      Object.entries(state.agents).forEach(([id, a]) => {
-        y += `  ${id}:\n    model: "inherit"\n    role: "${a.role}"\n    seniority: "${a.seniority}"\n    persona: "${a.persona.replace(/"/g, '\\"')}"\n    mcps:\n`;
-        (a.mcps || []).forEach(m => { y += `      - "${m}"\n`; });
-        y += `    skills:\n`;
-        (a.skills || []).forEach(sk => { y += `      - "${sk}"\n`; });
-      });
-      return y;
+    function columnFromHeading(heading) {
+      const numbered = heading.trim().match(/^(\d+)\s*[.)\-:]?/);
+      if (numbered && COLUMN_BY_NUMBER[numbered[1]]) return COLUMN_BY_NUMBER[numbered[1]];
+      for (const [id, re] of COLUMN_KEYWORDS) {
+        if (re.test(heading)) return id;
+      }
+      return null;
     }
 
-    function generateMcpJSON() {
-      const mcpServers = {};
-      Object.entries(state.mcps).forEach(([id, m]) => {
-        if (!m.active) return;
-        const entry = { command: m.command, args: m.args };
-        if (m.env && Object.keys(m.env).length) entry.env = m.env;
-        if (m.desc) entry.description = m.desc;
-        mcpServers[id] = entry;
-      });
-      return JSON.stringify({ mcpServers }, null, 2) + "\n";
+    function columnTitle(id) {
+      const col = COLUMNS.find(c => c.id === id);
+      return col ? col.title : id;
     }
 
-    function generateTaskBoardMarkdown() {
-      let md = `# 📋 Kanban de Desenvolvimento do Projeto (\`task-board.md\`)\n\n`;
-      md += `> Sincronizado via Antigravity Harness Studio v3.0 e gerenciado pelo \`master_orchestrator\`.\n`;
-      md += `> **Regra de ouro:** nenhum card avança de coluna sem cumprir o gate de saída da coluna atual.\n\n`;
-      md += "```text\nBacklog ──▶ TDD RED ──▶ TDD GREEN ──▶ Loop QA/A11y ──▶ Concluído\n```\n\n";
-      COLUMNS.forEach(col => {
-        md += `## ${col.title}\n`;
-        if (col.gate) md += `> **Gate de saída:** ${col.gate}\n\n`;
-        const list = state.tasks.filter(t => t.column === col.id);
-        if (list.length === 0) {
-          md += `- *(Nenhuma tarefa ativa nesta coluna)*\n\n`;
-        } else {
-          list.forEach(t => {
-            const agName = state.agents[t.agent] ? state.agents[t.agent].role : t.agent;
-            md += `- **[${t.id}] ${t.title}** — *Agente:* \`${t.agent}\` (${agName}) | *Skills:* \`${(t.skills || []).join(', ')}\`\n  - ${t.desc}\n`;
-            if (t.feedback) md += `  - ⚠️ **Feedback de Revisão**: ${t.feedback}\n`;
-          });
-          md += `\n`;
-        }
-      });
-      md += `---\n\n### Legenda de skills por card\n| Campo | Significado |\n|---|---|\n`;
-      md += `| \`Skills:\` | Lista 1:N de skills ativadas para o card (editável no \`harness-studio.html\`). |\n`;
-      md += `| \`WIP\` | Limite de trabalho em progresso da coluna; exceder exige justificativa no \`ai_memory\`. |\n`;
-      md += `| \`@agente\` | Subagente responsável pela coluna, conforme \`.agents/harness.yaml#subagents\`. |\n`;
-      return md;
-    }
-
-    // =========================================================================
-    // NAVEGAÇÃO E RENDERIZAÇÃO
-    // =========================================================================
-    function switchView(view, btn) {
-      document.querySelectorAll(".view-pane").forEach(p => p.classList.remove("active"));
-      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-      document.getElementById("view-" + view).classList.add("active");
-      if (btn) btn.classList.add("active");
-
-      const titles = {
-        orchestrator: "🧠 Master Orchestrator & Planejamento de Engenharia",
-        kanban: "📋 Kanban Interativo & Gate de Aprovação Humana",
-        agents: "🤖 Especialistas Configurados (Agentes 1:N Skills)",
-        skills: "⚡ Catálogo Global de Skills Reutilizáveis",
-        mcps: "🔌 Servidores MCP & Sensores do Ambiente"
+    function parseTaskMeta(text) {
+      const agent = text.match(/Agente:\s*\*?\s*`([^`]*)`/i);
+      const skills = text.match(/Skills:\s*\*?\s*`([^`]*)`/i);
+      const difficulty = text.match(/(?:Dificuldade|Complexidade):\s*\*?\s*`?([^`|\n]+)`?/i);
+      return {
+        agent: agent ? agent[1].trim() : "master_orchestrator",
+        skills: skills ? skills[1].trim() : "",
+        difficulty: difficulty ? difficulty[1].trim() : "Média"
       };
-      document.getElementById("view-title").innerText = titles[view] || "Antigravity Studio";
-      renderAll();
     }
 
-    function renderAll() {
-      document.getElementById("nav-count-tasks").innerText = state.tasks.length;
-      document.getElementById("nav-count-agents").innerText = Object.keys(state.agents).length;
-      document.getElementById("nav-count-skills").innerText = Object.keys(state.skills).length;
-      document.getElementById("nav-count-mcps").innerText = Object.values(state.mcps).filter(m => m.active).length;
+    // Varre o markdown e devolve linhas, seções (colunas) e blocos de tarefas.
+    // Cada tarefa conhece lineIndex/endIndex para edição cirúrgica.
+    function scanBoard(md) {
+      const lines = md.split(/\r?\n/);
+      const sections = [];
+      const found = [];
+      let section = null;
+      let current = null;
 
-      // Topbar MCP strip
-      document.getElementById("topbar-mcps").innerHTML = Object.entries(state.mcps).map(([id, m]) => `
-        <div class="mcp-chip ${m.active ? 'active' : ''}" onclick="toggleMcp('${id}')" title="Clique para ativar/desativar ${m.name}">
-          <span>${m.active ? '●' : '○'}</span> ${m.name.replace(' MCP', '')}
-        </div>
-      `).join('');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
 
-      renderKanban();
-      renderAgents();
-      renderSkills();
-      renderMcps();
+        const heading = line.match(/^#{1,6}\s+(.*)$/);
+        if (heading) {
+          const id = columnFromHeading(heading[1]);
+          section = id ? { id, headingIndex: i } : null;
+          if (section) sections.push(section);
+          current = null;
+          continue;
+        }
+
+        const taskMatch = line.match(TASK_LINE_RE);
+        if (taskMatch && section) {
+          current = {
+            id: taskMatch[3].trim(),
+            title: taskMatch[4].trim(),
+            checkbox: taskMatch[2] || " ",
+            column: section.id,
+            lineIndex: i,
+            endIndex: i + 1,
+            desc: ""
+          };
+          found.push(current);
+          continue;
+        }
+
+        if (current && /^\s+\S/.test(line)) {
+          current.endIndex = i + 1;
+          current.desc += line.replace(/^\s*-\s?/, "").trimEnd() + "\n";
+          continue;
+        }
+
+        // Linha em branco ou texto no nível da coluna encerra o bloco.
+        current = null;
+      }
+
+      found.forEach(t => {
+        const block = lines.slice(t.lineIndex, t.endIndex).join("\n");
+        Object.assign(t, parseTaskMeta(block));
+        t.desc = t.desc.trim();
+      });
+
+      return { lines, sections, tasks: found };
+    }
+
+    function parseMarkdown(md) {
+      const board = scanBoard(md);
+      tasks = board.tasks.map(t => ({ ...t }));
+      return board;
+    }
+
+    function buildTaskLine(task) {
+      const checkbox = task.column === "done" ? "x" : " ";
+      const meta = [
+        `Agente: \`${task.agent || "master_orchestrator"}\``,
+        `Dificuldade: \`${task.difficulty || "Média"}\``
+      ];
+      if (task.skills) meta.push(`Skills: \`${task.skills}\``);
+      return `- [${checkbox}] **[${task.id}] ${task.title}** | ${meta.join(" | ")}`;
+    }
+
+    function buildTaskBlock(task) {
+      const block = [buildTaskLine(task)];
+      const desc = (task.desc || "").trim();
+      if (desc) {
+        desc.split(/\r?\n/).forEach(line => block.push(`  - ${line.trim()}`));
+      }
+      return block;
+    }
+
+    // Insere o bloco no fim da coluna de destino, removendo placeholders vazios.
+    function insertBlock(lines, targetColId, block) {
+      let board = scanBoard(lines.join("\n"));
+      let section = board.sections.find(s => s.id === targetColId);
+
+      if (!section) {
+        while (lines.length && lines[lines.length - 1].trim() === "") lines.pop();
+        lines.push("", `## ${columnTitle(targetColId)}`, ...block, "");
+        return lines;
+      }
+
+      // Remove "(Nenhuma tarefa...)" da seção de destino.
+      const nextSection = board.sections.find(s => s.headingIndex > section.headingIndex);
+      const sectionEnd = nextSection ? nextSection.headingIndex : lines.length;
+      for (let i = sectionEnd - 1; i > section.headingIndex; i--) {
+        if (EMPTY_RE.test(lines[i])) lines.splice(i, 1);
+      }
+
+      board = scanBoard(lines.join("\n"));
+      section = board.sections.find(s => s.id === targetColId);
+      const sectionTasks = board.tasks.filter(t => t.column === targetColId);
+
+      let insertAt;
+      if (sectionTasks.length) {
+        insertAt = sectionTasks[sectionTasks.length - 1].endIndex;
+      } else {
+        const next = board.sections.find(s => s.headingIndex > section.headingIndex);
+        insertAt = next ? next.headingIndex : lines.length;
+        while (insertAt > section.headingIndex + 1 && lines[insertAt - 1].trim() === "") insertAt--;
+      }
+
+      lines.splice(insertAt, 0, ...block);
+      return lines;
+    }
+
+    function removeTaskFromBoard(md, id) {
+      const board = scanBoard(md);
+      const task = board.tasks.find(t => t.id === id);
+      if (!task) return md;
+
+      const lines = board.lines.slice();
+      lines.splice(task.lineIndex, task.endIndex - task.lineIndex);
+
+      // Evita deixar duas linhas em branco seguidas no ponto da remoção.
+      if (lines[task.lineIndex - 1] !== undefined && lines[task.lineIndex - 1].trim() === "" &&
+          lines[task.lineIndex] !== undefined && lines[task.lineIndex].trim() === "") {
+        lines.splice(task.lineIndex, 1);
+      }
+      return lines.join("\n");
+    }
+
+    function saveTaskInBoard(md, task) {
+      const board = scanBoard(md);
+      const existing = board.tasks.find(t => t.id === task.id);
+      const lines = board.lines.slice();
+      const block = buildTaskBlock(task);
+
+      if (existing && existing.column === task.column) {
+        // Edição no lugar: preserva a posição da tarefa na coluna.
+        lines.splice(existing.lineIndex, existing.endIndex - existing.lineIndex, ...block);
+        return lines.join("\n");
+      }
+
+      if (existing) {
+        lines.splice(existing.lineIndex, existing.endIndex - existing.lineIndex);
+      }
+      return insertBlock(lines, task.column, block).join("\n");
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[ch]));
     }
 
     function renderKanban() {
-      const container = document.getElementById("kanban-container");
+      const container = document.getElementById("kanban-board");
       container.innerHTML = COLUMNS.map(col => {
-        const colTasks = state.tasks.filter(t => t.column === col.id);
+        const colTasks = tasks.filter(t => t.column === col.id);
         return `
-          <div class="kanban-col">
-            <div class="col-header">
-              <h3><span style="color:${col.color}">●</span> ${col.title}</h3>
-              <span class="nav-pill">${colTasks.length}</span>
+          <div class="kanban-col" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event, '${col.id}')">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <span style="font-weight:700; font-size:0.85rem; color:${col.color};">● ${col.title}</span>
+              <span class="badge">${colTasks.length}</span>
             </div>
-            <div>
-              ${colTasks.map(t => {
-                const ag = state.agents[t.agent];
-                return `
-                  <div class="task-card" onclick="openTaskModal('${t.id}')">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span class="task-id">${t.id}</span>
-                      <span class="chip">${t.complexity || 'Média'}</span>
-                    </div>
-                    <div class="task-title">${t.title}</div>
-                    <div class="task-desc">${t.desc}</div>
-                    ${t.feedback ? `<div style="font-size:0.74rem; color:#fda4af; background:rgba(244,63,94,0.12); padding:6px; border-radius:4px; margin-bottom:8px;">⚠️ Feedback: ${t.feedback}</div>` : ''}
-                    <div class="task-meta">
-                      <span class="chip chip-agent">🤖 ${ag ? ag.role.split('&')[0] : t.agent}</span>
-                      <span class="chip chip-skill">⚡ ${(t.skills || []).length} skills</span>
-                    </div>
-                    ${col.id === 'review' ? `
-                      <div class="gate-box" onclick="event.stopPropagation()">
-                        <button class="btn-emerald" onclick="approveTask('${t.id}')">✔ Aprovar</button>
-                        <button class="btn-rose" onclick="rejectTask('${t.id}')">✖ Reprovar</button>
-                      </div>
-                    ` : ''}
+            <div style="flex:1;">
+              ${colTasks.map(t => `
+                <div class="card" draggable="true" ondragstart="drag(event, '${escapeHtml(t.id)}')" onclick="openTaskModal('${escapeHtml(t.id)}')">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="badge" style="background:#070a12;">${escapeHtml(t.id)}</span>
+                    <span style="font-size:0.7rem; color:var(--muted);">${escapeHtml(t.difficulty)}</span>
                   </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderAgents() {
-      document.getElementById("agents-grid").innerHTML = Object.entries(state.agents).map(([id, a]) => `
-        <div class="entity-card" onclick="openAgentModal('${id}')">
-          <div>
-            <div class="entity-head">
-              <div>
-                <div class="entity-title">🤖 ${a.role}</div>
-                <div class="entity-sub">ID: ${id} • ${a.seniority}</div>
-              </div>
-              <span class="chip">Editar ✎</span>
-            </div>
-            <div class="entity-body">${a.persona}</div>
-          </div>
-          <div>
-            <div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:6px; font-weight:700;">SKILLS ATRIBUÍDAS (${(a.skills||[]).length}):</div>
-            <div class="tag-row" style="margin-bottom:10px;">
-              ${(a.skills || []).map(sk => `<span class="chip chip-skill">⚡ ${state.skills[sk] ? state.skills[sk].name : sk}</span>`).join('')}
-            </div>
-            <div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:6px; font-weight:700;">MCPS CONECTADOS:</div>
-            <div class="tag-row">
-              ${(a.mcps || []).map(m => `<span class="chip">${state.mcps[m] ? state.mcps[m].name : m}</span>`).join('')}
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderSkills() {
-      document.getElementById("skills-grid").innerHTML = Object.entries(state.skills).map(([id, s]) => {
-        const usedBy = Object.entries(state.agents).filter(([_, a]) => (a.skills || []).includes(id)).map(([_, a]) => a.role.split(' ')[0]);
-        return `
-          <div class="entity-card" onclick="openSkillModal('${id}')">
-            <div>
-              <div class="entity-head">
-                <div>
-                  <div class="entity-title">⚡ ${s.name}</div>
-                  <div class="entity-sub">${s.file}</div>
+                  <div style="font-size:0.92rem; font-weight:600; margin:8px 0 6px; color:#fff;">${escapeHtml(t.title)}</div>
+                  <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+                    <span class="badge" style="background:rgba(192,132,252,0.15); color:var(--purple);">🤖 ${escapeHtml(t.agent)}</span>
+                    ${t.skills ? `<span class="badge">⚡ ${escapeHtml(t.skills)}</span>` : ""}
+                  </div>
                 </div>
-                <span class="chip">${s.category}</span>
-              </div>
-              <div class="entity-body">${s.desc}</div>
-            </div>
-            <div class="tag-row">
-              <span class="chip chip-agent">Usada por ${usedBy.length} agente(s)</span>
-              <span class="chip">Clique p/ editar SKILL.md ✎</span>
+              `).join("")}
+              ${colTasks.length === 0 ? `<div style="font-size:0.75rem; color:var(--muted); text-align:center; padding:30px 10px;">Arraste cards para cá</div>` : ""}
             </div>
           </div>
         `;
-      }).join('');
+      }).join("");
     }
 
-    function renderMcps() {
-      document.getElementById("mcps-grid").innerHTML = Object.entries(state.mcps).map(([id, m]) => `
-        <div class="entity-card" onclick="toggleMcp('${id}')">
-          <div>
-            <div class="entity-head">
-              <div>
-                <div class="entity-title">🔌 ${m.name}</div>
-                <div class="entity-sub">${m.command} ${m.args.join(' ')}</div>
-              </div>
-              <span class="chip" style="color:${m.active ? '#34d399' : '#94a3b8'}">${m.active ? 'ATIVO' : 'INATIVO'}</span>
-            </div>
-            <div class="entity-body">${m.desc}</div>
-          </div>
-          <div class="tag-row">
-            <span class="chip">Clique para alternar status no .agents/mcp.json</span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // =========================================================================
-    // MODAIS DE INSPEÇÃO E EDIÇÃO (CLICAR NO CARD ABRE DETALHES COMPLETOS)
-    // =========================================================================
-    function openModal(html) {
-      document.getElementById("modal-content").innerHTML = html;
-      document.getElementById("modal-backdrop").classList.add("open");
-    }
-    function closeModal() {
-      document.getElementById("modal-backdrop").classList.remove("open");
-    }
-
-    // MODAL DE AGENTE (CRIAR / EDITAR + SELECIONAR MÚLTIPLAS SKILLS E MCPS)
-    function openAgentModal(agentId = null) {
-      const a = agentId ? state.agents[agentId] : { role: "", seniority: "Senior Engineer (10+ anos)", persona: "", skills: [], mcps: ["dart_mcp"] };
-      const skillsCheckboxes = Object.entries(state.skills).map(([sid, s]) => `
-        <label class="check-item">
-          <input type="checkbox" name="agent-skill" value="${sid}" ${(a.skills || []).includes(sid) ? 'checked' : ''}>
-          <span>${s.name}</span>
-        </label>
-      `).join('');
-
-      const mcpsCheckboxes = Object.entries(state.mcps).map(([mid, m]) => `
-        <label class="check-item">
-          <input type="checkbox" name="agent-mcp" value="${mid}" ${(a.mcps || []).includes(mid) ? 'checked' : ''}>
-          <span>${m.name}</span>
-        </label>
-      `).join('');
-
-      openModal(`
-        <div class="modal-header">
-          <h3>🤖 ${agentId ? 'Editar Agente Especialista' : 'Criar Novo Agente Especialista'}</h3>
-          <button class="btn" onclick="closeModal()">✕</button>
-        </div>
-        <div class="form-field">
-          <label>ID Técnico do Agente (ex: ui_ux_specialist)</label>
-          <input type="text" id="m-agent-id" value="${agentId || ''}" ${agentId ? 'readonly' : ''} placeholder="Ex: security_auditor">
-        </div>
-        <div class="form-field">
-          <label>Título / Papel Profissional</label>
-          <input type="text" id="m-agent-role" value="${a.role}" placeholder="Ex: Senior UI/UX & Design System Architect">
-        </div>
-        <div class="form-field">
-          <label>Senioridade & Experiência</label>
-          <input type="text" id="m-agent-seniority" value="${a.seniority}" placeholder="Ex: Staff Designer & Frontend Engineer (12+ anos)">
-        </div>
-        <div class="form-field">
-          <label>Persona, Diretrizes Comportamentais e Foco Técnico</label>
-          <textarea id="m-agent-persona" rows="3">${a.persona}</textarea>
-        </div>
-        <div class="form-field">
-          <label>Selecione as Skills deste Agente (Relação 1:N):</label>
-          <div class="checkbox-grid">${skillsCheckboxes}</div>
-        </div>
-        <div class="form-field">
-          <label>Servidores MCP que este Agente pode utilizar:</label>
-          <div class="checkbox-grid">${mcpsCheckboxes}</div>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-top:18px;">
-          ${agentId ? `<button class="btn btn-rose" onclick="deleteAgent('${agentId}')">Excluir Agente</button>` : '<span></span>'}
-          <div style="display:flex; gap:10px;">
-            <button class="btn" onclick="closeModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="saveAgentModal()">💾 Salvar Agente no Harness</button>
-          </div>
-        </div>
-      `);
-    }
-
-    function saveAgentModal() {
-      const id = document.getElementById("m-agent-id").value.trim().replace(/\s+/g, "_").toLowerCase();
-      const role = document.getElementById("m-agent-role").value.trim();
-      const seniority = document.getElementById("m-agent-seniority").value.trim();
-      const persona = document.getElementById("m-agent-persona").value.trim();
-      const skills = Array.from(document.querySelectorAll("input[name='agent-skill']:checked")).map(i => i.value);
-      const mcps = Array.from(document.querySelectorAll("input[name='agent-mcp']:checked")).map(i => i.value);
-
-      if (!id || !role) return alert("Preencha o ID e o Papel do Agente!");
-      state.agents[id] = { role, seniority, persona, skills, mcps };
-      closeModal();
-      persistState(`Agente '${role}' salvo automaticamente no harness.yaml!`);
-    }
-
-    function deleteAgent(id) {
-      if (!confirm("Deseja remover este agente do catálogo?")) return;
-      delete state.agents[id];
-      closeModal();
-      persistState("Agente removido do harness.yaml.");
-    }
-
-    // MODAL DE SKILL (CRIAR / EDITAR + ATRIBUIR A AGENTES)
-    function openSkillModal(skillId = null) {
-      const s = skillId ? state.skills[skillId] : { name: "", category: "Engenharia Mobile", file: "", desc: "", rules: "" };
-      const assignedAgents = Object.entries(state.agents).map(([aid, ag]) => `
-        <label class="check-item">
-          <input type="checkbox" name="skill-agent" value="${aid}" ${(ag.skills || []).includes(skillId) ? 'checked' : ''}>
-          <span>${ag.role}</span>
-        </label>
-      `).join('');
-
-      openModal(`
-        <div class="modal-header">
-          <h3>⚡ ${skillId ? 'Inspecionar / Editar Skill' : 'Criar Nova Skill no Harness'}</h3>
-          <button class="btn" onclick="closeModal()">✕</button>
-        </div>
-        <div class="form-field">
-          <label>ID da Skill (ex: frontend_best_practices)</label>
-          <input type="text" id="m-skill-id" value="${skillId || ''}" ${skillId ? 'readonly' : ''} placeholder="Ex: design_tokens_m3">
-        </div>
-        <div class="form-field">
-          <label>Nome da Habilidade</label>
-          <input type="text" id="m-skill-name" value="${s.name}" placeholder="Ex: Boas Práticas de Frontend & Design System">
-        </div>
-        <div class="form-field">
-          <label>Categoria</label>
-          <input type="text" id="m-skill-cat" value="${s.category}" placeholder="Ex: UI/UX & Frontend">
-        </div>
-        <div class="form-field">
-          <label>Descrição Técnica da Competência</label>
-          <textarea id="m-skill-desc" rows="3">${s.desc}</textarea>
-        </div>
-        <div class="form-field">
-          <label>Guardrails e Regras Estritas (Conteúdo do SKILL.md)</label>
-          <textarea id="m-skill-rules" rows="3">${s.rules || ''}</textarea>
-        </div>
-        <div class="form-field">
-          <label>Vincular esta Skill imediatamente aos seguintes Agentes:</label>
-          <div class="checkbox-grid">${assignedAgents}</div>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-top:18px;">
-          ${skillId ? `<button class="btn btn-rose" onclick="deleteSkill('${skillId}')">Excluir Skill</button>` : '<span></span>'}
-          <div style="display:flex; gap:10px;">
-            <button class="btn" onclick="closeModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="saveSkillModal()">💾 Salvar Skill Automaticamente</button>
-          </div>
-        </div>
-      `);
-    }
-
-    function saveSkillModal() {
-      const id = document.getElementById("m-skill-id").value.trim().replace(/\s+/g, "_").toLowerCase();
-      const name = document.getElementById("m-skill-name").value.trim();
-      const category = document.getElementById("m-skill-cat").value.trim();
-      const desc = document.getElementById("m-skill-desc").value.trim();
-      const rules = document.getElementById("m-skill-rules").value.trim();
-      const folder = id.replace(/_/g, "-");
-
-      if (!id || !name) return alert("Preencha ID e Nome da Skill!");
-      state.skills[id] = { name, category, file: `.agents/skills/${folder}/SKILL.md`, desc, rules };
-
-      const checkedAgents = Array.from(document.querySelectorAll("input[name='skill-agent']:checked")).map(i => i.value);
-      Object.entries(state.agents).forEach(([aid, ag]) => {
-        ag.skills = ag.skills || [];
-        if (checkedAgents.includes(aid) && !ag.skills.includes(id)) ag.skills.push(id);
-        if (!checkedAgents.includes(aid)) ag.skills = ag.skills.filter(x => x !== id);
-      });
-
-      closeModal();
-      persistState(`Skill '${name}' salva em .agents/skills/${folder}/SKILL.md!`);
-    }
-
-    function deleteSkill(id) {
-      if (!confirm("Remover esta skill do catálogo?")) return;
-      delete state.skills[id];
-      Object.values(state.agents).forEach(ag => {
-        ag.skills = (ag.skills || []).filter(s => s !== id);
-      });
-      closeModal();
-      persistState("Skill removida.");
-    }
-
-    // MODAL DE TAREFA DO KANBAN (INSPECIONAR, EDITAR, APROVAR/REPROVAR)
-    function openTaskModal(taskId = null) {
-      const idx = state.tasks.findIndex(t => t.id === taskId);
-      const t = idx >= 0 ? state.tasks[idx] : {
-        id: "T-" + (101 + state.tasks.length),
-        title: "",
-        desc: "",
-        column: "backlog",
-        agent: "master_orchestrator",
-        skills: ["clean_architecture"],
-        complexity: "Média",
-        feedback: ""
-      };
-
-      const agentOptions = Object.entries(state.agents).map(([aid, ag]) => `
-        <option value="${aid}" ${t.agent === aid ? 'selected' : ''}>${ag.role} (${aid})</option>
-      `).join('');
-
-      const colOptions = COLUMNS.map(c => `
-        <option value="${c.id}" ${t.column === c.id ? 'selected' : ''}>${c.title}</option>
-      `).join('');
-
-      const skillChecks = Object.entries(state.skills).map(([sid, s]) => `
-        <label class="check-item">
-          <input type="checkbox" name="task-skill" value="${sid}" ${(t.skills || []).includes(sid) ? 'checked' : ''}>
-          <span>${s.name}</span>
-        </label>
-      `).join('');
-
-      openModal(`
-        <div class="modal-header">
-          <h3>📋 ${idx >= 0 ? `Tarefa ${t.id}` : 'Nova Tarefa no Kanban'}</h3>
-          <button class="btn" onclick="closeModal()">✕</button>
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-          <div class="form-field">
-            <label>ID da Tarefa</label>
-            <input type="text" id="m-task-id" value="${t.id}" ${idx >= 0 ? 'readonly' : ''}>
-          </div>
-          <div class="form-field">
-            <label>Etapa Atual no Pipeline (Coluna)</label>
-            <select id="m-task-col">${colOptions}</select>
-          </div>
-        </div>
-        <div class="form-field">
-          <label>Título da Tarefa</label>
-          <input type="text" id="m-task-title" value="${t.title}">
-        </div>
-        <div class="form-field">
-          <label>Especificação, Critérios de Aceitação e Escopo</label>
-          <textarea id="m-task-desc" rows="3">${t.desc}</textarea>
-        </div>
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
-          <div class="form-field">
-            <label>Agente Responsável</label>
-            <select id="m-task-agent" onchange="syncTaskAgentSkills(this.value)">${agentOptions}</select>
-          </div>
-          <div class="form-field">
-            <label>Complexidade</label>
-            <select id="m-task-comp">
-              <option value="Baixa" ${t.complexity==='Baixa'?'selected':''}>Baixa</option>
-              <option value="Média" ${t.complexity==='Média'?'selected':''}>Média</option>
-              <option value="Alta" ${t.complexity==='Alta'?'selected':''}>Alta</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-field">
-          <label>Skills Ativadas para esta Tarefa:</label>
-          <div class="checkbox-grid" id="m-task-skills-box">${skillChecks}</div>
-        </div>
-        <div class="form-field">
-          <label>Feedback de Revisão Humana (Gate de Aprovação)</label>
-          <input type="text" id="m-task-feedback" value="${t.feedback || ''}" placeholder="Opcional: motivo de reprovação ou ajuste fino">
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-top:18px;">
-          ${idx >= 0 ? `<button class="btn btn-rose" onclick="deleteTask('${t.id}')">Excluir Tarefa</button>` : '<span></span>'}
-          <div style="display:flex; gap:8px;">
-            ${idx >= 0 && t.column === 'review' ? `
-              <button class="btn btn-emerald" onclick="approveTask('${t.id}'); closeModal();">✔ Aprovar Entrega</button>
-              <button class="btn btn-rose" onclick="rejectTask('${t.id}'); closeModal();">✖ Reprovar</button>
-            ` : ''}
-            <button class="btn btn-primary" onclick="saveTaskModal(${idx})">💾 Salvar Tarefa</button>
-          </div>
-        </div>
-      `);
-    }
-
-    function syncTaskAgentSkills(agentId) {
-      const ag = state.agents[agentId];
-      if (!ag) return;
-      document.querySelectorAll("input[name='task-skill']").forEach(cb => {
-        cb.checked = (ag.skills || []).includes(cb.value);
+    // DRAG AND DROP HANDLERS
+    function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add("drag-over"); }
+    function leaveDrop(ev) { ev.currentTarget.classList.remove("drag-over"); }
+    function drag(ev, id) { ev.dataTransfer.setData("text/plain", id); }
+    async function drop(ev, targetColId) {
+      ev.preventDefault();
+      ev.currentTarget.classList.remove("drag-over");
+      const taskId = ev.dataTransfer.getData("text/plain");
+      await mutateBoard(md => {
+        // Usa o estado mais recente do arquivo, não o cache da tela.
+        const fresh = scanBoard(md).tasks.find(t => t.id === taskId);
+        if (!fresh || fresh.column === targetColId) return md;
+        return saveTaskInBoard(md, { ...fresh, column: targetColId });
       });
     }
 
-    function saveTaskModal(idx) {
-      const taskObj = {
-        id: document.getElementById("m-task-id").value.trim(),
-        title: document.getElementById("m-task-title").value.trim(),
-        desc: document.getElementById("m-task-desc").value.trim(),
-        column: document.getElementById("m-task-col").value,
-        agent: document.getElementById("m-task-agent").value,
-        complexity: document.getElementById("m-task-comp").value,
-        feedback: document.getElementById("m-task-feedback").value.trim(),
-        skills: Array.from(document.querySelectorAll("input[name='task-skill']:checked")).map(i => i.value)
-      };
-      if (!taskObj.title) return alert("Informe o título da tarefa!");
-      if (idx >= 0) state.tasks[idx] = taskObj;
-      else state.tasks.push(taskObj);
-      closeModal();
-      persistState(`Tarefa ${taskObj.id} atualizada no Kanban!`);
-    }
-
-    function deleteTask(id) {
-      state.tasks = state.tasks.filter(t => t.id !== id);
-      closeModal();
-      persistState(`Tarefa ${id} removida.`);
-    }
-
-    function approveTask(id) {
-      const t = state.tasks.find(x => x.id === id);
-      if (t) {
-        t.column = "done";
-        t.feedback = "Aprovado pelo Engenheiro Responsável.";
-        persistState(`Tarefa ${id} APROVADA e movida para Concluído!`);
-      }
-    }
-
-    function rejectTask(id) {
-      const t = state.tasks.find(x => x.id === id);
+    function openTaskModal(id) {
+      selectedTaskId = id;
+      const t = tasks.find(x => x.id === id);
       if (!t) return;
-      const reason = prompt("Informe o motivo da reprovação / ajuste necessário para o agente:", t.feedback || "");
-      if (reason !== null) {
-        t.column = "red";
-        t.feedback = reason || "Reprovado no Gate Humano — revisar testes e critérios.";
-        persistState(`Tarefa ${id} REPROVADA — retornou para TDD RED com feedback!`);
+
+      document.getElementById("m-task-id").innerText = t.id;
+      document.getElementById("m-title-display").innerText = t.title;
+      document.getElementById("m-task-col").value = t.column;
+      document.getElementById("m-task-agent").value = t.agent;
+      document.getElementById("m-task-skills").value = t.skills;
+      document.getElementById("m-task-title").value = t.title;
+      document.getElementById("m-task-desc").value = t.desc;
+      document.getElementById("m-task-feedback").value = "";
+
+      document.getElementById("task-modal").classList.add("open");
+    }
+
+    function closeModal() {
+      document.getElementById("task-modal").classList.remove("open");
+      selectedTaskId = null;
+    }
+
+    // Lê o arquivo atual, aplica UMA mutação cirúrgica e grava.
+    // Isso garante que tarefas não envolvidas na ação não mudem de coluna.
+    async function mutateBoard(mutator) {
+      if (!dirHandle) {
+        alert("Conecte a pasta do projeto antes de alterar o quadro.");
+        return;
+      }
+      try {
+        const specs = await dirHandle.getDirectoryHandle("_specs");
+        const fileHandle = await specs.getFileHandle("task-board.md", { create: true });
+        const file = await fileHandle.getFile();
+        const current = await file.text();
+        const next = mutator(current);
+
+        if (next !== current) {
+          const writable = await fileHandle.createWritable();
+          await writable.write(next);
+          await writable.close();
+        }
+        await loadFromTaskBoard();
+      } catch (e) {
+        console.error("Erro ao gravar task-board.md:", e);
+        alert("Não foi possível gravar o task-board.md. Verifique a conexão da pasta.");
       }
     }
 
-    function toggleMcp(id) {
-      state.mcps[id].active = !state.mcps[id].active;
-      persistState(`Servidor MCP '${state.mcps[id].name}' ${state.mcps[id].active ? 'ATIVADO' : 'DESATIVADO'}!`);
+    async function saveTaskModal() {
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (!t) return;
+
+      const updated = {
+        ...t,
+        column: document.getElementById("m-task-col").value,
+        agent: document.getElementById("m-task-agent").value.trim(),
+        skills: document.getElementById("m-task-skills").value.trim(),
+        title: document.getElementById("m-task-title").value.trim(),
+        desc: document.getElementById("m-task-desc").value.trim()
+      };
+      if (!updated.title) return alert("Informe o título da tarefa.");
+
+      closeModal();
+      await mutateBoard(md => saveTaskInBoard(md, updated));
     }
 
-    // =========================================================================
-    // MASTER ORCHESTRATOR — DECOMPOSIÇÃO INTELIGENTE E GERAÇÃO DE PROMPT
-    // =========================================================================
-    function orchestrateDemand() {
-      const title = document.getElementById("orch-title").value.trim();
-      const desc = document.getElementById("orch-desc").value.trim();
-      const comp = document.getElementById("orch-complexity").value;
-      if (!title || !desc) return alert("Preencha o título e a descrição da demanda!");
-
-      const lower = (title + " " + desc).toLowerCase();
-      const usedIds = new Set(state.tasks.map(t => t.id));
-      let baseNum = 1;
-      while (usedIds.has(`T${String(baseNum).padStart(2, "0")}`)) baseNum++;
-      const nextId = (offset) => `T${String(baseNum + offset).padStart(2, "0")}`;
-      const createdTasks = [];
-
-      if (comp.startsWith("Alta")) {
-        // Decompõe em 3 sub-tarefas coordenadas
-        const t1 = {
-          id: nextId(0),
-          title: `[Spec & Contrato] ${title}`,
-          desc: `Mapear contratos de domínio, impactos via Graft AST e definir critérios TDD para: ${desc}`,
-          column: "backlog",
-          agent: "master_orchestrator",
-          skills: ["spec_discovery", "clean_architecture"],
-          complexity: "Alta",
-          feedback: ""
-        };
-        const dataOrUiAgent = (lower.includes("sql") || lower.includes("supabase") || lower.includes("banco") || lower.includes("offline") || lower.includes("busca"))
-          ? "data_supabase_specialist"
-          : "mobile_domain_builder";
-        const t2 = {
-          id: nextId(1),
-          title: `[TDD & Domínio/Dados] ${title}`,
-          desc: `Criar teste falho (Fase RED) e implementar serviço/repositório (Fase GREEN): ${desc}`,
-          column: "red",
-          agent: dataOrUiAgent,
-          skills: state.agents[dataOrUiAgent].skills,
-          complexity: "Alta",
-          feedback: ""
-        };
-        const t3 = {
-          id: nextId(2),
-          title: `[UI/UX & Gate QA] ${title}`,
-          desc: `Integrar na camada de apresentação respeitando os 4 estados de UI, Design Tokens e validar em loop fechado.`,
-          column: "backlog",
-          agent: "ui_ux_specialist",
-          skills: ["mobile_ux_design_system", "stitch_visual_ingest", "tdd_red_green"],
-          complexity: "Média",
-          feedback: ""
-        };
-        state.tasks.push(t1, t2, t3);
-        createdTasks.push(t1, t2, t3);
-      } else {
-        let bestAgent = "mobile_domain_builder";
-        if (lower.includes("ui") || lower.includes("tela") || lower.includes("layout") || lower.includes("design") || lower.includes("stitch")) bestAgent = "ui_ux_specialist";
-        else if (lower.includes("sql") || lower.includes("supabase") || lower.includes("query") || lower.includes("índice") || lower.includes("offline")) bestAgent = "data_supabase_specialist";
-        else if (lower.includes("teste") || lower.includes("linter") || lower.includes("bug")) bestAgent = "qa_self_healer";
-
-        const singleTask = {
-          id: nextId(0),
-          title,
-          desc,
-          column: "backlog",
-          agent: bestAgent,
-          skills: state.agents[bestAgent].skills,
-          complexity: comp.split(" ")[0],
-          feedback: ""
-        };
-        state.tasks.push(singleTask);
-        createdTasks.push(singleTask);
-      }
-
-      const activeMcps = Object.entries(state.mcps).filter(([_, m]) => m.active).map(([id, m]) => `${id} (${m.command})`).join(", ");
-      const promptText = `Atue como o master_orchestrator do Antigravity Harness v3.0 (Google Harness² Architecture).
-
-1. CONTEXTO DO PROJETO & MCPS ATIVOS:
-   - Leia .agents/PROJECT_BRAIN.md, .agents/harness.yaml e _specs/task-board.md.
-   - Servidores MCP conectados neste ambiente: ${activeMcps}.
-
-2. DEMANDA SOLICITADA:
-   - Épico: "${title}"
-   - Especificação: "${desc}"
-   - Complexidade: ${comp}
-
-3. TAREFAS CRIADAS E ESCALADAS NO KANBAN:
-${createdTasks.map(ct => `   - [${ct.id}] ${ct.title}
-     • Agente Escalado: ${ct.agent} (${state.agents[ct.agent].role})
-     • Skills Ativadas: ${ct.skills.map(s => state.skills[s]?.file || s).join(", ")}`).join("\n")}
-
-4. PIPELINE DE EXECUÇÃO OBRIGATÓRIO:
-   - Passo A (Spec & AST): Use o Graft AST e Dart MCP para inspecionar impactos sem quebrar contratos existentes.
-   - Passo B (Fase RED): Acione as diretrizes de tdd_red_green e crie os testes que comprovem a necessidade/falha.
-   - Passo C (Fase GREEN): Implemente a solução mantendo regras de negócio estritamente na camada de Domain/Data.
-   - Passo D (QA Loop & Gate Humano): Rode os testes e linters até zerar erros, mova os cards para a coluna '4. Gate de Aprovação' em _specs/task-board.md e aguarde minha aprovação no Kanban.`;
-
-      document.getElementById("orch-output").value = promptText;
-      persistState(`${createdTasks.length} tarefa(s) criada(s) e atribuída(s) no Kanban!`);
+    async function approveTaskAction() {
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (!t) return;
+      const updated = {
+        ...t,
+        column: "done",
+        desc: (t.desc ? t.desc + "\n" : "") + "✔ Aprovado pelo Engenheiro no Gate Humano."
+      };
+      closeModal();
+      await mutateBoard(md => saveTaskInBoard(md, updated));
     }
 
-    function copyOrchestratorPrompt() {
-      const txt = document.getElementById("orch-output").value;
-      if (!txt) return alert("Gere uma análise no Orquestrador primeiro!");
-      navigator.clipboard.writeText(txt);
-      showToast("📋 Prompt copiado para a área de transferência!");
+    async function rejectTaskAction() {
+      const fb = document.getElementById("m-task-feedback").value.trim();
+      if (!fb) return alert("Informe o motivo da reprovação para orientar a IA no ajuste.");
+      const t = tasks.find(x => x.id === selectedTaskId);
+      if (!t) return;
+      const updated = {
+        ...t,
+        column: "red",
+        desc: (t.desc ? t.desc + "\n" : "") + `⚠️ Reprovado no Gate: ${fb}`
+      };
+      closeModal();
+      await mutateBoard(md => saveTaskInBoard(md, updated));
     }
 
-    function downloadHarnessBundle() {
-      const blob = new Blob([generateHarnessYAML()], { type: "text/yaml" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "harness.yaml";
-      a.click();
+    async function deleteCurrentTask() {
+      const id = selectedTaskId;
+      if (!id) return;
+      if (!confirm(`Deseja realmente remover a tarefa ${id} do quadro?\n\nAs demais tarefas permanecerão exatamente nas colunas atuais.`)) return;
+      closeModal();
+      await mutateBoard(md => removeTaskFromBoard(md, id));
     }
 
-    renderAll();
+    function manualReload() { loadFromTaskBoard(); }
   </script>
 </body>
 </html>
+
 EOF
 
 # ------------------------------------------------------------------------------
