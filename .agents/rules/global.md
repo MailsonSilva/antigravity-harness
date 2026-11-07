@@ -48,3 +48,8 @@ O desenvolvedor nunca precisa instruir o agente a "agir como arquiteto" ou "não
 ## 5. Isolamento do Git (Uso Local Apenas)
 - Todos os arquivos do harness (`.agents/`, `_specs/`, `_references/`, `harness-studio.html`, instaladores e scripts) pertencem ao ecossistema local do desenvolvedor e NUNCA devem ser enviados ao repositório GitHub da aplicação do usuário.
 - O Git da aplicação deve conter estritamente o código limpo do projeto.
+
+## 6. REGRA ANTI-DUPLICAÇÃO E GESTÃO DO KANBAN
+1. **LEITURA OBRIGATÓRIA ANTES DE CRIAR TASKS**: Antes de escrever qualquer nova tarefa em `_specs/task-board.md`, você DEVE ler integralmente o conteúdo atual do arquivo.
+2. **REUTILIZAÇÃO DE IDs**: Se uma tarefa para o mesmo requisito já existir, **atualize o status ou a descrição** da tarefa existente em vez de criar um novo card duplicado com outro ID.
+3. **LIMPEZA DE TAREFAS ÓRFÃS**: Se uma tarefa antiga já foi concluída ou substituída, mova-a para a coluna "Concluído" (`done`) ou remova-a do quadro para manter o `task-board.md` limpo e enxuto.

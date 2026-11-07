@@ -17,8 +17,10 @@
     .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
     .viewport { flex: 1; overflow-y: auto; padding: 24px; }
     .kanban-grid { display: grid; grid-template-columns: repeat(5, minmax(280px, 1fr)); gap: 16px; min-height: 82vh; overflow-x: auto; padding-bottom: 20px; }
-    .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; }
-    .card { background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: pointer; transition: all 0.15s; }
+    .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; transition: background 0.2s; }
+    .kanban-col.drag-over { background: rgba(56, 189, 248, 0.05); border-color: var(--primary); }
+    .card { background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: grab; transition: all 0.15s; }
+    .card:active { cursor: grabbing; }
     .card:hover { border-color: var(--primary); transform: translateY(-2px); }
     .badge { font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; background: rgba(56,189,248,0.15); color: var(--primary); font-weight: 600; }
     .btn { padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--elevated); color: var(--text); }
@@ -26,7 +28,6 @@
     .btn-green { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid #10b981; }
     .btn-red { background: rgba(244,63,94,0.2); color: #fb7185; border: 1px solid #f43f5e; }
     
-    /* MODAL ESTRUTURADO */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(3,6,12,0.85); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .modal-backdrop.open { display: flex; }
     .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
@@ -42,24 +43,24 @@
       <div style="width:34px; height:34px; background:linear-gradient(135deg,var(--primary),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#000;">A²</div>
       <div>
         <h2 style="font-size:0.95rem;">Antigravity Studio</h2>
-        <span style="font-size:0.72rem; color:var(--primary);">Harness Native Kanban</span>
+        <span style="font-size:0.72rem; color:var(--primary);">Kanban Nativo com Drag & Drop</span>
       </div>
     </div>
 
     <div style="font-size:0.8rem; color:var(--muted); line-height:1.4; background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; border:1px solid var(--border);">
-      💡 As tarefas são criadas e movimentadas pelo <strong>Orquestrador</strong> no chat da sua IDE. Este painel reflete o arquivo <code>_specs/task-board.md</code> em tempo real.
+      💡 Você pode <strong>arrastar os cards</strong> entre as colunas ou clicar neles para inspecionar, aprovar e reprovar.
     </div>
 
     <div style="margin-top:auto; display:flex; flex-direction:column; gap:8px;">
-      <button type="button" class="btn btn-primary" id="btn-connect" onclick="connectDirectory()">🔗 Conectar Pasta do Projeto</button>
-      <button type="button" class="btn" onclick="manualReload()">🔄 Forçar Leitura do task-board.md</button>
+      <button type="button" class="btn btn-primary" id="btn-connect" onclick="connectDirectory()">📁 Conectar Pasta do Projeto</button>
+      <button type="button" class="btn" onclick="manualReload()">🔄 Recarregar task-board.md</button>
       <span id="sync-status" style="font-size:0.75rem; color:var(--muted); text-align:center;">Verificando conexão...</span>
     </div>
   </aside>
 
   <main class="main">
     <header class="topbar">
-      <h2>📋 Quadro de Engenharia (Sincronizado)</h2>
+      <h2>📋 Quadro de Engenharia</h2>
       <span style="font-size:0.8rem; color:var(--muted);" id="last-sync-time">Aguardando conexão...</span>
     </header>
 
@@ -68,7 +69,7 @@
     </div>
   </main>
 
-  <!-- MODAL DE INSPEÇÃO E APROVAÇÃO -->
+  <!-- MODAL DE INSPEÇÃO -->
   <div class="modal-backdrop" id="task-modal" onclick="if(event.target===this) closeModal()">
     <div class="modal">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:12px;">
@@ -85,7 +86,7 @@
           <option value="backlog">1. Backlog & Specs</option>
           <option value="red">2. Fase RED (TDD)</option>
           <option value="green">3. Fase GREEN (Código)</option>
-          <option value="review">4. Gate de Aprovação (Aguardando Você)</option>
+          <option value="review">4. Gate de Aprovação</option>
           <option value="done">5. Concluído</option>
         </select>
       </div>
@@ -107,20 +108,20 @@
       </div>
 
       <div class="form-group">
-        <label>Especificação Técnica & Critérios de Aceitação</label>
+        <label>Especificação Técnica & Critérios</label>
         <textarea id="m-task-desc" rows="5"></textarea>
       </div>
 
-      <div class="form-group" id="group-feedback" style="display:none;">
+      <div class="form-group" id="group-feedback">
         <label style="color:#fb7185;">⚠️ Feedback de Reprovação (Instrução para a IA corrigir)</label>
-        <input type="text" id="m-task-feedback" placeholder="Informe o que ficou errado ou incompleto...">
+        <input type="text" id="m-task-feedback" placeholder="Informe o motivo da reprovação...">
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:14px; border-top:1px solid var(--border);">
         <button type="button" class="btn btn-red" onclick="deleteCurrentTask()">Excluir</button>
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn btn-red" id="btn-reject-task" onclick="rejectTaskAction()">✖ Reprovar com Feedback</button>
-          <button type="button" class="btn btn-green" id="btn-approve-task" onclick="approveTaskAction()">✔ Aprovar Entrega</button>
+          <button type="button" class="btn btn-red" onclick="rejectTaskAction()">✖ Reprovar (Vai para RED)</button>
+          <button type="button" class="btn btn-green" onclick="approveTaskAction()">✔ Aprovar (Vai para Concluído)</button>
           <button type="button" class="btn btn-primary" onclick="saveTaskModal()">Salvar Alterações</button>
         </div>
       </div>
@@ -140,7 +141,6 @@
     let tasks = [];
     let selectedTaskId = null;
 
-    // PERSISTÊNCIA DA PASTA VIA INDEXEDDB
     const DB_NAME = "AntigravityStudioDB";
     function openDB() {
       return new Promise((resolve, reject) => {
@@ -178,7 +178,7 @@
           }
         }
       } catch (e) {
-        console.warn("Auto-reconexão falhou, necessário clique manual:", e);
+        console.warn("Auto-reconexão falhou:", e);
       }
       document.getElementById("sync-status").innerText = "Pasta não conectada";
     });
@@ -197,7 +197,7 @@
       document.getElementById("btn-connect").innerText = `📁 ${dirHandle.name}`;
       document.getElementById("sync-status").innerText = `Conectado: ${dirHandle.name}`;
       loadFromTaskBoard();
-      setInterval(loadFromTaskBoard, 3000); // Polling silencioso
+      setInterval(loadFromTaskBoard, 3500);
     }
 
     async function loadFromTaskBoard() {
@@ -209,7 +209,7 @@
         const text = await file.text();
         parseMarkdown(text);
         renderKanban();
-        document.getElementById("last-sync-time").innerText = `Última sincronização: ${new Date().toLocaleTimeString()}`;
+        document.getElementById("last-sync-time").innerText = `Sincronizado: ${new Date().toLocaleTimeString()}`;
       } catch (e) {
         console.warn("Erro lendo task-board.md:", e);
       }
@@ -255,14 +255,14 @@
       container.innerHTML = COLUMNS.map(col => {
         const colTasks = tasks.filter(t => t.column === col.id);
         return `
-          <div class="kanban-col">
+          <div class="kanban-col" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event, '${col.id}')">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
               <span style="font-weight:700; font-size:0.85rem; color:${col.color};">● ${col.title}</span>
               <span class="badge">${colTasks.length}</span>
             </div>
-            <div>
+            <div style="flex:1;">
               ${colTasks.map(t => `
-                <div class="card" onclick="openTaskModal('${t.id}')">
+                <div class="card" draggable="true" ondragstart="drag(event, '${t.id}')" onclick="openTaskModal('${t.id}')">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span class="badge" style="background:#070a12;">${t.id}</span>
                     <span style="font-size:0.7rem; color:var(--muted);">${t.difficulty}</span>
@@ -274,11 +274,26 @@
                   </div>
                 </div>
               `).join("")}
-              ${colTasks.length === 0 ? `<div style="font-size:0.75rem; color:var(--muted); text-align:center; padding:30px 10px;">Nenhuma tarefa</div>` : ""}
+              ${colTasks.length === 0 ? `<div style="font-size:0.75rem; color:var(--muted); text-align:center; padding:30px 10px;">Arraste cards para cá</div>` : ""}
             </div>
           </div>
         `;
       }).join("");
+    }
+
+    // DRAG AND DROP HANDLERS
+    function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add("drag-over"); }
+    function leaveDrop(ev) { ev.currentTarget.classList.remove("drag-over"); }
+    function drag(ev, id) { ev.dataTransfer.setData("text/plain", id); }
+    async function drop(ev, targetColId) {
+      ev.preventDefault();
+      ev.currentTarget.classList.remove("drag-over");
+      const taskId = ev.dataTransfer.getData("text/plain");
+      const t = tasks.find(x => x.id === taskId);
+      if (t && t.column !== targetColId) {
+        t.column = targetColId;
+        await writeTaskBoardToDisk();
+      }
     }
 
     function openTaskModal(id) {
@@ -293,11 +308,7 @@
       document.getElementById("m-task-skills").value = t.skills;
       document.getElementById("m-task-title").value = t.title;
       document.getElementById("m-task-desc").value = t.desc.trim();
-
-      const isReview = t.column === "review";
-      document.getElementById("btn-approve-task").style.display = isReview ? "inline-block" : "none";
-      document.getElementById("btn-reject-task").style.display = isReview ? "inline-block" : "none";
-      document.getElementById("group-feedback").style.display = isReview ? "block" : "none";
+      document.getElementById("m-task-feedback").value = "";
 
       document.getElementById("task-modal").classList.add("open");
     }
@@ -361,8 +372,8 @@
       const fb = document.getElementById("m-task-feedback").value.trim();
       if (!fb) return alert("Informe o motivo da reprovação para orientar a IA no ajuste.");
       if (t) {
-        t.column = "red";
-        t.desc += `\n⚠️ Reprovado no Gate Humano: ${fb}`;
+        t.column = "red"; // Joga estritamente para a Fase RED
+        t.desc += `\n⚠️ Reprovado no Gate: ${fb}`;
         closeModal();
         await writeTaskBoardToDisk();
       }
