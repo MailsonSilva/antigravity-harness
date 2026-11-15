@@ -1,159 +1,91 @@
-# 🚀 Antigravity Mobile Harness (Flutter)
+# ⚡ Antigravity Harness
 
-Harness modular para desenvolvimento autónomo de **aplicativos mobile em Flutter** (Android + iOS).
-
-Projetado para orquestrar subagentes especializados através de ciclos estritos de **TDD (Red-Green-Refactor)**, prototipagem visual orientada por referências (**Google Stitch MCP**), navegação precisa por AST (**Graft**) e persistência contextual entre agentes (**ai-memory**).
+Harness de engenharia de software para o **Google Antigravity**, otimizado para a **hierarquia Gemini 4** com separação estrita de contextos entre **Flutter (Mobile)** e **Web & Landing Pages**.
 
 ---
 
-## 🎯 Arquitetura Mobile-First (Flutter)
+## 🧠 Hierarquia Gemini 4
 
-O harness centraliza as regras de negócio e a identidade de produto, com o app definido em `_specs/prd-template.md`:
+O harness divide o ciclo de desenvolvimento em três camadas para maximizar qualidade e velocidade sem poluir a janela de contexto:
 
-* **`apps/mobile`**: Aplicações móveis em Flutter com Clean Architecture, tratamento dos 4 estados de ecrã (*loading, empty, error, success*), flavors `dev/stg/prod` e suporte a bases de dados locais/remotas (SQLite/Drift, Supabase, etc.).
-* **Plataformas**: Android e iOS a partir da mesma base de código, com builds assinados via Fastlane e publicação na Play Store e App Store.
+| Camada | Modelo Sugerido | Papel Principal | Workflow / Ação |
+|---|---|---|---|
+| **Arquitetura** | **Gemini 4 Carbon** | Raciocínio profundo, modelagem de dados e contratos técnicos | Executa `core/workflows/plan.md` gerando a `_specs/SPEC.md` fechada |
+| **Orquestração** | **Gemini 4 Argon** | Coordenação, decomposição de tarefas e resolução de conflitos | Executa `core/workflows/orchestrate.md` disparando subagentes |
+| **Execução** | **Gemini 4 Hydrogen** | Workers de baixa latência em workspaces isolados (`branch`/`share`) | Implementação atômica paralela de components, repositórios e testes |
 
 ---
 
-## 📂 Estrutura do Repositório
+## 🚀 Instalação Rápida em Qualquer Projeto
+
+Execute o comando a partir da pasta raiz do seu projeto de destino:
+
+### 1. Projeto Flutter (Mobile / SQLite Offline-First)
+Instala apenas diretrizes, workflows e skills mobile:
+
+- **Windows (PowerShell)**:
+  ```powershell
+  # A partir da pasta do seu app:
+  & "caminho\para\antigravity-harness\setup.ps1" -Profile flutter
+  ```
+- **Linux / macOS**:
+  ```bash
+  # A partir da pasta do seu app:
+  /caminho/para/antigravity-harness/init.sh flutter
+  ```
+
+### 2. Projeto Web / Landing Pages (Next.js / Tailwind / SEO)
+Instala apenas diretrizes, workflows e skills web de alta conversão:
+
+- **Windows (PowerShell)**:
+  ```powershell
+  # A partir da pasta do seu site/landing:
+  & "caminho\para\antigravity-harness\setup.ps1" -Profile web
+  ```
+- **Linux / macOS**:
+  ```bash
+  # A partir da pasta do seu site/landing:
+  /caminho/para/antigravity-harness/init.sh web
+  ```
+
+---
+
+## 📂 Estrutura Modular do Repositório
 
 ```text
 antigravity-harness/
-├── _references/                     # Ativos visuais e capturas para leitura por IA
-│   ├── brand/                       # Guias visuais, identidades e logótipos
-│   └── screens/                     # Capturas de ecrã para o Google Stitch MCP
-├── _specs/                          # Contratos técnicos e especificações de produto
-│   └── prd-template.md              # Template agnóstico de descoberta de produto
-├── .agents/
-│   ├── harness.yaml                 # Orquestrador mestre e mapeamento de subagentes
-│   ├── mcp.json                     # Configuração dos servidores MCP (Stitch, Graft, ai-memory)
-│   ├── rules/                       # Diretrizes e restrições técnicas
-│   │   ├── global.md                # TDD, Conventional Commits e pt-BR
-│   │   │   └── mobile.md                # Normas de arquitetura Flutter e padrões de UI
-│   ├── skills/                      # Competências modulares padronizadas
-│   │   ├── antigravity-skill-orchestrator/ # SKILL.md (Triagem cognitiva e roteamento)
-│   │   ├── clean-architecture/      # SKILL.md (Fase Red-Green e testes isolados)
-│   │   ├── code-quality-tests/      # SKILL.md (QA mobile, testes e análise)
-│   │   ├── dart-collect-coverage/   # SKILL.md (Cobertura LCOV + gate de CI)
-│   │   ├── dart-use-pattern-matching/ # SKILL.md (Patterns Dart 3)
-│   │   ├── flutter-add-integration-test/ # SKILL.md (E2E em device/emulador)
-│   │   ├── flutter-add-widget-test/ # SKILL.md (WidgetTester + 4 estados)
-│   │   ├── flutter-apply-architecture-best-practices/ # SKILL.md (Camadas UI/Lógica/Dados, oficial Flutter)
-│   │   ├── flutter-build-responsive-layout/ # SKILL.md (Adaptativo celular/tablet)
-│   │   ├── flutter-release/         # SKILL.md (Pipeline test→version→build→ship)
-│   │   ├── flutter-setup-declarative-routing/ # SKILL.md (go_router + deep links)
-│   │   ├── flutter-setup-localization/ # SKILL.md (i18n ARB, pt-BR base)
-│   │   ├── flutter-state-riverpod/  # SKILL.md (Estado padrão com Riverpod)
-│   │   ├── flutter-use-http-package/ # SKILL.md (REST em services)
-│   │   ├── local-first-data/        # SKILL.md (Drift/SQLite, sync offline)
-│   │   ├── mobile-cicd/             # SKILL.md (Fastlane + GitHub Actions)
-│   │   ├── mobile-ux/               # SKILL.md (Ergonomia móvel e ligação Stitch)
-│   │   ├── spec-discovery/          # SKILL.md (Entrevista e definição de PRD)
-│   │   └── store-publishing/        # SKILL.md (Play Store + App Store)
-│   │   └── supabase-flutter/        # SKILL.md (Auth, DB, Storage, Realtime)
+├── core/                                # Núcleo compartilhado independente de stack
+│   ├── GEMINI.base.md                   # Protocolo base pt-BR, subagentes e verification gate
 │   └── workflows/
-│       └── dev-cycle.yaml           # Ciclo fechado: Spec ➔ Red ➔ Green ➔ QA ➔ Git
-├── install.ps1                      # Script de instalação para Windows
-└── install.sh                       # Script de instalação para ambientes Unix/WSL
-
-⚡ Instalação Rápida em Qualquer Computador
-Para configurar um novo projeto a partir de uma pasta limpa, execute o comando correspondente ao seu sistema operativo no terminal:
-
-Windows (PowerShell)
-```powershell
-irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/install.ps1 | iex
-```
-Linux / macOS / WSL
-```bash
-curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/install.sh | bash
-```
-> Ajuste `MailsonSilva/antigravity-harness` para o seu `USUARIO/REPO` se fizer fork.
-
-## 🔄 Atualizando um projeto existente
-
-Se o harness já está instalado e você quer as skills/regras novas **sem perder** seu código, PRD, tarefas e referências:
-
-```powershell
-# Windows (PowerShell) — rode na raiz do projeto
-irm https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/update.ps1 | iex
+│       ├── plan.md                      # Workflow Carbon: Geração da SPEC.md
+│       └── orchestrate.md               # Workflow Argon: Despacho paralelo Hydrogen
+├── profiles/
+│   ├── flutter/                         # Perfil Mobile & SaaS Offline-First
+│   │   ├── GEMINI.flutter.md            # Clean Architecture, 4 estados, SQLite e gates
+│   │   └── skills/                      # clean-architecture, local-first-data, riverpod, etc.
+│   └── web-sites/                       # Perfil Web & Landing Pages
+│       ├── GEMINI.web.md                # Next.js App Router, Tailwind, Core Web Vitals e SEO
+│       └── skills/                      # web-performance-seo, web-landing-conversion, web-responsive-ui
+├── setup.ps1                            # Instalador automatizado para Windows
+├── init.sh                              # Instalador automatizado para Unix/macOS
+└── README.md
 ```
 
-```bash
-# Linux / macOS / WSL — rode na raiz do projeto
-curl -sSL https://raw.githubusercontent.com/MailsonSilva/antigravity-harness/main/update.sh | bash
-```
+---
 
-- **Atualiza**: `.agents/harness.yaml`, `.agents/mcp.json`, `.agents/rules/`, `.agents/workflows/`, templates e os scripts `install.*` / `update.*` (com backup prévio em `%TEMP%/harness-backup-<data>`).
-- **Preserva**: `.agents/PROJECT_BRAIN.md`, **todas as skills existentes** em `.agents/skills/`, `.agents/memory/`, `apps/`, `_specs/prd.md`, `_specs/features/`, suas tarefas e board, `_references/`, `README.md`, `.git/`.
-- Skills novas publicadas no upstream são adicionadas automaticamente, sem tocar nas suas.
+## 🔄 Fluxo de Desenvolvimento no Antigravity
 
-## 🤖 Seleção de Modelos por Tarefa
+1. **Fase 1: Especificação (Carbon)**
+   - Selecione o modelo **Carbon**.
+   - Solicite: *"Execute o workflow plan.md para a funcionalidade [Nome]"*.
+   - O Carbon cria `_specs/SPEC.md` com contratos, checklist e tarefas atômicas sem tocar no código de produção.
 
-O harness **não fixa nenhum modelo**: por padrão cada subagente usa `inherit`, ou seja, o modelo já autenticado na sua CLI/IDE. Se quiser diferenciar por tarefa, sobrescreva os perfis — sem editar arquivos:
+2. **Fase 2: Orquestração e Paralelismo (Argon + Hydrogen)**
+   - Mude para o modelo **Argon**.
+   - Solicite: *"Execute o workflow orchestrate.md para a SPEC.md aprovada"*.
+   - O Argon quebra a spec em ondas de dependência e despacha subagentes **Hydrogen** em paralelo via `invoke_subagent`.
 
-```powershell
-# Windows (PowerShell) — vale para a sessão atual
-$env:AI_MODEL_REASONING = "seu-modelo-forte"    # PRD, arquitetura (product_architect)
-$env:AI_MODEL_CODING = "seu-modelo-rapido"      # TDD e builders (tdd_tester, mobile_builder, web_builder, qa)
-$env:AI_MODEL_DESIGN = "seu-modelo-com-visao"   # Protótipos visuais (ui_ux_designer)
-$env:AI_MODEL_FAST = "seu-modelo-leve"          # Commits e comandos (git_committer)
-```
-
-```bash
-# Linux / macOS / WSL
-export AI_MODEL_REASONING="seu-modelo-forte" AI_MODEL_CODING="seu-modelo-rapido" \
-       AI_MODEL_DESIGN="seu-modelo-com-visao" AI_MODEL_FAST="seu-modelo-leve"
-```
-
-Sem variáveis definidas, tudo roda com o modelo logado (herança total).
-
-## 📋 Tarefas e priorização (dificuldade × urgência)
-
-1. **Crie uma tarefa** copiando `_specs/tasks/_template.md` para `_specs/tasks/<ID>-<slug>.md` e preenchendo `difficulty` (1–5), `urgency` (1–4), `target` e `status`.
-2. **Visualize o quadro** em `_specs/task-board.md`: ranking por `score = urgência×10 − dificuldade` (quick wins primeiro), quadrantes e visão por target.
-3. **Execute escolhendo a ordem**: rode o `dev-cycle` sem `task_id` para ver o ranking e escolher, ou com `task_id` (ex: `T01`) para ir direto — a spec é derivada da tarefa e o status vira `done` ao final.
-
-🔄 Fluxo de Desenvolvimento (Pipeline dev-cycle)
-O desenvolvimento opera através de transições estruturadas entre subagentes especializados:
-
-Plaintext
-[Descoberta / PRD] ──► [Design & Stitch] ──► [Fase RED (TDD)]
-                                                   │
-[Git Commit] ◄── [Auditoria / QA] ◄── [Fase GREEN (Código)]
-Descoberta (product_architect): Conduz a análise dos requisitos e preenche _specs/prd-template.md.
-
-Design Visual (ui_ux_designer): Inspeciona _references/screens/, interage com o Google Stitch MCP e gera os tokens visuais.
-
-Fase Vermelha (tdd_tester): Cria a bateria de testes unitários ou de widgets que inicialmente falham.
-
-Fase Verde (mobile_builder): Implementa o código mínimo necessário com auxílio do Graft para satisfazer os testes.
-
-Auditoria e Autorreparo (qa-validator): Executa validações estáticas e testes; em caso de falha, aciona o ciclo de correção automática (limite de 3 tentativas).
-
-Registo Semântico (git_committer): Valida as alterações pendentes no Git e cria commits atómicos no formato Conventional Commits baseando-se no contexto registado pelo ai-memory.
-
-Release (opcional via `release: true`): as skills `flutter-release`, `mobile-cicd` e `store-publishing` executam gates, versionamento, builds por plataforma (android/ios) e entrega nas lojas com rollout controlado.
-
-🤖 Agentes × Skills (8 agentes, 22 skills)
-
-Cada subagente carrega só as skills do seu papel (ver `subagents:` em `.agents/harness.yaml`):
-
-| Agente | Skills |
-|---|---|
-| `product_architect` | `spec-discovery`, `antigravity-skill-orchestrator` |
-| `ui_ux_designer` | `mobile-ux` |
-| `tdd_tester` | `clean-architecture`, `flutter-add-widget-test` |
-| `mobile_builder` | `clean-architecture`, `local-first-data` |
-| `web_builder` | `web-performance-seo` |
-| `qa_validator` | `code-quality-tests` |
-| `harness_evolver` | `harness-evolver` |
-| `git_committer` | (nenhuma — usa `ai-memory` + diff) |
-
-O `antigravity-skill-orchestrator` sabe qual chamar para cada tipo de tarefa — ver **Tabela de Roteamento** em `.agents/skills/antigravity-skill-orchestrator/SKILL.md` (máx. 2 skills por turno).
-
-🛠️ Ferramentas e Protocolos Integrados
-Google Stitch MCP: Prototipagem e extração de padrões visuais a partir de imagens.
-
-Graft: Navegação eficiente na árvore sintática abstrata (AST) sem dispersão de contexto.
-
-ai-memory: Gestão de transferências formais (handoffs) entre subagentes e retenção de decisões técnicas.
+3. **Fase 3: Loop Obrigatório de Verificação (Verification Gate)**
+   - **Flutter**: O Argon executa obrigatoriamente `dart format .`, `flutter analyze` e `flutter test`.
+   - **Web**: O Argon executa obrigatoriamente `npm run lint` e `npm run build`.
+   - Tarefas só são concluídas com código de saída 0 em todas as validações.
