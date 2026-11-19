@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Antigravity Harness - Verificação Unificada de Qualidade (Windows / Linux / macOS)
 # Executa análise estática e suíte de testes com isolamento de locks (-j 1)
 # ==============================================================================
