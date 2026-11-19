@@ -28,7 +28,7 @@ settings:
 workspaces:
   mobile:
     path: "./"
-    test_command: "flutter test"
+    test_command: "flutter test -j 1"
     lint_command: "dart analyze"
     format_command: "dart format ."
 

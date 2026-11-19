@@ -85,7 +85,13 @@ steps:
     name: "6. Validação Contínua (Linter, Tipos e Testes)"
     skill: code-quality-tests
     thinking_budget: 1000
-    description: "Executa os comandos de teste e lint do workspace alvo (mobile: flutter test / dart analyze; web: npm test / npm run lint) até garantir estabilidade completa."
+    description: "Executa os comandos de teste e lint do workspace alvo (mobile: flutter test -j 1 / dart analyze; web: npm test / npm run lint) até garantir estabilidade completa."
+
+  - id: update_memory
+    name: "6.1 Atualização de Memória e Aprendizado (Harness Evolver)"
+    skill: harness-evolver
+    thinking_budget: 1000
+    description: "Registra decisões arquiteturais, armadilhas identificadas e regras aprendidas em .agents/PROJECT_BRAIN.md e .agents/memory/ antes de finalizar a entrega."
 
   - id: git_semantic_commit
     name: "7. Versionamento Semântico no Git"
