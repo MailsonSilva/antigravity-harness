@@ -1,0 +1,13 @@
+name: flutter
+aliases:
+  - mobile
+display_name: "Flutter (Mobile & Offline-First)"
+gemini_file: GEMINI.flutter.md
+mcps:
+  default:
+    - dart_mcp
+  optional:
+    - supabase_mcp
+    - google_stitch
+    - graft_ast
+    - ai_memory

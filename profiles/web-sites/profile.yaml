@@ -1,0 +1,11 @@
+name: web-sites
+aliases:
+  - web
+display_name: "Web & Landing Pages (Next.js / Tailwind / SEO)"
+gemini_file: GEMINI.web.md
+mcps:
+  default: []
+  optional:
+    - google_stitch
+    - graft_ast
+    - ai_memory

@@ -21,12 +21,14 @@ O harness divide o ciclo de desenvolvimento em três camadas para maximizar qual
 Execute o comando a partir da pasta raiz do seu projeto de destino:
 
 ### 1. Projeto Flutter (Mobile / SQLite Offline-First)
-Instala apenas diretrizes, workflows e skills mobile:
+Instala ou atualiza diretrizes, workflows, `harness-studio.html` e skills mobile (preservando `_specs/` e skills customizadas):
 
 - **Windows (PowerShell)**:
   ```powershell
   # A partir da pasta do seu app:
   & "caminho\para\antigravity-harness\setup.ps1" -Profile flutter
+  # Opcional (habilitar supabase_mcp, google_stitch, graft_ast, ai_memory):
+  & "caminho\para\antigravity-harness\setup.ps1" -Profile flutter -WithOptionalMcps
   ```
 - **Linux / macOS**:
   ```bash
@@ -35,7 +37,7 @@ Instala apenas diretrizes, workflows e skills mobile:
   ```
 
 ### 2. Projeto Web / Landing Pages (Next.js / Tailwind / SEO)
-Instala apenas diretrizes, workflows e skills web de alta conversão:
+Instala apenas diretrizes, workflows e skills web:
 
 - **Windows (PowerShell)**:
   ```powershell

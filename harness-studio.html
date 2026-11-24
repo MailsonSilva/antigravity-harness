@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antigravity Studio — Kanban & OS</title>
+  <title>Antigravity Studio — Kanban &amp; SPEC</title>
   <style>
     :root {
       --bg: #090d16; --surface: #111726; --elevated: #182238; --border: #232f48;
@@ -14,9 +14,15 @@
     body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
     .sidebar { width: 280px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 14px; flex-shrink: 0; }
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; gap: 12px; }
+    .tabs { display: flex; gap: 8px; }
+    .tab-btn { padding: 7px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 0.85rem; }
+    .tab-btn.active { background: rgba(56, 189, 248, 0.15); color: var(--primary); border-color: var(--primary); }
     .viewport { flex: 1; overflow-y: auto; padding: 24px; }
-    .kanban-grid { display: grid; grid-template-columns: repeat(5, minmax(280px, 1fr)); gap: 16px; min-height: 82vh; overflow-x: auto; padding-bottom: 20px; }
+    .banner { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: none; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.85rem; }
+    .banner.error { display: flex; background: rgba(244, 63, 94, 0.12); border: 1px solid var(--red); color: #fda4af; }
+    .banner.warn { display: flex; background: rgba(245, 158, 11, 0.12); border: 1px solid var(--amber); color: #fcd34d; }
+    .kanban-grid { display: grid; grid-template-columns: repeat(5, minmax(260px, 1fr)); gap: 16px; min-height: 78vh; overflow-x: auto; padding-bottom: 20px; }
     .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; transition: background 0.2s; }
     .kanban-col.drag-over { background: rgba(56, 189, 248, 0.05); border-color: var(--primary); }
     .card { background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: grab; transition: all 0.15s; }
@@ -27,7 +33,18 @@
     .btn-primary { background: var(--primary); color: #04101e; border: none; font-weight: 700; }
     .btn-green { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid #10b981; }
     .btn-red { background: rgba(244,63,94,0.2); color: #fb7185; border: 1px solid #f43f5e; }
-    
+
+    .spec-viewer { max-width: 920px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 28px; line-height: 1.65; display: none; }
+    .spec-viewer h1, .spec-viewer h2, .spec-viewer h3 { color: #fff; margin: 18px 0 8px; }
+    .spec-viewer h1 { font-size: 1.45rem; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 0; }
+    .spec-viewer h2 { font-size: 1.15rem; color: var(--primary); }
+    .spec-viewer h3 { font-size: 1rem; color: var(--purple); }
+    .spec-viewer p { margin: 8px 0; color: var(--text); }
+    .spec-viewer ul { margin: 8px 0 12px 20px; }
+    .spec-viewer li { margin: 4px 0; }
+    .spec-viewer pre { background: #070a12; border: 1px solid var(--border); border-radius: 6px; padding: 12px; overflow-x: auto; margin: 10px 0; font-family: ui-monospace, Consolas, monospace; font-size: 0.85rem; }
+    .spec-viewer code { background: #070a12; padding: 2px 5px; border-radius: 4px; font-family: ui-monospace, Consolas, monospace; font-size: 0.85em; color: #7dd3fc; }
+
     .modal-backdrop { position: fixed; inset: 0; background: rgba(3,6,12,0.85); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .modal-backdrop.open { display: flex; }
     .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
@@ -43,62 +60,78 @@
       <div style="width:34px; height:34px; background:linear-gradient(135deg,var(--primary),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#000;">A²</div>
       <div>
         <h2 style="font-size:0.95rem;">Antigravity Studio</h2>
-        <span style="font-size:0.72rem; color:var(--primary);">Kanban Nativo com Drag & Drop</span>
+        <span style="font-size:0.72rem; color:var(--primary);">v4 · board.json + SPEC.md</span>
       </div>
     </div>
 
     <div style="font-size:0.8rem; color:var(--muted); line-height:1.4; background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; border:1px solid var(--border);">
-      💡 Você pode <strong>arrastar os cards</strong> entre as colunas ou clicar neles para inspecionar, aprovar e reprovar. Excluir um card remove apenas ele — as demais tarefas ficam exatamente onde estão.
+      💡 Persistência estruturada em <code>_specs/board.json</code> com trava otimista (<code>lastModified</code>) para evitar conflitos com subagentes.
     </div>
 
     <div style="margin-top:auto; display:flex; flex-direction:column; gap:8px;">
       <button type="button" class="btn btn-primary" id="btn-connect" onclick="connectDirectory()">📁 Conectar Pasta do Projeto</button>
-      <button type="button" class="btn" onclick="manualReload()">🔄 Recarregar task-board.md</button>
+      <button type="button" class="btn" onclick="openNewTaskModal()">＋ Nova Tarefa</button>
+      <button type="button" class="btn" onclick="manualReload()">🔄 Recarregar _specs/</button>
       <span id="sync-status" style="font-size:0.75rem; color:var(--muted); text-align:center;">Verificando conexão...</span>
     </div>
   </aside>
 
   <main class="main">
     <header class="topbar">
-      <h2>📋 Quadro de Engenharia</h2>
+      <div class="tabs">
+        <button type="button" class="tab-btn active" id="tab-kanban" onclick="switchTab('kanban')">📋 Quadro Kanban</button>
+        <button type="button" class="tab-btn" id="tab-spec" onclick="switchTab('spec')">📄 SPEC.md (Leitura)</button>
+      </div>
       <span style="font-size:0.8rem; color:var(--muted);" id="last-sync-time">Aguardando conexão...</span>
     </header>
 
     <div class="viewport">
+      <div id="status-banner" class="banner"></div>
       <div class="kanban-grid" id="kanban-board"></div>
+      <article class="spec-viewer" id="spec-viewer"></article>
     </div>
   </main>
 
-  <!-- MODAL DE INSPEÇÃO -->
+  <!-- MODAL DE INSPEÇÃO / CRIAÇÃO -->
   <div class="modal-backdrop" id="task-modal" onclick="if(event.target===this) closeModal()">
     <div class="modal">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:12px;">
         <div>
-          <span class="badge" id="m-task-id" style="font-size:0.8rem;">TASK</span>
+          <span class="badge" id="m-task-id-badge" style="font-size:0.8rem;">TASK</span>
           <h3 id="m-title-display" style="font-size:1.15rem; margin-top:6px; color:#fff;"></h3>
         </div>
         <button class="btn" onclick="closeModal()">✕</button>
       </div>
 
-      <div class="form-group">
-        <label>Status / Coluna</label>
-        <select id="m-task-col">
-          <option value="backlog">1. Backlog & Specs</option>
-          <option value="red">2. Fase RED (TDD)</option>
-          <option value="green">3. Fase GREEN (Código)</option>
-          <option value="review">4. Gate de Aprovação</option>
-          <option value="done">5. Concluído</option>
-        </select>
-      </div>
-
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div class="form-group">
-          <label>Agente Designado</label>
-          <input type="text" id="m-task-agent">
+          <label>ID da Tarefa</label>
+          <input type="text" id="m-task-id" placeholder="TASK-01">
         </div>
         <div class="form-group">
-          <label>Skills Ativadas</label>
-          <input type="text" id="m-task-skills">
+          <label>Status / Coluna</label>
+          <select id="m-task-col">
+            <option value="backlog">1. Backlog &amp; Specs</option>
+            <option value="red">2. Fase RED (TDD)</option>
+            <option value="green">3. Fase GREEN (Código)</option>
+            <option value="review">4. Gate de Aprovação</option>
+            <option value="done">5. Concluído</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label>Agente</label>
+          <input type="text" id="m-task-agent" placeholder="hydrogen">
+        </div>
+        <div class="form-group">
+          <label>Dificuldade</label>
+          <input type="text" id="m-task-difficulty" placeholder="Média">
+        </div>
+        <div class="form-group">
+          <label>Skills (vírgula)</label>
+          <input type="text" id="m-task-skills" placeholder="clean-architecture">
         </div>
       </div>
 
@@ -108,38 +141,27 @@
       </div>
 
       <div class="form-group">
-        <label>Especificação Técnica & Critérios</label>
-        <textarea id="m-task-desc" rows="5"></textarea>
+        <label>Especificação Técnica &amp; Critérios</label>
+        <textarea id="m-task-desc" rows="4"></textarea>
       </div>
 
       <div class="form-group" id="group-feedback">
-        <label style="color:#fb7185;">⚠️ Feedback de Reprovação (Instrução para a IA corrigir)</label>
+        <label style="color:#fb7185;">⚠️ Feedback de Reprovação</label>
         <input type="text" id="m-task-feedback" placeholder="Informe o motivo da reprovação...">
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:14px; border-top:1px solid var(--border);">
-        <button type="button" class="btn btn-red" onclick="deleteCurrentTask()">Excluir</button>
+        <button type="button" class="btn btn-red" id="btn-delete-task" onclick="deleteCurrentTask()">Excluir</button>
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn btn-red" onclick="rejectTaskAction()">✖ Reprovar (Vai para RED)</button>
-          <button type="button" class="btn btn-green" onclick="approveTaskAction()">✔ Aprovar (Vai para Concluído)</button>
-          <button type="button" class="btn btn-primary" onclick="saveTaskModal()">Salvar Alterações</button>
+          <button type="button" class="btn btn-red" id="btn-reject-task" onclick="rejectTaskAction()">✖ Reprovar (RED)</button>
+          <button type="button" class="btn btn-green" id="btn-approve-task" onclick="approveTaskAction()">✔ Aprovar (Done)</button>
+          <button type="button" class="btn btn-primary" onclick="saveTaskModal()">Salvar</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // =========================================================================
-    // REGRAS DE PARSING DO task-board.md
-    //
-    // 1. A coluna de uma tarefa é definida SOMENTE pelo cabeçalho da seção
-    //    ("## 1. ...", "## 2. ..."). Nada de procurar "red"/"backlog" no meio
-    //    de títulos ou descrições (isso movia cards sem querer).
-    // 2. O formato aceito é flexível: "- **[T01] ...**" e
-    //    "- [ ] **[T01] ...**" (backlog) ou "- [x] **[T01] ...**" (concluído).
-    // 3. Toda mutação é cirúrgica: excluir/mover/editar altera apenas o bloco
-    //    da tarefa alvo e preserva o restante do arquivo byte a byte.
-    // =========================================================================
     const COLUMNS = [
       { id: "backlog", title: "1. Backlog & Specs", color: "#94a3b8" },
       { id: "red", title: "2. Fase RED (TDD)", color: "#f43f5e" },
@@ -147,23 +169,16 @@
       { id: "review", title: "4. Gate de Aprovação", color: "#f59e0b" },
       { id: "done", title: "5. Concluído", color: "#10b981" }
     ];
-
-    const COLUMN_BY_NUMBER = { "1": "backlog", "2": "red", "3": "green", "4": "review", "5": "done" };
-    const COLUMN_KEYWORDS = [
-      ["backlog", /backlog/i],
-      ["red", /\bred\b/i],
-      ["green", /\bgreen\b/i],
-      ["review", /aprova|review|gate|\bqa\b/i],
-      ["done", /conclu|done|finaliz/i]
-    ];
-
-    // - [ ] **[T-101] Título** | Agente: `x` | Dificuldade: `Alta` | Skills: `a, b`
-    const TASK_LINE_RE = /^(\s*)-\s*(?:\[([ xX])\]\s*)?\*\*\[([^\]]+)\]\s*(.*?)\*\*(.*)$/;
-    const EMPTY_RE = /^\s*(?:[-*]\s*)?\*{0,2}\(?(?:nenhuma|sem)\s+tarefa/i;
+    const VALID_COLUMNS = new Set(COLUMNS.map(c => c.id));
 
     let dirHandle = null;
-    let tasks = [];
+    let boardState = { schemaVersion: 1, lastModified: "", tasks: [] };
+    let loadedLastModified = null;
+    let loadedFileMtime = null;
     let selectedTaskId = null;
+    let isCreatingTask = false;
+    let activeTab = "kanban";
+    let specMarkdown = "";
     let syncTimer = null;
 
     const DB_NAME = "AntigravityStudioDB";
@@ -191,7 +206,83 @@
       });
     }
 
+    function escapeHtml(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+
+    function showBanner(type, messageHtml, actionLabel, onAction) {
+      const el = document.getElementById("status-banner");
+      el.className = "banner " + type;
+      el.innerHTML = `<span>${messageHtml}</span>`;
+      if (actionLabel && typeof onAction === "function") {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-primary";
+        btn.textContent = actionLabel;
+        btn.onclick = onAction;
+        el.appendChild(btn);
+      }
+    }
+
+    function clearBanner() {
+      const el = document.getElementById("status-banner");
+      el.className = "banner";
+      el.innerHTML = "";
+    }
+
+    function validateBoardSchema(data) {
+      if (!data || typeof data !== "object" || Array.isArray(data)) {
+        return "Raiz do JSON deve ser um objeto.";
+      }
+      if (data.schemaVersion !== 1) {
+        return "schemaVersion inválido (esperado: 1).";
+      }
+      if (typeof data.lastModified !== "string" || !data.lastModified.trim()) {
+        return "Campo lastModified ausente ou vazio.";
+      }
+      if (!Array.isArray(data.tasks)) {
+        return "Campo tasks deve ser um array.";
+      }
+      const seenIds = new Set();
+      for (let i = 0; i < data.tasks.length; i++) {
+        const t = data.tasks[i];
+        if (!t || typeof t !== "object") return `Tarefa no índice ${i} inválida.`;
+        if (typeof t.id !== "string" || !t.id.trim()) return `Tarefa no índice ${i} sem id válido.`;
+        if (seenIds.has(t.id)) return `ID duplicado encontrado: ${t.id}`;
+        seenIds.add(t.id);
+        if (typeof t.title !== "string" || !t.title.trim()) return `Tarefa ${t.id} sem title válido.`;
+        if (!VALID_COLUMNS.has(t.column)) return `Tarefa ${t.id} com column inválida: ${t.column}`;
+      }
+      return null;
+    }
+
+    function normalizeSkills(raw) {
+      if (Array.isArray(raw)) return raw.map(s => String(s).trim()).filter(Boolean);
+      if (typeof raw === "string") return raw.split(",").map(s => s.trim()).filter(Boolean);
+      return [];
+    }
+
+    function normalizeBoard(data) {
+      return {
+        schemaVersion: 1,
+        lastModified: data.lastModified,
+        tasks: data.tasks.map(t => ({
+          id: t.id.trim(),
+          title: t.title.trim(),
+          column: t.column,
+          agent: typeof t.agent === "string" && t.agent.trim() ? t.agent.trim() : "hydrogen",
+          difficulty: typeof t.difficulty === "string" && t.difficulty.trim() ? t.difficulty.trim() : "Média",
+          skills: normalizeSkills(t.skills),
+          desc: typeof t.desc === "string" ? t.desc : "",
+          feedback: typeof t.feedback === "string" ? t.feedback : ""
+        }))
+      };
+    }
+
     window.addEventListener("DOMContentLoaded", async () => {
+      renderKanban();
       try {
         const saved = await getSavedHandle();
         if (saved) {
@@ -221,211 +312,87 @@
     function onConnected() {
       document.getElementById("btn-connect").innerText = `📁 ${dirHandle.name}`;
       document.getElementById("sync-status").innerText = `Conectado: ${dirHandle.name}`;
-      loadFromTaskBoard();
+      loadWorkspaceData();
       if (syncTimer) clearInterval(syncTimer);
-      // Não recarrega enquanto o modal está aberto para não atropelar a edição.
-      syncTimer = setInterval(() => { if (!selectedTaskId) loadFromTaskBoard(); }, 3500);
+      syncTimer = setInterval(() => {
+        if (!selectedTaskId && !isCreatingTask) loadWorkspaceData();
+      }, 3500);
     }
 
-    async function loadFromTaskBoard() {
+    async function loadWorkspaceData() {
       if (!dirHandle) return;
+      await Promise.all([loadBoardJson(), loadSpecMarkdown()]);
+      document.getElementById("last-sync-time").innerText = `Sincronizado: ${new Date().toLocaleTimeString()}`;
+    }
+
+    async function loadBoardJson() {
       try {
         const specs = await dirHandle.getDirectoryHandle("_specs");
-        const fileHandle = await specs.getFileHandle("task-board.md");
+        let fileHandle;
+        try {
+          fileHandle = await specs.getFileHandle("board.json");
+        } catch (notFound) {
+          showBanner(
+            "warn",
+            "⚠️ <strong>_specs/board.json</strong> não encontrado neste projeto.",
+            "Inicializar _specs/board.json",
+            initializeBoardJson
+          );
+          return;
+        }
         const file = await fileHandle.getFile();
         const text = await file.text();
-        parseMarkdown(text);
+        let parsed;
+        try {
+          parsed = JSON.parse(text);
+        } catch (jsonErr) {
+          showBanner("error", `❌ <strong>_specs/board.json</strong> corrompido (JSON inválido): ${escapeHtml(jsonErr.message)}. Arquivo preservado.`);
+          return;
+        }
+        const schemaErr = validateBoardSchema(parsed);
+        if (schemaErr) {
+          showBanner("error", `❌ Erro de schema em <strong>_specs/board.json</strong>: ${escapeHtml(schemaErr)} Arquivo preservado.`);
+          return;
+        }
+
+        clearBanner();
+        boardState = normalizeBoard(parsed);
+        loadedLastModified = boardState.lastModified;
+        loadedFileMtime = file.lastModified;
         renderKanban();
-        document.getElementById("last-sync-time").innerText = `Sincronizado: ${new Date().toLocaleTimeString()}`;
       } catch (e) {
-        console.warn("Erro lendo task-board.md:", e);
+        console.warn("Erro lendo _specs/board.json:", e);
+        showBanner("error", `❌ Não foi possível acessar a pasta <strong>_specs/</strong>: ${escapeHtml(e.message)}`);
       }
     }
 
-    function columnFromHeading(heading) {
-      const numbered = heading.trim().match(/^(\d+)\s*[.)\-:]?/);
-      if (numbered && COLUMN_BY_NUMBER[numbered[1]]) return COLUMN_BY_NUMBER[numbered[1]];
-      for (const [id, re] of COLUMN_KEYWORDS) {
-        if (re.test(heading)) return id;
+    async function initializeBoardJson() {
+      if (!dirHandle) return;
+      const specs = await dirHandle.getDirectoryHandle("_specs", { create: true });
+      const fileHandle = await specs.getFileHandle("board.json", { create: true });
+      const initial = { schemaVersion: 1, lastModified: new Date().toISOString(), tasks: [] };
+      const writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify(initial, null, 2) + "\n");
+      await writable.close();
+      await loadBoardJson();
+    }
+
+    async function loadSpecMarkdown() {
+      try {
+        const specs = await dirHandle.getDirectoryHandle("_specs");
+        const fileHandle = await specs.getFileHandle("SPEC.md");
+        const file = await fileHandle.getFile();
+        specMarkdown = await file.text();
+      } catch (e) {
+        specMarkdown = "";
       }
-      return null;
-    }
-
-    function columnTitle(id) {
-      const col = COLUMNS.find(c => c.id === id);
-      return col ? col.title : id;
-    }
-
-    function parseTaskMeta(text) {
-      const agent = text.match(/Agente:\s*\*?\s*`([^`]*)`/i);
-      const skills = text.match(/Skills:\s*\*?\s*`([^`]*)`/i);
-      const difficulty = text.match(/(?:Dificuldade|Complexidade):\s*\*?\s*`?([^`|\n]+)`?/i);
-      return {
-        agent: agent ? agent[1].trim() : "master_orchestrator",
-        skills: skills ? skills[1].trim() : "",
-        difficulty: difficulty ? difficulty[1].trim() : "Média"
-      };
-    }
-
-    // Varre o markdown e devolve linhas, seções (colunas) e blocos de tarefas.
-    // Cada tarefa conhece lineIndex/endIndex para edição cirúrgica.
-    function scanBoard(md) {
-      const lines = md.split(/\r?\n/);
-      const sections = [];
-      const found = [];
-      let section = null;
-      let current = null;
-
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-
-        const heading = line.match(/^#{1,6}\s+(.*)$/);
-        if (heading) {
-          const id = columnFromHeading(heading[1]);
-          section = id ? { id, headingIndex: i } : null;
-          if (section) sections.push(section);
-          current = null;
-          continue;
-        }
-
-        const taskMatch = line.match(TASK_LINE_RE);
-        if (taskMatch && section) {
-          current = {
-            id: taskMatch[3].trim(),
-            title: taskMatch[4].trim(),
-            checkbox: taskMatch[2] || " ",
-            column: section.id,
-            lineIndex: i,
-            endIndex: i + 1,
-            desc: ""
-          };
-          found.push(current);
-          continue;
-        }
-
-        if (current && /^\s+\S/.test(line)) {
-          current.endIndex = i + 1;
-          current.desc += line.replace(/^\s*-\s?/, "").trimEnd() + "\n";
-          continue;
-        }
-
-        // Linha em branco ou texto no nível da coluna encerra o bloco.
-        current = null;
-      }
-
-      found.forEach(t => {
-        const block = lines.slice(t.lineIndex, t.endIndex).join("\n");
-        Object.assign(t, parseTaskMeta(block));
-        t.desc = t.desc.trim();
-      });
-
-      return { lines, sections, tasks: found };
-    }
-
-    function parseMarkdown(md) {
-      const board = scanBoard(md);
-      tasks = board.tasks.map(t => ({ ...t }));
-      return board;
-    }
-
-    function buildTaskLine(task) {
-      const checkbox = task.column === "done" ? "x" : " ";
-      const meta = [
-        `Agente: \`${task.agent || "master_orchestrator"}\``,
-        `Dificuldade: \`${task.difficulty || "Média"}\``
-      ];
-      if (task.skills) meta.push(`Skills: \`${task.skills}\``);
-      return `- [${checkbox}] **[${task.id}] ${task.title}** | ${meta.join(" | ")}`;
-    }
-
-    function buildTaskBlock(task) {
-      const block = [buildTaskLine(task)];
-      const desc = (task.desc || "").trim();
-      if (desc) {
-        desc.split(/\r?\n/).forEach(line => block.push(`  - ${line.trim()}`));
-      }
-      return block;
-    }
-
-    // Insere o bloco no fim da coluna de destino, removendo placeholders vazios.
-    function insertBlock(lines, targetColId, block) {
-      let board = scanBoard(lines.join("\n"));
-      let section = board.sections.find(s => s.id === targetColId);
-
-      if (!section) {
-        while (lines.length && lines[lines.length - 1].trim() === "") lines.pop();
-        lines.push("", `## ${columnTitle(targetColId)}`, ...block, "");
-        return lines;
-      }
-
-      // Remove "(Nenhuma tarefa...)" da seção de destino.
-      const nextSection = board.sections.find(s => s.headingIndex > section.headingIndex);
-      const sectionEnd = nextSection ? nextSection.headingIndex : lines.length;
-      for (let i = sectionEnd - 1; i > section.headingIndex; i--) {
-        if (EMPTY_RE.test(lines[i])) lines.splice(i, 1);
-      }
-
-      board = scanBoard(lines.join("\n"));
-      section = board.sections.find(s => s.id === targetColId);
-      const sectionTasks = board.tasks.filter(t => t.column === targetColId);
-
-      let insertAt;
-      if (sectionTasks.length) {
-        insertAt = sectionTasks[sectionTasks.length - 1].endIndex;
-      } else {
-        const next = board.sections.find(s => s.headingIndex > section.headingIndex);
-        insertAt = next ? next.headingIndex : lines.length;
-        while (insertAt > section.headingIndex + 1 && lines[insertAt - 1].trim() === "") insertAt--;
-      }
-
-      lines.splice(insertAt, 0, ...block);
-      return lines;
-    }
-
-    function removeTaskFromBoard(md, id) {
-      const board = scanBoard(md);
-      const task = board.tasks.find(t => t.id === id);
-      if (!task) return md;
-
-      const lines = board.lines.slice();
-      lines.splice(task.lineIndex, task.endIndex - task.lineIndex);
-
-      // Evita deixar duas linhas em branco seguidas no ponto da remoção.
-      if (lines[task.lineIndex - 1] !== undefined && lines[task.lineIndex - 1].trim() === "" &&
-          lines[task.lineIndex] !== undefined && lines[task.lineIndex].trim() === "") {
-        lines.splice(task.lineIndex, 1);
-      }
-      return lines.join("\n");
-    }
-
-    function saveTaskInBoard(md, task) {
-      const board = scanBoard(md);
-      const existing = board.tasks.find(t => t.id === task.id);
-      const lines = board.lines.slice();
-      const block = buildTaskBlock(task);
-
-      if (existing && existing.column === task.column) {
-        // Edição no lugar: preserva a posição da tarefa na coluna.
-        lines.splice(existing.lineIndex, existing.endIndex - existing.lineIndex, ...block);
-        return lines.join("\n");
-      }
-
-      if (existing) {
-        lines.splice(existing.lineIndex, existing.endIndex - existing.lineIndex);
-      }
-      return insertBlock(lines, task.column, block).join("\n");
-    }
-
-    function escapeHtml(value) {
-      return String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-      }[ch]));
+      if (activeTab === "spec") renderSpecViewer();
     }
 
     function renderKanban() {
       const container = document.getElementById("kanban-board");
       container.innerHTML = COLUMNS.map(col => {
-        const colTasks = tasks.filter(t => t.column === col.id);
+        const colTasks = boardState.tasks.filter(t => t.column === col.id);
         return `
           <div class="kanban-col" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event, '${col.id}')">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -440,9 +407,10 @@
                     <span style="font-size:0.7rem; color:var(--muted);">${escapeHtml(t.difficulty)}</span>
                   </div>
                   <div style="font-size:0.92rem; font-weight:600; margin:8px 0 6px; color:#fff;">${escapeHtml(t.title)}</div>
+                  ${t.feedback ? `<div style="font-size:0.74rem; color:#fda4af; margin-bottom:6px;">⚠️ ${escapeHtml(t.feedback)}</div>` : ""}
                   <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
                     <span class="badge" style="background:rgba(192,132,252,0.15); color:var(--purple);">🤖 ${escapeHtml(t.agent)}</span>
-                    ${t.skills ? `<span class="badge">⚡ ${escapeHtml(t.skills)}</span>` : ""}
+                    ${t.skills.length ? `<span class="badge">⚡ ${escapeHtml(t.skills.join(", "))}</span>` : ""}
                   </div>
                 </div>
               `).join("")}
@@ -453,7 +421,68 @@
       }).join("");
     }
 
-    // DRAG AND DROP HANDLERS
+    function renderSafeInline(escapedText) {
+      return escapedText.replace(/`([^`]+)`/g, "<code>$1</code>");
+    }
+
+    function renderSpecViewer() {
+      const viewer = document.getElementById("spec-viewer");
+      if (!specMarkdown.trim()) {
+        viewer.innerHTML = `<p style="color:var(--muted);">Nenhum arquivo <code>_specs/SPEC.md</code> encontrado no projeto conectado.</p>`;
+        return;
+      }
+      const lines = specMarkdown.split(/\r?\n/);
+      let html = [];
+      let inCode = false;
+      let inList = false;
+
+      for (const rawLine of lines) {
+        if (rawLine.trim().startsWith("```")) {
+          if (inList) { html.push("</ul>"); inList = false; }
+          if (!inCode) { html.push("<pre><code>"); inCode = true; }
+          else { html.push("</code></pre>"); inCode = false; }
+          continue;
+        }
+        if (inCode) {
+          html.push(escapeHtml(rawLine) + "\n");
+          continue;
+        }
+        const safe = escapeHtml(rawLine);
+        if (/^###\s+/.test(rawLine)) {
+          if (inList) { html.push("</ul>"); inList = false; }
+          html.push(`<h3>${renderSafeInline(safe.replace(/^###\s+/, ""))}</h3>`);
+        } else if (/^##\s+/.test(rawLine)) {
+          if (inList) { html.push("</ul>"); inList = false; }
+          html.push(`<h2>${renderSafeInline(safe.replace(/^##\s+/, ""))}</h2>`);
+        } else if (/^#\s+/.test(rawLine)) {
+          if (inList) { html.push("</ul>"); inList = false; }
+          html.push(`<h1>${renderSafeInline(safe.replace(/^#\s+/, ""))}</h1>`);
+        } else if (/^\s*-\s+/.test(rawLine)) {
+          if (!inList) { html.push("<ul>"); inList = true; }
+          const item = safe.replace(/^\s*-\s+/, "")
+            .replace(/^\[x\]\s*/i, "✅ ")
+            .replace(/^\[\s\]\s*/, "⬜ ");
+          html.push(`<li>${renderSafeInline(item)}</li>`);
+        } else {
+          if (inList) { html.push("</ul>"); inList = false; }
+          if (safe.trim()) html.push(`<p>${renderSafeInline(safe)}</p>`);
+        }
+      }
+      if (inList) html.push("</ul>");
+      if (inCode) html.push("</code></pre>");
+      viewer.innerHTML = html.join("\n");
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.getElementById("tab-kanban").classList.toggle("active", tab === "kanban");
+      document.getElementById("tab-spec").classList.toggle("active", tab === "spec");
+      document.getElementById("kanban-board").style.display = tab === "kanban" ? "grid" : "none";
+      document.getElementById("spec-viewer").style.display = tab === "spec" ? "block" : "none";
+      if (tab === "spec") renderSpecViewer();
+    }
+
+    // DRAG AND DROP
     function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add("drag-over"); }
     function leaveDrop(ev) { ev.currentTarget.classList.remove("drag-over"); }
     function drag(ev, id) { ev.dataTransfer.setData("text/plain", id); }
@@ -461,38 +490,15 @@
       ev.preventDefault();
       ev.currentTarget.classList.remove("drag-over");
       const taskId = ev.dataTransfer.getData("text/plain");
-      await mutateBoard(md => {
-        // Usa o estado mais recente do arquivo, não o cache da tela.
-        const fresh = scanBoard(md).tasks.find(t => t.id === taskId);
-        if (!fresh || fresh.column === targetColId) return md;
-        return saveTaskInBoard(md, { ...fresh, column: targetColId });
+      await mutateBoard(board => {
+        const idx = board.tasks.findIndex(t => t.id === taskId);
+        if (idx === -1 || board.tasks[idx].column === targetColId) return false;
+        board.tasks[idx].column = targetColId;
+        return true;
       });
     }
 
-    function openTaskModal(id) {
-      selectedTaskId = id;
-      const t = tasks.find(x => x.id === id);
-      if (!t) return;
-
-      document.getElementById("m-task-id").innerText = t.id;
-      document.getElementById("m-title-display").innerText = t.title;
-      document.getElementById("m-task-col").value = t.column;
-      document.getElementById("m-task-agent").value = t.agent;
-      document.getElementById("m-task-skills").value = t.skills;
-      document.getElementById("m-task-title").value = t.title;
-      document.getElementById("m-task-desc").value = t.desc;
-      document.getElementById("m-task-feedback").value = "";
-
-      document.getElementById("task-modal").classList.add("open");
-    }
-
-    function closeModal() {
-      document.getElementById("task-modal").classList.remove("open");
-      selectedTaskId = null;
-    }
-
-    // Lê o arquivo atual, aplica UMA mutação cirúrgica e grava.
-    // Isso garante que tarefas não envolvidas na ação não mudem de coluna.
+    // CONCORRÊNCIA OTIMISTA + VALIDAÇÃO DE SCHEMA
     async function mutateBoard(mutator) {
       if (!dirHandle) {
         alert("Conecte a pasta do projeto antes de alterar o quadro.");
@@ -500,76 +506,175 @@
       }
       try {
         const specs = await dirHandle.getDirectoryHandle("_specs");
-        const fileHandle = await specs.getFileHandle("task-board.md", { create: true });
-        const file = await fileHandle.getFile();
-        const current = await file.text();
-        const next = mutator(current);
+        const fileHandle = await specs.getFileHandle("board.json");
+        const diskFile = await fileHandle.getFile();
+        const diskText = await diskFile.text();
+        const diskData = JSON.parse(diskText);
 
-        if (next !== current) {
-          const writable = await fileHandle.createWritable();
-          await writable.write(next);
-          await writable.close();
+        const schemaErr = validateBoardSchema(diskData);
+        if (schemaErr) {
+          showBanner("error", `❌ Gravação abortada: schema inválido no disco (${escapeHtml(schemaErr)}).`);
+          return;
         }
-        await loadFromTaskBoard();
+
+        if (loadedLastModified !== null &&
+            (diskData.lastModified !== loadedLastModified || diskFile.lastModified !== loadedFileMtime)) {
+          showBanner("warn", "⚠️ Conflito externo detectado: <strong>_specs/board.json</strong> foi alterado por outro processo. O quadro foi recarregado sem sobrescrever.");
+          boardState = normalizeBoard(diskData);
+          loadedLastModified = boardState.lastModified;
+          loadedFileMtime = diskFile.lastModified;
+          renderKanban();
+          return;
+        }
+
+        const nextBoard = normalizeBoard(diskData);
+        const changed = mutator(nextBoard);
+        if (!changed) return;
+
+        nextBoard.lastModified = new Date().toISOString();
+        const nextErr = validateBoardSchema(nextBoard);
+        if (nextErr) {
+          alert("Erro de validação: " + nextErr);
+          return;
+        }
+
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(nextBoard, null, 2) + "\n");
+        await writable.close();
+
+        await loadBoardJson();
       } catch (e) {
-        console.error("Erro ao gravar task-board.md:", e);
-        alert("Não foi possível gravar o task-board.md. Verifique a conexão da pasta.");
+        console.error("Erro ao gravar _specs/board.json:", e);
+        alert("Não foi possível gravar _specs/board.json: " + e.message);
       }
     }
 
-    async function saveTaskModal() {
-      const t = tasks.find(x => x.id === selectedTaskId);
+    function openNewTaskModal() {
+      isCreatingTask = true;
+      selectedTaskId = null;
+      document.getElementById("m-task-id-badge").innerText = "NOVA";
+      document.getElementById("m-title-display").innerText = "Criar Nova Tarefa";
+      document.getElementById("m-task-id").value = `TASK-${String(boardState.tasks.length + 1).padStart(2, "0")}`;
+      document.getElementById("m-task-id").disabled = false;
+      document.getElementById("m-task-col").value = "backlog";
+      document.getElementById("m-task-agent").value = "hydrogen";
+      document.getElementById("m-task-difficulty").value = "Média";
+      document.getElementById("m-task-skills").value = "";
+      document.getElementById("m-task-title").value = "";
+      document.getElementById("m-task-desc").value = "";
+      document.getElementById("m-task-feedback").value = "";
+      document.getElementById("btn-delete-task").style.display = "none";
+      document.getElementById("btn-reject-task").style.display = "none";
+      document.getElementById("btn-approve-task").style.display = "none";
+      document.getElementById("task-modal").classList.add("open");
+    }
+
+    function openTaskModal(id) {
+      const t = boardState.tasks.find(x => x.id === id);
       if (!t) return;
+      isCreatingTask = false;
+      selectedTaskId = id;
 
-      const updated = {
-        ...t,
+      document.getElementById("m-task-id-badge").innerText = t.id;
+      document.getElementById("m-title-display").innerText = t.title;
+      document.getElementById("m-task-id").value = t.id;
+      document.getElementById("m-task-id").disabled = true;
+      document.getElementById("m-task-col").value = t.column;
+      document.getElementById("m-task-agent").value = t.agent;
+      document.getElementById("m-task-difficulty").value = t.difficulty;
+      document.getElementById("m-task-skills").value = t.skills.join(", ");
+      document.getElementById("m-task-title").value = t.title;
+      document.getElementById("m-task-desc").value = t.desc;
+      document.getElementById("m-task-feedback").value = t.feedback || "";
+      document.getElementById("btn-delete-task").style.display = "inline-block";
+      document.getElementById("btn-reject-task").style.display = "inline-block";
+      document.getElementById("btn-approve-task").style.display = "inline-block";
+      document.getElementById("task-modal").classList.add("open");
+    }
+
+    function closeModal() {
+      document.getElementById("task-modal").classList.remove("open");
+      selectedTaskId = null;
+      isCreatingTask = false;
+    }
+
+    async function saveTaskModal() {
+      const id = document.getElementById("m-task-id").value.trim();
+      const title = document.getElementById("m-task-title").value.trim();
+      if (!id || !title) return alert("Informe ID e título da tarefa.");
+
+      const payload = {
+        id,
+        title,
         column: document.getElementById("m-task-col").value,
-        agent: document.getElementById("m-task-agent").value.trim(),
-        skills: document.getElementById("m-task-skills").value.trim(),
-        title: document.getElementById("m-task-title").value.trim(),
-        desc: document.getElementById("m-task-desc").value.trim()
+        agent: document.getElementById("m-task-agent").value.trim() || "hydrogen",
+        difficulty: document.getElementById("m-task-difficulty").value.trim() || "Média",
+        skills: normalizeSkills(document.getElementById("m-task-skills").value),
+        desc: document.getElementById("m-task-desc").value.trim(),
+        feedback: document.getElementById("m-task-feedback").value.trim()
       };
-      if (!updated.title) return alert("Informe o título da tarefa.");
 
+      const creating = isCreatingTask;
+      const targetId = selectedTaskId;
       closeModal();
-      await mutateBoard(md => saveTaskInBoard(md, updated));
+
+      await mutateBoard(board => {
+        if (creating) {
+          if (board.tasks.some(t => t.id === payload.id)) {
+            alert(`Já existe uma tarefa com ID ${payload.id}.`);
+            return false;
+          }
+          board.tasks.push(payload);
+          return true;
+        }
+        const idx = board.tasks.findIndex(t => t.id === targetId);
+        if (idx === -1) return false;
+        board.tasks[idx] = payload;
+        return true;
+      });
     }
 
     async function approveTaskAction() {
-      const t = tasks.find(x => x.id === selectedTaskId);
-      if (!t) return;
-      const updated = {
-        ...t,
-        column: "done",
-        desc: (t.desc ? t.desc + "\n" : "") + "✔ Aprovado pelo Engenheiro no Gate Humano."
-      };
+      const targetId = selectedTaskId;
+      if (!targetId) return;
       closeModal();
-      await mutateBoard(md => saveTaskInBoard(md, updated));
+      await mutateBoard(board => {
+        const idx = board.tasks.findIndex(t => t.id === targetId);
+        if (idx === -1) return false;
+        board.tasks[idx].column = "done";
+        board.tasks[idx].feedback = "";
+        return true;
+      });
     }
 
     async function rejectTaskAction() {
       const fb = document.getElementById("m-task-feedback").value.trim();
-      if (!fb) return alert("Informe o motivo da reprovação para orientar a IA no ajuste.");
-      const t = tasks.find(x => x.id === selectedTaskId);
-      if (!t) return;
-      const updated = {
-        ...t,
-        column: "red",
-        desc: (t.desc ? t.desc + "\n" : "") + `⚠️ Reprovado no Gate: ${fb}`
-      };
+      if (!fb) return alert("Informe o motivo da reprovação para orientar a IA.");
+      const targetId = selectedTaskId;
+      if (!targetId) return;
       closeModal();
-      await mutateBoard(md => saveTaskInBoard(md, updated));
+      await mutateBoard(board => {
+        const idx = board.tasks.findIndex(t => t.id === targetId);
+        if (idx === -1) return false;
+        board.tasks[idx].column = "red";
+        board.tasks[idx].feedback = fb;
+        return true;
+      });
     }
 
     async function deleteCurrentTask() {
-      const id = selectedTaskId;
-      if (!id) return;
-      if (!confirm(`Deseja realmente remover a tarefa ${id} do quadro?\n\nAs demais tarefas permanecerão exatamente nas colunas atuais.`)) return;
+      const targetId = selectedTaskId;
+      if (!targetId) return;
+      if (!confirm(`Deseja remover a tarefa ${targetId} do quadro?`)) return;
       closeModal();
-      await mutateBoard(md => removeTaskFromBoard(md, id));
+      await mutateBoard(board => {
+        const len = board.tasks.length;
+        board.tasks = board.tasks.filter(t => t.id !== targetId);
+        return board.tasks.length !== len;
+      });
     }
 
-    function manualReload() { loadFromTaskBoard(); }
+    function manualReload() { loadWorkspaceData(); }
   </script>
 </body>
 </html>

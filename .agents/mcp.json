@@ -6,44 +6,6 @@
         "mcp-server"
       ],
       "description": "Inspeção da árvore de widgets em runtime, resolução de símbolos, pubspec e execução assistida de testes Flutter."
-    },
-    "supabase_mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest"
-      ],
-      "description": "Inspeção de schema Postgres, criação de migrations, políticas RLS, Edge Functions e geração de tipos."
-    },
-    "google_stitch": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@google/stitch-mcp-server"
-      ],
-      "env": {
-        "STITCH_REFERENCES_DIR": "./_references/screens",
-        "STITCH_OUTPUT_DIR": "./_specs"
-      },
-      "description": "Extração de Design Tokens, hierarquia de componentes e fidelidade visual a partir de telas em _references/screens/."
-    },
-    "graft_ast": {
-      "command": "graft",
-      "args": [
-        "mcp",
-        "--watch"
-      ],
-      "description": "Navegação cirúrgica em árvore sintática (AST) para localizar chamadas e impactos sem estourar janela de contexto."
-    },
-    "ai_memory": {
-      "command": "ai-memory",
-      "args": [
-        "mcp"
-      ],
-      "env": {
-        "AI_MEMORY_DB_PATH": "./.agents/memory/context.db"
-      },
-      "description": "Memória episódica de decisões arquiteturais e passagem de tickets atômicos entre subagentes."
     }
   }
 }

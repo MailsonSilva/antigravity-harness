@@ -8,11 +8,13 @@
 
 ## 1. Papel do Orquestrador Argon
 - Ler `_specs/SPEC.md` e extrair a lista de tarefas atômicas independentes (`TASK-01`, `TASK-02`, etc.).
+- Sincronizar as tarefas extraídas em `_specs/board.json` (`schemaVersion: 1`, `lastModified` ISO-8601, `column: "backlog"`).
 - Organizar as tarefas em ondas de execução baseadas em dependências:
   - **Onda 1 (Base)**: Contratos, Entidades de Domínio, Migrations de Banco ou Schemas de Dados.
   - **Onda 2 (Implementação Paralela)**: Repositórios, Data Sources e Componentes de UI desacoplados.
   - **Onda 3 (Integração & Estado)**: Controllers/Notifiers, montagem de telas e injeção de dependências.
   - **Onda 4 (Qualidade)**: Bateria de testes automatizados e suíte de regressão.
+- Ao iniciar uma onda, mover as tarefas em execução em `_specs/board.json` para `red`/`green` conforme o estágio e atualizar `lastModified`.
 
 ---
 
@@ -53,7 +55,7 @@ Após a conclusão dos subagentes de uma onda:
 
 ## 4. Conclusão da Entrega
 Quando todas as tarefas estiverem verdes e verificadas:
-1. Atualizar o checklist da `_specs/SPEC.md`.
+1. Atualizar o checklist da `_specs/SPEC.md` e mover as tarefas concluídas em `_specs/board.json` para `done` (atualizando `lastModified`).
 2. Apresentar ao usuário o relatório final:
    - Arquivos alterados.
    - Evidência dos comandos de teste e lint (código de saída 0).
