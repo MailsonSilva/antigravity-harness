@@ -280,7 +280,8 @@ try {
                 $ResolvedAppDir = "."
             }
         }
-        $UnifiedGeminiMd += "`n---`n`n## Workspace Flutter Detectado`n- Diretório do pacote Dart/Flutter: ``$ResolvedAppDir`` (execute ``flutter test`` e ``dart analyze`` a partir deste caminho).`n"
+        $bt = [char]96
+        $UnifiedGeminiMd += "`n---`n`n## Workspace Flutter Detectado`n- Diretório do pacote Dart/Flutter: $bt$ResolvedAppDir$bt (execute ${bt}flutter test${bt} e ${bt}dart analyze${bt} a partir deste caminho).`n"
     }
 
     $TargetGeminiFile = Join-Path $TargetDir "GEMINI.md"

@@ -52,4 +52,4 @@ Consulte esta tabela para delegar; ative no máximo 2 skills por turno, prioriza
 
 ## Protocolo de Decisão
 - Nunca ative mais de duas skills simultaneamente no mesmo turno.
-- Garanta que as regras contidas em `.agents/rules/global.md` e `.agents/rules/mobile.md` sejam o teto máximo de conformidade.
+- Garanta que as regras contidas em `GEMINI.md` na raiz do projeto sejam o teto máximo de conformidade.
