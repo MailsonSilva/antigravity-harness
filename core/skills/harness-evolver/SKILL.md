@@ -1,4 +1,4 @@
-﻿---
+---
 name: harness-evolver
 description: Ciclo recursivo Propose-Probe-Compose do Google Research Harness² para atualizar automaticamente as skills e regras após resolução de bugs complexos.
 category: Meta-Otimização
