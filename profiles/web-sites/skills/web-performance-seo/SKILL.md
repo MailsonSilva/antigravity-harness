@@ -5,7 +5,7 @@ description: Otimização de Core Web Vitals, renderização no servidor e SEO t
 
 # Skill: Performance Web e SEO Técnico
 
-Esta skill orienta a construção e a revisão de aplicações web em `apps/web/` e `apps/landing/`, sempre subordinada às regras de `.agents/rules/web.md` e `.agents/rules/global.md`.
+Esta skill orienta a construção e a revisão de aplicações web em `apps/web/` e `apps/landing/`, sempre subordinada às regras de `GEMINI.md`.
 
 ## 1. Gatilho de Ativação
 Acione quando:

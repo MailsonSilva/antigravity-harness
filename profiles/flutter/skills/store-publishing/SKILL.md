@@ -19,4 +19,4 @@ description: Publicação na Play Store e App Store (tracks, TestFlight, review,
 - Gerar a partir de frames reais do app (golden tests ou device frames), nos tamanhos exigidos por cada loja; nunca mock desatualizado da UI.
 
 ## 4. Rejeições
-- Registrar motivo + correção como aprendizado no `ai-memory`; re-submeter só após reproduzir a correção em build interno.
+- Registrar motivo + correção como aprendizado em `.agents/PROJECT_BRAIN.md`; re-submeter só após reproduzir a correção em build interno.

@@ -6,7 +6,7 @@ description: Arquitetura Flutter em camadas (UI, Lógica, Dados) com workflow de
 # Skill: Arquitetura Flutter em Camadas
 
 > Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).
-> Compatibilizado com este harness: pastas `core/` + `features/` (ver `.agents/rules/mobile.md`),
+> Compatibilizado com este harness: pastas `core/` + `features/` (ver `GEMINI.md`),
 > estado via Riverpod (`flutter-state-riverpod`) e TDD obrigatório (`clean-architecture`).
 
 ## 1. Camadas (Separation of Concerns)
