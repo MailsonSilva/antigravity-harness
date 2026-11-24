@@ -5,51 +5,50 @@ description: Meta-orquestrador cognitivo para triagem de tarefas e ativação pr
 
 # Antigravity Skill Orchestrator
 
-Você atua como o avaliador prévio de execução no harness. Seu papel é impedir o desperdício de tokens e garantir que apenas o contexto necessário seja carregado.
+Você atua como o avaliador prévio de execução no harness. Seu papel é impedir o desperdício de tokens, selecionar as skills certas e delegar para subagentes nativos (`invoke_subagent`) com briefing focado.
 
 ## Regras de Triagem
 
 1. **Alterações Elementares (Low Complexity):**
    - Correções simples de sintaxe, ajustes pontuais de tema/widgets, renomeação de variáveis ou adição de tipagens triviais.
-   - **Ação:** NÃO ative skills adicionais. Execute a alteração diretamente usando ferramentas nativas de edição de arquivos (`edit_file`).
+   - **Ação:** NÃO ative skills adicionais nem dispare subagentes. Execute diretamente com `edit_file`.
 
 2. **Planejamento de Funcionalidade ou Refatoração Estrutural:**
    - Criação de novas features, telas, fluxos de navegação ou integração de fontes de dados.
-   - **Ação:** Invoque a skill `spec-discovery` e/ou `clean-architecture`.
+   - **Ação:** Ative `spec-discovery` e/ou `clean-architecture` (ou delegue com `invoke_subagent`).
 
 3. **Performance Mobile (Flutter):**
    - Rebuilds excessivos, jank em listas/animações, tamanho do app elevado ou descarte de quadros.
-   - **Ação:** Ative exclusivamente a skill `clean-architecture` (isolamento e refatoração) com apoio de `mobile-ux` (skeletons e estados).
+   - **Ação:** Ative `clean-architecture` com apoio de `mobile-ux`.
 
 4. **Validação e Entrega:**
-   - Criação de testes unitários/integração ou preparação para merge.
-   - **Ação:** Ative a skill `code-quality-tests`.
+   - Criação de testes unitários/integração, lint, cobertura ou preparação para release.
+   - **Ação:** Ative `code-quality-tests` (e/ou `dart-collect-coverage`, `flutter-release`).
 
-## Tabela de Roteamento (tarefa → agente + skills)
+## Tabela de Roteamento (tarefa → subagente Antigravity + skills)
 
-Consulte esta tabela para delegar; ative no máximo 2 skills por turno, priorizando a primeira listada.
+Ao delegar via `invoke_subagent`, use **sempre** um `TypeName` nativo (`"self"` para edição/execução, `"research"` para leitura/descoberta) com o `Role` abaixo, e instrua o subagente no `Prompt` a ler `.agents/skills/<skill>/SKILL.md` (no máximo 2 skills por delegação).
 
-| Tarefa | Agente | Skills (ordem de prioridade) |
-|---|---|---|
-| Descobrir escopo, PRD, regras de negócio | `product_architect` | `spec-discovery` |
-| Protótipo visual, tokens, Stitch | `ui_ux_designer` | `mobile-ux` |
-| Breakpoints e telas grandes (design) | `ui_ux_designer` | `flutter-build-responsive-layout`, `mobile-ux` |
-| Inventário de strings / idiomas (design) | `ui_ux_designer` | `flutter-setup-localization`, `mobile-ux` |
-| Estruturar feature (camadas, pastas) | `mobile_builder` | `flutter-apply-architecture-best-practices`, `clean-architecture` |
-| Estado com Riverpod / 4 estados | `mobile_builder` | `flutter-state-riverpod`, `mobile-ux` |
-| Navegação, rotas, deep links | `mobile_builder` | `flutter-setup-declarative-routing` |
-| Textos/i18n no código | `mobile_builder` | `flutter-setup-localization` |
-| Layout adaptativo no código | `mobile_builder` | `flutter-build-responsive-layout` |
-| REST/HTTP em services | `mobile_builder` | `flutter-use-http-package`, `local-first-data` |
-| Supabase (auth, RLS, storage) | `mobile_builder` | `supabase-flutter`, `local-first-data` |
-| Banco local, sync offline | `mobile_builder` | `local-first-data`, `supabase-flutter` |
-| Refatorar if-else/JSON/sealed | `mobile_builder` ou `qa_validator` | `dart-use-pattern-matching`, `clean-architecture` |
-| Testes RED (unit/widget) | `tdd_tester` | `clean-architecture`, `flutter-add-widget-test` |
-| Teste E2E em device | `tdd_tester` | `flutter-add-integration-test`, `code-quality-tests` |
-| QA, lint, autorreparo | `qa_validator` | `code-quality-tests`, `dart-use-pattern-matching` |
-| Cobertura e gate de CI | `qa_validator` | `dart-collect-coverage`, `code-quality-tests` |
-| Commit semântico | `git_committer` | (nenhuma — usa `ai-memory` + diff) |
+| Tarefa | `TypeName` | `Role` Sugerido | Skills (ordem de prioridade) |
+|---|---|---|---|
+| Descobrir escopo, PRD, regras de negócio | `research` | `Product Discovery Analyst` | `spec-discovery` |
+| Protótipo visual, tokens, UX mobile | `self` | `Flutter UI/UX Designer` | `mobile-ux` |
+| Breakpoints e telas grandes | `self` | `Flutter Responsive Builder` | `flutter-build-responsive-layout`, `mobile-ux` |
+| Inventário de strings / i18n | `self` | `Flutter Localization Engineer` | `flutter-setup-localization` |
+| Estruturar feature (camadas, pastas) | `self` | `Flutter Clean Arch Builder` | `flutter-apply-architecture-best-practices`, `clean-architecture` |
+| Estado com Riverpod / 4 estados | `self` | `Flutter Riverpod Engineer` | `flutter-state-riverpod`, `mobile-ux` |
+| Navegação, rotas, deep links | `self` | `Flutter Routing Engineer` | `flutter-setup-declarative-routing` |
+| REST/HTTP em services | `self` | `Flutter Network Engineer` | `flutter-use-http-package`, `local-first-data` |
+| Supabase (auth, RLS, storage) | `self` | `Supabase Flutter Engineer` | `supabase-flutter`, `local-first-data` |
+| Banco local, sync offline | `self` | `Offline-First Data Engineer` | `local-first-data`, `supabase-flutter` |
+| Refatorar if-else/JSON/sealed | `self` | `Dart Pattern Matching Engineer` | `dart-use-pattern-matching`, `clean-architecture` |
+| Testes RED (unit/widget) | `self` | `Flutter TDD Tester` | `clean-architecture`, `flutter-add-widget-test` |
+| Teste E2E em device | `self` | `Flutter Integration Tester` | `flutter-add-integration-test`, `code-quality-tests` |
+| QA, lint, cobertura, autorreparo | `self` | `Flutter QA & Coverage Validator` | `code-quality-tests`, `dart-collect-coverage` |
+| Release, CI/CD e publicação | `self` | `Flutter Release Engineer` | `flutter-release`, `mobile-cicd`, `store-publishing` |
+| Commit semântico | `self` | `Git Release Committer` | (nenhuma — usa `git diff` e pt-BR) |
 
 ## Protocolo de Decisão
-- Nunca ative mais de duas skills simultaneamente no mesmo turno.
+- Nunca carregue mais de duas skills simultaneamente no mesmo turno ou subagente.
+- No `Prompt` de todo `invoke_subagent`, inclua explicitamente: *"Leia `.agents/skills/<skill>/SKILL.md` antes de executar."*
 - Garanta que as regras contidas em `GEMINI.md` na raiz do projeto sejam o teto máximo de conformidade.

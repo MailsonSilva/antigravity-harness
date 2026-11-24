@@ -33,13 +33,15 @@ Protocolo universal obrigatório para o modelo coordenador e todos os subagentes
 ---
 
 ## 3. Protocolo de Delegação Paralela (Hydrogen Workers)
-1. **Atomicidade**: Cada subagente recebe apenas uma fatia vertical independente (sem dependência circular).
-2. **Briefing Completo**: O prompt do subagente deve conter:
+1. **Triagem Cognitiva (`antigravity-skill-orchestrator`)**: Antes de delegar tarefas médias/complexas, consulte `.agents/skills/antigravity-skill-orchestrator/SKILL.md` para selecionar o `TypeName` nativo (`self` ou `research`), o `Role` e até 2 skills aplicáveis.
+2. **Atomicidade**: Cada subagente recebe apenas uma fatia vertical independente (sem dependência circular).
+3. **Briefing Completo**: O prompt do subagente deve conter:
+   - Instrução explícita para ler `.agents/skills/<skill>/SKILL.md` das skills designadas (quando aplicável).
    - Caminho exato dos arquivos a criar/modificar.
    - Contrato de interface e tipos esperados.
    - Critério de aceitação e comando de validação local.
-3. **Isolamento**: Usar preferencialmente modo branch/share para evitar concorrência de escrita nos mesmos arquivos.
-4. **Handoff**: O worker reporta apenas arquivos tocados, testes executados e status de compilação.
+4. **Isolamento**: Usar preferencialmente modo `branch`/`share` para evitar concorrência de escrita nos mesmos arquivos.
+5. **Handoff**: O worker reporta apenas arquivos tocados, testes executados e status de compilação.
 
 ---
 
