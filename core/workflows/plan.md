@@ -19,17 +19,17 @@ Mapear integralmente os requisitos de negócio, contratos de dados, dependência
 - Identificar dependências de persistência (ex: SQLite local, Supabase, API REST).
 
 ### Passo 2: Entrevista e Alinhamento Técnico (Cirúrgico)
-- Se houver lacunas ou regras de negócio implícitas, formular no máximo 3 perguntas diretas.
+- Formular no máximo **3 a 5 perguntas diretas** sobre lacunas reais (transições de estado, falhas offline/rede, contratos de erro e limites de escopo).
 - Propor escolhas padrão para UX, modelos de erro e offline-first caso o usuário não especifique.
 
-### Passo 3: Geração da `_specs/SPEC.md`
-Escrever a especificação seguindo rigorosamente a estrutura abaixo:
+### Passo 3: Geração da `_specs/SPEC.md` (Micro-Spec)
+Escrever uma **Micro-Spec** enxuta (uma fatia vertical por vez, legível em ~2 minutos) seguindo rigorosamente a estrutura abaixo:
 
 ```markdown
 # SPEC: [Nome da Funcionalidade]
 
 ## 1. Visão Geral e Contexto de Negócio
-- Descrição concisa do objetivo.
+- Descrição concisa do objetivo (fatia vertical única).
 - Perfis de usuário impactados.
 
 ## 2. Contratos de Dados & Entidades
@@ -39,19 +39,22 @@ Escrever a especificação seguindo rigorosamente a estrutura abaixo:
 ## 3. Arquitetura e Camadas
 - **Domain**: Entidades e interfaces de repositórios.
 - **Data**: Implementações de data sources e mappers.
-- **Presentation / UI**: Componentes, telas e gerenciamento de estado.
+- **Presentation / UI**: Componentes, telas, gerenciamento de estado e 4 estados (`Loading`, `Empty`, `Error`, `Success`).
 
-## 4. Matriz de Tarefas Atômicas (Para o Orquestrador Argon)
-- [ ] `TASK-01`: [Camada/Componente] - Descrição e arquivos envolvidos.
-- [ ] `TASK-02`: [Camada/Componente] - Descrição e arquivos envolvidos.
-- [ ] `TASK-03`: [Testes] - Testes unitários/widget para a feature.
+## 4. Guardrails Negativos (Fora de Escopo / Não Tocar)
+- Arquivos, módulos e contratos existentes que NÃO devem ser alterados pelos subagentes.
 
-## 5. Critérios de Aceitação (Gherkin / Checklist)
-- Cenários principais de sucesso.
-- Cenários de borda (offline, erro de rede, dados vazios).
+## 5. Matriz de Tarefas Atômicas (TDD First → Para o Orquestrador Argon)
+- [ ] `TASK-01`: [Base/Contratos] - Entidades, interfaces e schemas.
+- [ ] `TASK-02`: [Fase RED] - Testes unitários/widget mapeados 1:1 dos critérios da Seção 6.
+- [ ] `TASK-03`: [Fase GREEN] - Implementação mínima (Data/Presentation) para passar nos testes da `TASK-02`.
 
-## 6. Comandos do Gate de Verificação
-- Comando de lint: `[flutter analyze | npm run lint]`
+## 6. Critérios de Aceitação (Dado / Quando / Então → Teste RED 1:1)
+- Cenários principais de sucesso → `[arquivo_test.dart :: caso]`
+- Cenários de borda (offline, erro de rede, dados vazios) → `[arquivo_test.dart :: caso]`
+
+## 7. Comandos do Gate de Verificação
+- Comando de lint: `[dart analyze | npm run lint]`
 - Comando de testes: `[flutter test <arquivo> | npm test]`
 - Comando de compilação: `[flutter build ... | npm run build]`
 ```

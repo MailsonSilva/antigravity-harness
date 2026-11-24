@@ -113,6 +113,11 @@ function Get-McpCatalog {
             }
             description = "Extração de Design Tokens e fidelidade visual a partir de telas em _references/screens/."
         }
+        patrol_mcp = @{
+            command     = "dart"
+            args        = @("run", "patrol_mcp")
+            description = "Testes E2E em dispositivos/emuladores com interação nativa via Patrol MCP."
+        }
         graft_ast = @{
             command     = "graft"
             args        = @("mcp", "--watch")

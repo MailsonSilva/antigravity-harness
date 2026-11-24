@@ -9,5 +9,6 @@ mcps:
   optional:
     - supabase_mcp
     - google_stitch
+    - patrol_mcp
     - graft_ast
     - ai_memory

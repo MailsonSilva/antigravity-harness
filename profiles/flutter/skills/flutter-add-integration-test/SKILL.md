@@ -49,3 +49,8 @@ void main() {
   });
 }
 ```
+
+## 6. E2E Avançado e Interação Nativa com Patrol (`patrol` / `patrol_mcp`)
+- **Quando usar Patrol em vez de `integration_test` puro:** fluxos que exigem interação com UI nativa do sistema operacional (permissões de câmera/localização, notificações push, diálogos nativos ou WebViews externas).
+- **Seletores resilientes a i18n:** sempre priorize `ValueKey` nos widgets (`$(#minha_key)`) para evitar falhas quando textos mudarem por localização.
+- **Ciclo rápido com `patrol_mcp`:** quando `patrol_mcp` estiver habilitado (`-WithOptionalMcps`), reutilize sessões ativas com `hot-restart` entre cenários para evitar *cold boot* repetido em emuladores e capturar evidências visuais antes de concluir a tarefa.

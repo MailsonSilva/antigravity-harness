@@ -224,6 +224,8 @@ mcp_entry() {
             printf '    "supabase_mcp": {\n      "command": "npx",\n      "args": ["-y", "@supabase/mcp-server-supabase@latest"],\n      "description": "Inspeção de schema Postgres, migrations, RLS e Edge Functions."\n    }' ;;
         google_stitch)
             printf '    "google_stitch": {\n      "command": "npx",\n      "args": ["-y", "@google/stitch-mcp-server"],\n      "env": {"STITCH_REFERENCES_DIR": "./_references/screens", "STITCH_OUTPUT_DIR": "./_specs"},\n      "description": "Extração de Design Tokens a partir de telas em _references/screens/."\n    }' ;;
+        patrol_mcp)
+            printf '    "patrol_mcp": {\n      "command": "dart",\n      "args": ["run", "patrol_mcp"],\n      "description": "Testes E2E em dispositivos/emuladores com interação nativa via Patrol MCP."\n    }' ;;
         graft_ast)
             printf '    "graft_ast": {\n      "command": "graft",\n      "args": ["mcp", "--watch"],\n      "description": "Navegação em árvore sintática (AST) para localizar chamadas e impactos."\n    }' ;;
         ai_memory)

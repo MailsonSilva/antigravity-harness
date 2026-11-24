@@ -7,14 +7,14 @@
 ---
 
 ## 1. Papel do Orquestrador Argon
-- Ler `_specs/SPEC.md` e extrair a lista de tarefas atômicas independentes (`TASK-01`, `TASK-02`, etc.).
+- Ler `_specs/SPEC.md` e extrair as tarefas atômicas (`TASK-01`, `TASK-02`, etc.) e os **Guardrails Negativos (Não Tocar)**.
 - Sincronizar as tarefas extraídas em `_specs/board.json` (`schemaVersion: 1`, `lastModified` ISO-8601, `column: "backlog"`).
-- Organizar as tarefas em ondas de execução baseadas em dependências:
-  - **Onda 1 (Base)**: Contratos, Entidades de Domínio, Migrations de Banco ou Schemas de Dados.
-  - **Onda 2 (Implementação Paralela)**: Repositórios, Data Sources e Componentes de UI desacoplados.
-  - **Onda 3 (Integração & Estado)**: Controllers/Notifiers, montagem de telas e injeção de dependências.
-  - **Onda 4 (Qualidade)**: Bateria de testes automatizados e suíte de regressão.
-- Ao iniciar uma onda, mover as tarefas em execução em `_specs/board.json` para `red`/`green` conforme o estágio e atualizar `lastModified`.
+- Organizar as tarefas em ondas TDD reais baseadas em dependências:
+  - **Onda 1 (Base & Contratos)**: Entidades de Domínio, Interfaces de Repositório, Migrations ou Schemas de Dados.
+  - **Onda 2 (Fase RED — TDD First)**: Subagentes criam os testes unitários/widget mapeados 1:1 dos critérios da `SPEC.md` e confirmam a falha inicial (mover tarefas para `"red"` em `_specs/board.json`).
+  - **Onda 3 (Fase GREEN — Implementação Paralela)**: Subagentes implementam Repositórios, Data Sources, Controllers/Notifiers e UI mínima para passar nos testes da Onda 2 (mover tarefas para `"green"` em `_specs/board.json`).
+  - **Onda 4 (Refactor & Gate de Verificação)**: Refatoração limpa, análise estática (`dart analyze` / `npm run lint`), suíte completa de testes e transição para `"review"` / `"done"`.
+- Ao iniciar cada onda, atualizar a coluna correspondente em `_specs/board.json` e o campo `lastModified`.
 
 ---
 
@@ -22,7 +22,7 @@
 
 ### Configuração do Despacho
 Para cada tarefa elegível da onda atual:
-1. Invoque um subagente via `invoke_subagent` com `TypeName: "self"` ou role especializado, com `Workspace: "branch"` ou `"inherit"` (se arquivos forem estritamente disjuntos).
+1. Invoque um subagente via `invoke_subagent` com `TypeName: "self"` (ou `"research"` para exploração), com `Workspace: "branch"` ou `"inherit"` (se arquivos forem estritamente disjuntos).
 2. Forneça um briefing focado:
    ```markdown
    Você é um executor Hydrogen para a tarefa: [TASK-ID: Nome].
@@ -30,7 +30,11 @@ Para cada tarefa elegível da onda atual:
    - [caminho/do/arquivo_1]
    - [caminho/do/arquivo_2]
 
+   Guardrails Negativos (Não Tocar):
+   - [arquivos/módulos fora de escopo extraídos da SPEC.md]
+
    Instruções:
+   - Leia `.agents/skills/<skill>/SKILL.md` antes de executar (se aplicável).
    - Implemente estritamente o escopo solicitado sem alterar arquivos fora do alvo.
    - Siga as regras em GEMINI.md.
    - Execute o teste unitário local correspondente antes de reportar.
