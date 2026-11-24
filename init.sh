@@ -3,7 +3,7 @@
 # Antigravity Harness Setup & Update (Linux / macOS / WSL)
 # Configura ou atualiza o ambiente Antigravity (v4 Modular) no projeto-alvo.
 # Uso:
-#   ./init.sh flutter [caminho_destino] [--with-optional-mcps] [--app-dir apps/mobile]
+#   ./init.sh flutter [caminho_destino] [--with-optional-mcps] [--init-app] [--app-dir apps/mobile]
 #   ./init.sh web     [caminho_destino] [--repo owner/repo] [--branch main]
 # ==============================================================================
 
@@ -14,6 +14,9 @@ TARGET_DIR="$(pwd)"
 REPO="MailsonSilva/antigravity-harness"
 BRANCH="main"
 APP_DIR=""
+ORG="com.example"
+PROJECT_NAME=""
+INIT_APP="false"
 WITH_OPTIONAL_MCPS="false"
 
 while [ $# -gt 0 ]; do
@@ -21,6 +24,18 @@ while [ $# -gt 0 ]; do
         --with-optional-mcps)
             WITH_OPTIONAL_MCPS="true"
             shift
+            ;;
+        --init-app)
+            INIT_APP="true"
+            shift
+            ;;
+        --org)
+            ORG="${2:-com.example}"
+            shift 2
+            ;;
+        --project-name)
+            PROJECT_NAME="${2:-}"
+            shift 2
             ;;
         --repo)
             REPO="${2:-}"
@@ -35,7 +50,7 @@ while [ $# -gt 0 ]; do
             shift 2
             ;;
         -h|--help)
-            echo "Uso: ./init.sh <perfil> [caminho_destino] [--with-optional-mcps] [--app-dir dir] [--repo owner/repo] [--branch main]"
+            echo "Uso: ./init.sh <perfil> [caminho_destino] [--with-optional-mcps] [--init-app] [--org com.example] [--project-name app] [--app-dir dir] [--repo owner/repo] [--branch main]"
             exit 0
             ;;
         *)
@@ -208,6 +223,42 @@ if [ -f "$CORE_DIR/templates/board.json" ] && [ ! -f "$SPECS_DIR/board.json" ]; 
 fi
 if [ -f "$CORE_DIR/templates/PROJECT_BRAIN.md" ] && [ ! -f "$AGENTS_DIR/PROJECT_BRAIN.md" ]; then
     cp "$CORE_DIR/templates/PROJECT_BRAIN.md" "$AGENTS_DIR/PROJECT_BRAIN.md"
+fi
+if [ -f "$CORE_DIR/templates/HARNESS_FEEDBACK.md" ] && [ ! -f "$AGENTS_DIR/HARNESS_FEEDBACK.md" ]; then
+    cp "$CORE_DIR/templates/HARNESS_FEEDBACK.md" "$AGENTS_DIR/HARNESS_FEEDBACK.md"
+fi
+
+# Scaffolding inicial do app Flutter (--init-app)
+if [ "$INIT_APP" = "true" ] && [ "$PROFILE_NAME" = "flutter" ]; then
+    TARGET_APP_PATH="$TARGET_DIR"
+    [ -n "$APP_DIR" ] && TARGET_APP_PATH="$TARGET_DIR/$APP_DIR"
+    mkdir -p "$TARGET_APP_PATH"
+
+    if [ ! -f "$TARGET_APP_PATH/pubspec.yaml" ]; then
+        RAW_NAME="${PROJECT_NAME:-$(basename "$TARGET_APP_PATH")}"
+        RESOLVED_PROJECT_NAME="$(printf '%s' "$RAW_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]\+/_/g; s/^_\+//; s/_\+$//')"
+        if [ -z "$RESOLVED_PROJECT_NAME" ] || printf '%s' "$RESOLVED_PROJECT_NAME" | grep -qE '^[0-9]'; then
+            RESOLVED_PROJECT_NAME="flutter_app"
+        fi
+        if command -v flutter >/dev/null 2>&1; then
+            echo "📱 Executando flutter create ($RESOLVED_PROJECT_NAME)..."
+            flutter create --org "$ORG" --project-name "$RESOLVED_PROJECT_NAME" "$TARGET_APP_PATH" || echo "⚠️ flutter create falhou; seguindo com criação de pastas."
+        else
+            echo "⚠️ Comando 'flutter' não encontrado no PATH; criando apenas estrutura de pastas."
+        fi
+    fi
+
+    mkdir -p \
+        "$TARGET_APP_PATH/lib/core/database" \
+        "$TARGET_APP_PATH/lib/core/errors" \
+        "$TARGET_APP_PATH/lib/core/network" \
+        "$TARGET_APP_PATH/lib/core/theme" \
+        "$TARGET_APP_PATH/lib/features" \
+        "$TARGET_APP_PATH/test/core" \
+        "$TARGET_APP_PATH/test/features" \
+        "$TARGET_APP_PATH/integration_test" \
+        "$TARGET_DIR/_references/brand" \
+        "$TARGET_DIR/_references/screens"
 fi
 
 # Gerar .agents/mcp.json com base em mcps.default + mcps.optional (se --with-optional-mcps)

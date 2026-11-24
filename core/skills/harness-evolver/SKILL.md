@@ -10,4 +10,4 @@ category: Meta-Otimização
 Sempre que uma tarefa reprovar no Gate Humano ou exigir mais de 1 tentativa de autorreparo no `Verification Gate` (`dart analyze` / `flutter test`):
 1. **PROPOSE**: Identifique qual lacuna de instrução permitiu que o erro acontecesse (ex: faltou uma regra sobre lock de banco ou conversão de tipo nulo).
 2. **PROBE**: Valide a correção no código e confirme que todos os testes passam.
-3. **COMPOSE**: Adicione uma subseção `## Armadilhas Conhecidas (Learned Guardrails)` no final da `SKILL.md` correspondente ou atualize `.agents/PROJECT_BRAIN.md`, documentando o antipadrão evitado.
+3. **COMPOSE**: Adicione uma subseção `## Armadilhas Conhecidas (Learned Guardrails)` no final da `SKILL.md` correspondente ou atualize `.agents/PROJECT_BRAIN.md`, documentando o antipadrão evitado. Se a melhoria for reutilizável em outros projetos, registre também uma entrada (`Status: pendente`) em `.agents/HARNESS_FEEDBACK.md` com a skill/workflow alvo e a regra sugerida para o `antigravity-harness`.

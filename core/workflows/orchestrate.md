@@ -60,7 +60,8 @@ Após a conclusão dos subagentes de uma onda:
 ## 4. Conclusão da Entrega
 Quando todas as tarefas estiverem verdes e verificadas:
 1. Atualizar o checklist da `_specs/SPEC.md`, mover as tarefas concluídas em `_specs/board.json` para `done` (atualizando `lastModified`) e atualizar o bloco `Último Handoff & Decisões Recentes` em `.agents/PROJECT_BRAIN.md` (substituindo itens obsoletos, sem acumular log infinito).
-2. Apresentar ao usuário o relatório final:
+2. Se houve retrabalho ou lacuna de instrução durante as ondas, registrar uma sugestão (`Status: pendente`) em `.agents/HARNESS_FEEDBACK.md` para futura promoção ao `antigravity-harness`.
+3. Apresentar ao usuário o relatório final:
    - Arquivos alterados.
    - Evidência dos comandos de teste e lint (código de saída 0).
    - Próximos passos recomendados.

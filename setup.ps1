@@ -2,7 +2,7 @@
 # Antigravity Harness Setup & Update (Windows / PowerShell 5.1+)
 # Configura ou atualiza o ambiente Antigravity (v4 Modular) no projeto-alvo.
 # Uso:
-#   .\setup.ps1 -Profile flutter [-TargetDir <caminho>] [-WithOptionalMcps]
+#   .\setup.ps1 -Profile flutter [-TargetDir <caminho>] [-WithOptionalMcps] [-InitApp]
 #   .\setup.ps1 -Profile web     [-TargetDir <caminho>] [-Repo <owner/repo>] [-Branch main]
 # ==============================================================================
 
@@ -21,6 +21,14 @@ param(
 
     [Parameter(Mandatory = $false)]
     [string]$AppDir = "",
+
+    [Parameter(Mandatory = $false)]
+    [string]$Org = "com.example",
+
+    [Parameter(Mandatory = $false)]
+    [string]$ProjectName = "",
+
+    [switch]$InitApp,
 
     [switch]$WithOptionalMcps
 )
@@ -327,6 +335,47 @@ try {
     $TargetBrain = Join-Path $AgentsDir "PROJECT_BRAIN.md"
     if ((Test-Path $BrainTemplate) -and -not (Test-Path $TargetBrain)) {
         Copy-Item -Path $BrainTemplate -Destination $TargetBrain -Force
+    }
+
+    $FeedbackTemplate = Join-Path $CoreDir "templates\HARNESS_FEEDBACK.md"
+    $TargetFeedback = Join-Path $AgentsDir "HARNESS_FEEDBACK.md"
+    if ((Test-Path $FeedbackTemplate) -and -not (Test-Path $TargetFeedback)) {
+        Copy-Item -Path $FeedbackTemplate -Destination $TargetFeedback -Force
+    }
+
+    # 8.1 Scaffolding inicial do app Flutter (-InitApp)
+    if ($InitApp -and $ProfileName -eq "flutter") {
+        $TargetAppPath = if ([string]::IsNullOrWhiteSpace($AppDir)) { $TargetDir } else { Join-Path $TargetDir $AppDir }
+        if (-not (Test-Path $TargetAppPath)) {
+            New-Item -ItemType Directory -Path $TargetAppPath -Force | Out-Null
+        }
+
+        if (-not (Test-Path (Join-Path $TargetAppPath "pubspec.yaml"))) {
+            $RawName = if ([string]::IsNullOrWhiteSpace($ProjectName)) { Split-Path -Leaf $TargetAppPath } else { $ProjectName }
+            $ResolvedProjectName = (($RawName.ToLowerInvariant() -replace '[^a-z0-9]+', '_') -replace '^_+|_+$', '')
+            if ([string]::IsNullOrWhiteSpace($ResolvedProjectName) -or ($ResolvedProjectName -match '^[0-9]')) {
+                $ResolvedProjectName = "flutter_app"
+            }
+
+            if (Get-Command flutter -ErrorAction SilentlyContinue) {
+                Write-Host "📱 Executando flutter create ($ResolvedProjectName)..." -ForegroundColor Green
+                flutter create --org $Org --project-name $ResolvedProjectName $TargetAppPath
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Warning "flutter create retornou código $LASTEXITCODE; prosseguindo com criação das pastas."
+                }
+            } else {
+                Write-Warning "Comando 'flutter' não encontrado no PATH; criando apenas estrutura de pastas."
+            }
+        }
+
+        $FlutterFolders = @(
+            "lib\core\database", "lib\core\errors", "lib\core\network", "lib\core\theme",
+            "lib\features", "test\core", "test\features", "integration_test"
+        )
+        foreach ($folder in $FlutterFolders) {
+            New-Item -ItemType Directory -Path (Join-Path $TargetAppPath $folder) -Force | Out-Null
+        }
+        New-Item -ItemType Directory -Path (Join-Path $TargetDir "_references\brand"), (Join-Path $TargetDir "_references\screens") -Force | Out-Null
     }
 
     # 9. Gravar manifesto .agents/.harness-manifest.json

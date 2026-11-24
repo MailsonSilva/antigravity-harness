@@ -25,16 +25,20 @@ Instala ou atualiza diretrizes, workflows, `harness-studio.html` e skills mobile
 
 - **Windows (PowerShell)**:
   ```powershell
-  # A partir da pasta do seu app:
+  # Em um projeto existente:
   & "caminho\para\antigravity-harness\setup.ps1" -Profile flutter
-  # Opcional (habilitar supabase_mcp, google_stitch, graft_ast, ai_memory):
-  & "caminho\para\antigravity-harness\setup.ps1" -Profile flutter -WithOptionalMcps
+  # Para criar um app Flutter novo + estrutura Clean Architecture + MCPs opcionais:
+  & "caminho\para\antigravity-harness\setup.ps1" -Profile flutter -InitApp -Org com.suaempresa -WithOptionalMcps
   ```
 - **Linux / macOS**:
   ```bash
-  # A partir da pasta do seu app:
+  # Em um projeto existente:
   /caminho/para/antigravity-harness/init.sh flutter
+  # Para criar um app Flutter novo + pastas + MCPs opcionais:
+  /caminho/para/antigravity-harness/init.sh flutter . --init-app --org com.suaempresa --with-optional-mcps
   ```
+
+> **Auto-evolução:** Cada projeto instalado também recebe `.agents/PROJECT_BRAIN.md` (memória curada local) e `.agents/HARNESS_FEEDBACK.md` (onde os agentes registram sugestões de melhoria para promover depois ao `antigravity-harness`).
 
 ### 2. Projeto Web / Landing Pages (Next.js / Tailwind / SEO)
 Instala apenas diretrizes, workflows e skills web:
