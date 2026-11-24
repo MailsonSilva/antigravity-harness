@@ -1,37 +1,27 @@
-# 🧠 PROJECT BRAIN — Memória Viva e Decisões Técnicas
+# PROJECT BRAIN — Memória Curada do Antigravity Harness
 
-Este documento é a fonte única de verdade do projeto. Ele preserva o contexto entre diferentes sessões de IA, desenvolvedores e máquinas.
+> **Regra Anti-Inchaço (Máx. ~60 linhas):** Mantenha apenas blocos curados. Decisões superadas devem ser substituídas ou movidas para `Padrões Depreciados`.
 
----
+## 1. Visão Geral & Stack
+- **Projeto:** `antigravity-harness` (Harness modular v4 para Google Antigravity).
+- **Foco Principal:** Desenvolvimento Mobile Flutter com SDD (`_specs/SPEC.md`), TDD (`RED → GREEN`) e Studio Kanban (`_specs/board.json`).
 
-## 1. Visão Geral do Produto
-- **Stack**: Flutter (Dart 3), SQLite local (Offline-first), Clean Architecture.
-- **Domínio Principal**: Força de Vendas e Catálogo Comercial Mobile.
+## 2. Invariantes Arquiteturais Ativas
+1. **SSOT Modular v4:** Toda regra/workflow/skill mora em `core/` e `profiles/<stack>/`, materializada nos projetos-alvo via `setup.ps1` ou `init.sh`.
+2. **Triagem Progressiva:** Máximo de 2 skills carregadas por turno via `core/skills/antigravity-skill-orchestrator/SKILL.md`, delegando com `TypeName` nativo (`self` / `research`).
+3. **Atualização Segura:** `.agents/.harness-manifest.json` controla arquivos gerenciados; `_specs/`, `_references/`, `.agents/PROJECT_BRAIN.md` e skills customizadas nunca são sobrescritos.
 
----
+## 3. Padrões Depreciados / Não Usar
+- Instaladores por heredoc (`install.ps1`, `install.sh`), `update.ps1`/`update.sh`, `.agents/harness.yaml`, `.agents/rules/` e `_specs/task-board.md` (substituídos pela v4 Modular + `_specs/board.json`).
+- Alteração automática de `.gitignore` ou execução de `git rm --cached` nos scripts de setup.
 
-## 2. Invariantes Arquiteturais Inegociáveis
-1. **Domain Purity**: A pasta `domain/` não importa pacotes externos, HTTP ou SQLite.
-2. **Cálculo Único**: Preços e regras de negócio nunca são calculados na camada de apresentação (UI).
-3. **Ergonomia Mobile**: Alvos de toque com no mínimo $48 \times 48\text{ dp}$ e regra dos 4 estados de tela (Loading, Empty, Error, Success).
+## 4. Contratos de Dados & Persistência
+- **Perfis:** `profiles/<stack>/profile.yaml` (sem `if` hardcoded nos instaladores).
+- **Kanban Studio:** `_specs/board.json` (`schemaVersion: 1`, `lastModified` com trava otimista).
+- **MCP Padrão Flutter:** `dart_mcp`; pesados (`supabase_mcp`, `google_stitch`, `patrol_mcp`, `graft_ast`, `ai_memory`) apenas via `-WithOptionalMcps`.
 
----
-
-## 3. Contratos de Banco Local (SQLite)
-- Toda query com filtro de texto (`WHERE LIKE`) ou chave estrangeira (`JOIN`) deve ter índice composto (`CREATE INDEX IF NOT EXISTS`).
-- Operações de importação em massa devem rodar dentro de `db.transaction` usando `Batch`.
-
----
-
-## 4. Servidores MCP Ativos
-- `dart`: Daemon oficial do SDK para diagnósticos e testes.
-- `google-stitch`: Leitor visual de telas em `_references/screens/`.
-- `graft-ast`: Navegação estática de símbolos.
-- `ai-memory`: Histórico local de tickets.
-
----
-
-## 5. Decisões Arquiteturais Recentes (Histórico Autônomo)
-*(Preenchido automaticamente pelo Orquestrador ao finalizar tarefas no Kanban)*
-- **[2026-11-05]**: Aprovado o isolamento local do harness via `.gitignore` para manter o GitHub do projeto limpo.
-- **[2026-11-05]**: Formalizado o protocolo anti-alucinação de ferramentas no `.agents/rules/global.md`.
+## 5. Último Handoff & Decisões Recentes (Máx. 5 itens)
+- **[2026-11-24]:** Consolidada arquitetura v4 Modular (`core/` + `profiles/`) com `setup.ps1`/`init.sh` unificados.
+- **[2026-11-24]:** Migrado `harness-studio.html` para `_specs/board.json` com trava otimista e visualizador read-only de `SPEC.md`.
+- **[2026-11-24]:** Adotado fluxo SDD/TDD (`RED → GREEN`), Guardrails Negativos, `patrol_mcp` opcional e Golden Tests.
+- **[2026-11-24]:** Formalizada memória curada File-First em `.agents/PROJECT_BRAIN.md`.

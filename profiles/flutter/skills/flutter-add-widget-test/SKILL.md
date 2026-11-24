@@ -1,4 +1,4 @@
-﻿---
+---
 name: flutter-add-widget-test
 description: Criação de Widget Tests determinísticos em Flutter validando os 4 estados da UI, interações de toque, digitação e acessibilidade.
 category: Qualidade & Testes

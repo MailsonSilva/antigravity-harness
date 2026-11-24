@@ -206,6 +206,9 @@ fi
 if [ -f "$CORE_DIR/templates/board.json" ] && [ ! -f "$SPECS_DIR/board.json" ]; then
     cp "$CORE_DIR/templates/board.json" "$SPECS_DIR/board.json"
 fi
+if [ -f "$CORE_DIR/templates/PROJECT_BRAIN.md" ] && [ ! -f "$AGENTS_DIR/PROJECT_BRAIN.md" ]; then
+    cp "$CORE_DIR/templates/PROJECT_BRAIN.md" "$AGENTS_DIR/PROJECT_BRAIN.md"
+fi
 
 # Gerar .agents/mcp.json com base em mcps.default + mcps.optional (se --with-optional-mcps)
 MCPS_DEFAULT="$(awk '/^mcps:/{m=1; next} m && /^[a-zA-Z0-9_]+:/{m=0} m && /^  default:/{d=1; next} m && /^  [a-zA-Z0-9_]+:/{d=0} m && d && /^    - /{gsub(/^    - *|["'\'' ]/, ""); print}' "$SELECTED_YAML")"

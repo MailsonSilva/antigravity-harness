@@ -14,6 +14,7 @@ Mapear integralmente os requisitos de negócio, contratos de dados, dependência
 ## 2. Etapas de Execução
 
 ### Passo 1: Inspeção Prévia do Contexto
+- Ler `.agents/PROJECT_BRAIN.md` (se existir) para respeitar invariantes ativas e padrões depreciados.
 - Ler arquivos de configuração do projeto (`pubspec.yaml` ou `package.json`).
 - Inspecionar a estrutura existente de diretórios e contratos já estabelecidos.
 - Identificar dependências de persistência (ex: SQLite local, Supabase, API REST).

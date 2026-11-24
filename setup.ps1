@@ -323,6 +323,12 @@ try {
         Copy-Item -Path $BoardTemplate -Destination $TargetBoard -Force
     }
 
+    $BrainTemplate = Join-Path $CoreDir "templates\PROJECT_BRAIN.md"
+    $TargetBrain = Join-Path $AgentsDir "PROJECT_BRAIN.md"
+    if ((Test-Path $BrainTemplate) -and -not (Test-Path $TargetBrain)) {
+        Copy-Item -Path $BrainTemplate -Destination $TargetBrain -Force
+    }
+
     # 9. Gravar manifesto .agents/.harness-manifest.json
     $ManifestObj = [ordered]@{
         schemaVersion       = 1

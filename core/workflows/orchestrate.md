@@ -59,7 +59,7 @@ Após a conclusão dos subagentes de uma onda:
 
 ## 4. Conclusão da Entrega
 Quando todas as tarefas estiverem verdes e verificadas:
-1. Atualizar o checklist da `_specs/SPEC.md` e mover as tarefas concluídas em `_specs/board.json` para `done` (atualizando `lastModified`).
+1. Atualizar o checklist da `_specs/SPEC.md`, mover as tarefas concluídas em `_specs/board.json` para `done` (atualizando `lastModified`) e atualizar o bloco `Último Handoff & Decisões Recentes` em `.agents/PROJECT_BRAIN.md` (substituindo itens obsoletos, sem acumular log infinito).
 2. Apresentar ao usuário o relatório final:
    - Arquivos alterados.
    - Evidência dos comandos de teste e lint (código de saída 0).

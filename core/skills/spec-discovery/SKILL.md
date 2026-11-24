@@ -1,4 +1,4 @@
-﻿---
+---
 name: spec-discovery
 description: Descoberta técnica estruturada (SDD) em formato de Micro-Spec com entrevista cirúrgica, guardrails negativos e mapeamento 1:1 de critérios de aceitação para testes RED.
 category: Arquitetura & Produto
