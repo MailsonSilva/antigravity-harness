@@ -62,20 +62,28 @@ Instala apenas diretrizes, workflows e skills web:
 antigravity-harness/
 ├── core/                                # Núcleo compartilhado independente de stack
 │   ├── GEMINI.base.md                   # Protocolo base pt-BR, subagentes e verification gate
+│   ├── skills/                          # antigravity-skill-orchestrator, spec-discovery, skill-creator, harness-evolver
+│   ├── templates/                       # board.json, PROJECT_BRAIN.md, HARNESS_FEEDBACK.md
 │   └── workflows/
 │       ├── plan.md                      # Workflow Carbon: Geração da SPEC.md
-│       └── orchestrate.md               # Workflow Argon: Despacho paralelo Hydrogen
+│       └── orchestrate.md               # Workflow Argon: Despacho paralelo Hydrogen (RED -> GREEN)
 ├── profiles/
 │   ├── flutter/                         # Perfil Mobile & SaaS Offline-First
+│   │   ├── profile.yaml                 # Manifesto de aliases e MCPs (default/optional)
 │   │   ├── GEMINI.flutter.md            # Clean Architecture, 4 estados, SQLite e gates
-│   │   └── skills/                      # clean-architecture, local-first-data, riverpod, etc.
+│   │   └── skills/                      # 18 skills Dart/Flutter (arquitetura, Riverpod, TDD, Patrol, etc.)
 │   └── web-sites/                       # Perfil Web & Landing Pages
+│       ├── profile.yaml                 # Manifesto do perfil Web
 │       ├── GEMINI.web.md                # Next.js App Router, Tailwind, Core Web Vitals e SEO
 │       └── skills/                      # web-performance-seo, web-landing-conversion, web-responsive-ui
-├── setup.ps1                            # Instalador automatizado para Windows
-├── init.sh                              # Instalador automatizado para Unix/macOS
+├── harness-studio.html                  # Kanban visual (_specs/board.json) + leitor de SPEC.md
+├── COMANDOS.md                          # Guia operacional do dia a dia (início/fim de sessão e prompts)
+├── setup.ps1                            # Instalador/atualizador unificado para Windows
+├── init.sh                              # Instalador/atualizador unificado para Unix/macOS
 └── README.md
 ```
+
+> 📘 **Guia prático do dia a dia:** consulte [COMANDOS.md](COMANDOS.md) (também copiado para `.agents/COMANDOS.md` em todo projeto instalado) para ver prompts prontos de início de sessão, ciclo SDD/TDD e encerramento/handoff.
 
 ---
 

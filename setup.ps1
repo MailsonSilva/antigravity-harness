@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Antigravity Harness Setup & Update (Windows / PowerShell 5.1+)
 # Configura ou atualiza o ambiente Antigravity (v4 Modular) no projeto-alvo.
 # Uso:
@@ -317,12 +317,19 @@ try {
     Write-Utf8NoBom -Path $McpJsonPath -Content ($McpJsonObj | ConvertTo-Json -Depth 6)
     $ManagedFiles += @{ path = ".agents/mcp.json"; sha256 = (Get-FileSha256 $McpJsonPath) }
 
-    # 8. Copiar harness-studio.html e inicializar _specs/board.json somente se não existir
+    # 8. Copiar harness-studio.html, COMANDOS.md e inicializar templates somente se não existirem
     $StudioSource = Join-Path $HarnessRoot "harness-studio.html"
     if (Test-Path $StudioSource) {
         $StudioDest = Join-Path $TargetDir "harness-studio.html"
         Copy-Item -Path $StudioSource -Destination $StudioDest -Force
         $ManagedFiles += @{ path = "harness-studio.html"; sha256 = (Get-FileSha256 $StudioDest) }
+    }
+
+    $ComandosSource = Join-Path $HarnessRoot "COMANDOS.md"
+    if (Test-Path $ComandosSource) {
+        $ComandosDest = Join-Path $AgentsDir "COMANDOS.md"
+        Copy-Item -Path $ComandosSource -Destination $ComandosDest -Force
+        $ManagedFiles += @{ path = ".agents/COMANDOS.md"; sha256 = (Get-FileSha256 $ComandosDest) }
     }
 
     $BoardTemplate = Join-Path $CoreDir "templates\board.json"

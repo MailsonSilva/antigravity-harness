@@ -214,9 +214,12 @@ if [ "$PROFILE_NAME" = "flutter" ]; then
     printf "\n---\n\n## Workspace Flutter Detectado\n- Diretório do pacote Dart/Flutter: \`%s\` (execute \`flutter test\` e \`dart analyze\` a partir deste caminho).\n" "$RESOLVED_APP_DIR" >> "$TARGET_DIR/GEMINI.md"
 fi
 
-# Copiar harness-studio.html e inicializar _specs/board.json se ausente
+# Copiar harness-studio.html, COMANDOS.md e inicializar templates se ausentes
 if [ -f "$HARNESS_ROOT/harness-studio.html" ]; then
     cp "$HARNESS_ROOT/harness-studio.html" "$TARGET_DIR/harness-studio.html"
+fi
+if [ -f "$HARNESS_ROOT/COMANDOS.md" ]; then
+    cp "$HARNESS_ROOT/COMANDOS.md" "$AGENTS_DIR/COMANDOS.md"
 fi
 if [ -f "$CORE_DIR/templates/board.json" ] && [ ! -f "$SPECS_DIR/board.json" ]; then
     cp "$CORE_DIR/templates/board.json" "$SPECS_DIR/board.json"
