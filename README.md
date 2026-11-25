@@ -69,13 +69,14 @@ antigravity-harness/
 │       └── orchestrate.md               # Workflow Argon: Despacho paralelo Hydrogen (RED -> GREEN)
 ├── profiles/
 │   ├── flutter/                         # Perfil Mobile & SaaS Offline-First
-│   │   ├── profile.yaml                 # Manifesto de aliases e MCPs (default/optional)
-│   │   ├── GEMINI.flutter.md            # Clean Architecture, 4 estados, SQLite e gates
-│   │   └── skills/                      # 18 skills Dart/Flutter (arquitetura, Riverpod, TDD, Patrol, etc.)
+│   │   ├── profile.yaml                 # Manifesto de aliases, skills e MCPs (default/optional)
+│   │   ├── GEMINI.flutter.md            # Clean Architecture, 4 estados, codegen, segurança e gates
+│   │   └── skills/                      # 23 skills Dart/Flutter (arquitetura, Dio, codegen, goldens, observabilidade, etc.)
 │   └── web-sites/                       # Perfil Web & Landing Pages
 │       ├── profile.yaml                 # Manifesto do perfil Web
 │       ├── GEMINI.web.md                # Next.js App Router, Tailwind, Core Web Vitals e SEO
 │       └── skills/                      # web-performance-seo, web-landing-conversion, web-responsive-ui
+├── .agents/scripts/                     # Gates de verificação (verify.ps1 e verify.sh) copiados no setup
 ├── harness-studio.html                  # Kanban visual (_specs/board.json) + leitor de SPEC.md
 ├── COMANDOS.md                          # Guia operacional do dia a dia (início/fim de sessão e prompts)
 ├── setup.ps1                            # Instalador/atualizador unificado para Windows
@@ -100,6 +101,6 @@ antigravity-harness/
    - O Argon quebra a spec em ondas de dependência e despacha subagentes **Hydrogen** em paralelo via `invoke_subagent`.
 
 3. **Fase 3: Loop Obrigatório de Verificação (Verification Gate)**
-   - **Flutter**: O Argon executa obrigatoriamente `dart format .`, `flutter analyze` e `flutter test`.
-   - **Web**: O Argon executa obrigatoriamente `npm run lint` e `npm run build`.
+   - **Flutter**: execute `.agents/scripts/verify.ps1` (Windows) ou `.agents/scripts/verify.sh` (Linux/macOS/CI), que rodam `dart analyze` e `flutter test -j 1`.
+   - **Web**: o Argon executa obrigatoriamente `npm run lint` e `npm run build`.
    - Tarefas só são concluídas com código de saída 0 em todas as validações.

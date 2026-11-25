@@ -1,76 +1,53 @@
 ---
 name: flutter-apply-architecture-best-practices
-description: Arquitetura Flutter em camadas (UI, Lógica, Dados) com workflow de feature em 8 passos. Use ao estruturar um projeto novo ou refatorar para escalabilidade.
+description: Convenções de código Dart 3, imutabilidade, composição Services → Repositories → AsyncNotifier e workflow de implementação de feature em 8 passos. NÃO use para definir topologia de pastas Clean Architecture ou pureza de domínio (use clean-architecture).
+category: Arquitetura & Domínio
 ---
 
-# Skill: Arquitetura Flutter em Camadas
+# Skill: Convenções de Implementação Flutter & Fluxo de Feature
 
-> Adaptado de `flutter/agent-plugins` (time oficial do Flutter, licença BSD-3-Clause).
-> Compatibilizado com este harness: pastas `core/` + `features/` (ver `GEMINI.md`),
-> estado via Riverpod (`flutter-state-riverpod`) e TDD obrigatório (`clean-architecture`).
+## 1. Quando Acionar Esta Skill
+- Ao implementar uma feature passo a passo após os contratos de `clean-architecture` estarem definidos.
+- Ao padronizar Services, Repositories concretos e State Holders (`AsyncNotifier`) em Dart 3.
+- Ao revisar imutabilidade, injeção de dependência e separação entre View e lógica de estado.
+- NÃO acione quando: precisar definir fronteiras de `domain/`/`data/`/`presentation/` ou modelar `Result<T>` (use `clean-architecture`), nem para regras específicas de `build_runner` (use `flutter-code-generation`).
 
-## 1. Camadas (Separation of Concerns)
+## 2. Arquitetura e Diretrizes Técnicas
+1. **Papéis de Execução (sem sobrepor camadas)**:
+   - **Views (`pages/`, `widgets/`)**: widgets enxutos com `const` sempre que possível; apenas layout, animação e despacho de ações ao Notifier.
+   - **State Holders (`AsyncNotifier`)**: expõem `AsyncValue` (casando com Loading, Empty, Error e Success) e recebem repositórios via `ref.read(...)`.
+   - **Services**: classes sem estado que encapsulam I/O externo (HTTP/Dio, SQLite, plugins) e retornam DTOs/Models crus.
+   - **Repositories (Implementação)**: orquestram Services, aplicam cache/retry/offline e expõem apenas entidades ou `Result<T>`.
+   - **Use Cases (Opcional)**: crie apenas quando houver regra reutilizada entre múltiplas features ou orquestração complexa; CRUD simples vai direto do Notifier ao Repositório.
+2. **Workflow Operacional de Feature (8 Passos + TDD)**:
+   - [ ] 1. Entidades imutáveis (`const`, `final`) em `domain/`.
+   - [ ] 2. Interfaces de repositório em `domain/` (base para os testes RED).
+   - [ ] 3. Services de I/O em `data/` ou `core/`.
+   - [ ] 4. Repositórios concretos em `data/` com mapeamento para domínio.
+   - [ ] 5. `DomainService`/UseCase (somente se houver regra complexa ou reuso).
+   - [ ] 6. `AsyncNotifier` (Riverpod) injetando o repositório.
+   - [ ] 7. View observando o provider e tratando os 4 estados de UI.
+   - [ ] 8. Gate verde: `.agents/scripts/verify.ps1` (ou `verify.sh`).
 
-Nunca misture renderização de UI com regra de negócio ou acesso a dados.
-
-### UI (Presentation) — `features/<feature>/presentation/`
-- **Views:** widgets enxutos e reutilizáveis; só lógica de UI (animação, layout, navegação simples). Todo dado vem do state holder.
-- **State holders:** neste harness, o papel de ViewModel é do `AsyncNotifier` (Riverpod). Expõe `AsyncValue` (casa com os 4 estados de tela) e recebe repositórios por injeção (provider/construtor).
-
-### Dados — `features/<feature>/data/` (+ `core/database/`, `core/network/`)
-- **Services:** classes sem estado que envelopam APIs externas (HTTP, banco local, plugins). Retornam modelos crus.
-- **Repositories:** consomem um ou mais services, transformam em modelos de domínio, cuidam de cache, sync offline e retry. Expõem apenas modelos de domínio.
-
-### Lógica (Domain) — `features/<feature>/domain/` — opcional por feature
-- **Use cases:** só quando a lógica é complexa ou reutilizada entre telas; CRUD simples vai direto do state holder ao repositório.
-
-## 2. Estrutura de Projeto (padrão do harness)
-
-```text
-lib/
-├── core/
-│   ├── database/   # SQLite/Drift: migrations, DAOs
-│   ├── network/    # Clientes HTTP / Supabase
-│   └── theme/      # Design tokens
-└── features/
-    └── [feature_name]/
-        ├── data/          # Models crus, services, repositórios concretos
-        ├── domain/        # Entidades + contratos (Dart puro, sem Flutter)
-        └── presentation/  # Telas, widgets e Notifiers (Riverpod)
-```
-
-## 3. Workflow: Implementar uma Feature (8 passos + TDD)
-
-Siga em ordem; cada passo de código nasce de um teste (`clean-architecture`):
-
-- [ ] **1. Modelos de domínio:** entidades imutáveis em `domain/`.
-- [ ] **2. Contratos:** interfaces de repositório em `domain/` (é contra elas que os testes RED são escritos).
-- [ ] **3. Services:** acesso a API/banco em `data/` ou `core/`.
-- [ ] **4. Repositórios:** implementações concretas; cache, retry e mapeamento para o domínio.
-- [ ] **5. Lógica condicional:** use case em `domain/` se houver transformação complexa ou reuso; senão, pule.
-- [ ] **6. State holder:** `AsyncNotifier` (Riverpod) com repositórios injetados; estados via `AsyncValue`.
-- [ ] **7. View:** widget que observa o provider e renderiza os 4 estados (loading/empty/error/success).
-- [ ] **8. Validador:** `flutter test` + `dart analyze` verdes; corrija e reexecute até passar.
-
-## 4. Exemplo Mínimo (repositório + state holder)
-
+## 3. Código Canônico (Dart 3 / Flutter)
 ```dart
-// data: implementação contra o contrato do domínio
+// data/repositories/user_repository_impl.dart
 class UserRepositoryImpl implements UserRepository {
   UserRepositoryImpl(this._api);
-  final ApiClient _api;
+
+  final UserApiService _api;
   User? _cached;
 
   @override
   Future<User> getUser(String id) async {
     final cached = _cached;
-    if (cached != null) return cached;
-    final raw = await _api.fetchUser(id);
-    return _cached = User(id: raw.id, name: raw.fullName);
+    if (cached != null && cached.id == id) return cached;
+    final dto = await _api.fetchUser(id);
+    return _cached = dto.toEntity();
   }
 }
 
-// presentation: AsyncNotifier no lugar do ViewModel
+// presentation/controllers/profile_notifier.dart
 class ProfileNotifier extends AsyncNotifier<User?> {
   @override
   FutureOr<User?> build() => null;
@@ -83,3 +60,8 @@ class ProfileNotifier extends AsyncNotifier<User?> {
   }
 }
 ```
+
+## 4. Antipadrões Proibidos
+- ❌ Misturar chamadas de `Dio`/`Database` diretamente dentro de Widgets ou `AsyncNotifier` pulando o Repositório.
+- ❌ Criar `UseCase` pass-through para todo método trivial de CRUD.
+- ❌ Usar campos mutáveis sem `final` em entidades e estados.

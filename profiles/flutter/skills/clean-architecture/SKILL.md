@@ -1,51 +1,50 @@
 ﻿---
 name: clean-architecture
-description: Arquitetura Limpa em Flutter com separação estrita Presentation, Domain e Data, Domain Services puros e tratamento funcional de erros com sealed classes.
-category: Engenharia de Software
+description: Estrutura de camadas Clean Architecture (Presentation, Domain, Data), inversão de dependência, pureza de domínio e tratamento funcional de erros com sealed classes em Flutter. NÃO use para convenções passo a passo de implementação Dart, Riverpod ou build_runner.
+category: Arquitetura & Domínio
 ---
 
-# Skill: Clean Architecture & Domain Purity (Flutter/Dart 3)
+# Skill: Clean Architecture & Pureza de Domínio (Flutter / Dart 3)
 
 ## 1. Quando Acionar Esta Skill
-Acione sempre que criar uma nova feature, refatorar regras de negócio espalhadas em Widgets/Controllers ou corrigir divergências de cálculo comercial entre telas (ex: pesquisa vs pedido).
+- Ao criar uma nova feature e definir fronteiras entre `domain/`, `data/` e `presentation/`.
+- Ao extrair regras de negócio ou cálculos comerciais espalhados em Widgets/Controllers para `DomainService`.
+- Ao modelar contratos de repositório (`abstract interface class`) e retornos tipados (`sealed class Result<T>`).
+- NÃO acione quando: a estrutura de camadas já estiver definida e a tarefa for apenas convenções de código Dart/Notifier (`flutter-apply-architecture-best-practices`) ou geração de código (`flutter-code-generation`).
 
-## 2. Topologia de Pastas por Feature
-```text
-lib/features/<feature_name>/
-├── domain/
-│   ├── entities/          # Objetos imutáveis de negócio (100% Dart puro)
-│   ├── repositories/      # Interfaces abstratas (contratos)
-│   ├── services/          # Regras comerciais complexas (ex: PrecoDomainService)
-│   └── failures/          # Sealed classes de falhas de domínio
-├── data/
-│   ├── datasources/       # LocalDataSource (SQLite) e RemoteDataSource (REST/Supabase)
-│   ├── models/            # DTOs com fromJson/toJson e fromMap/toMap + toEntity()
-│   └── repositories/      # Implementação concreta dos contratos de domain
-└── presentation/
-    ├── controllers/       # Notifiers / AsyncNotifiers (Riverpod)
-    ├── pages/             # Scaffolds de tela
-    └── widgets/           # Componentes visuais desacoplados e const
-```
+## 2. Arquitetura e Diretrizes Técnicas
+1. **Topologia de Pastas por Feature (`lib/features/<feature_name>/`)**:
+   - `domain/`: `entities/` (objetos puros), `repositories/` (contratos abstratos), `services/` (regras comerciais puras), `failures/` (falhas tipadas).
+   - `data/`: `datasources/` (Local SQLite e Remote Dio/Supabase), `models/` (DTOs com mapeamento `toEntity()`), `repositories/` (implementações dos contratos de `domain/`).
+   - `presentation/`: `controllers/` (State Notifiers), `pages/` (telas), `widgets/` (componentes isolados).
+2. **Regra da Dependência (Inversão Estrita)**:
+   - Direção única: `presentation` → `domain` ← `data`.
+   - `domain/` é 100% Dart puro: **proibido** importar `package:flutter/material.dart`, `sqflite`, `dio`, `http` ou `supabase_flutter`.
+3. **Separação Model vs. Entity**:
+   - `Model`/`DTO` conhece JSON/colunas de banco e converte para `Entity` via `toEntity()`.
+   - `Entity` usa nomenclatura semântica de negócio e valida invariantes.
 
-## 3. Regras Inegociáveis (Guardrails)
-1. **Regra da Dependência**: `presentation` -> `domain` <- `data`. O diretório `domain` NUNCA importa pacotes de UI (`package:flutter/material.dart`) nem pacotes de banco/rede (`sqflite`, `dio`, `supabase_flutter`).
-2. **Centralização de Cálculos**: É proibido calcular preços, descontos, impostos ou saldos dentro de `Widget.build()` ou dentro de queries SQL duplicadas. Crie um `DomainService` testável.
-3. **Model vs Entity**: `Model` conhece JSON e colunas do SQLite (`pro00_codigo`). `Entity` usa nomes semânticos do domínio (`idProduto`, `precoBase`) e valida invariantes no construtor.
-
-## 4. Padrão de Código Canônico (Dart 3 Sealed Result & Domain Service)
+## 3. Código Canônico (Dart 3 / Flutter)
 ```dart
 // domain/failures/result.dart
 sealed class Result<T> {
   const Result();
 }
+
 final class Success<T> extends Result<T> {
-  final T value;
   const Success(this.value);
+  final T value;
 }
+
 final class Failure<T> extends Result<T> {
+  const Failure(this.message, {this.code = 'DOMAIN_ERROR'});
   final String message;
   final String code;
-  const Failure(this.message, {this.code = 'DOMAIN_ERROR'});
+}
+
+// domain/repositories/pedido_repository.dart
+abstract interface class PedidoRepository {
+  Future<Result<double>> calcularTotalPedido(String pedidoId);
 }
 
 // domain/services/preco_calculator_service.dart
@@ -54,20 +53,18 @@ class PrecoCalculatorService {
 
   double calcularPrecoFinal({
     required double precoTabela,
-    required double fatorPlanoPagamento,
-    required double multiplicadorEmbalagem,
-    double percentualDesconto = 0,
+    double fatorPagamento = 1.0,
+    double percentualDesconto = 0.0,
   }) {
-    final fator = fatorPlanoPagamento > 0 ? fatorPlanoPagamento : 1.0;
-    final mult = multiplicadorEmbalagem > 0 ? multiplicadorEmbalagem : 1.0;
-    final bruto = precoTabela * fator * mult;
-    final comDesconto = bruto * (1 - (percentualDesconto / 100));
-    return double.parse(comDesconto.toStringAsFixed(2));
+    final fator = fatorPagamento > 0 ? fatorPagamento : 1.0;
+    final liquido = (precoTabela * fator) * (1 - (percentualDesconto / 100));
+    return double.parse(liquido.toStringAsFixed(2));
   }
 }
 ```
 
-## 5. Antipadrões Proibidos
-- ❌ Chamar `DatabaseHelper.instance.query(...)` diretamente de dentro de um `StatefulWidget`.
-- ❌ Retornar `Map<String, dynamic>` cru do repositório para a camada de UI.
-- ❌ Silenciar exceções com `catch (e) { return []; }` sem propagar `Failure` para o estado da tela.
+## 4. Antipadrões Proibidos
+- ❌ Importar `material.dart`, `sqflite` ou `dio` dentro de qualquer arquivo em `domain/`.
+- ❌ Retornar `Map<String, dynamic>` cru do repositório para a camada `presentation/`.
+- ❌ Calcular preços, impostos ou descontos dentro de `Widget.build()` ou queries SQL duplicadas.
+- ❌ Silenciar exceções com `catch (_) { return []; }` sem propagar `Failure`.

@@ -12,3 +12,27 @@ mcps:
     - patrol_mcp
     - graft_ast
     - ai_memory
+skills:
+  - clean-architecture
+  - code-quality-tests
+  - dart-collect-coverage
+  - dart-use-pattern-matching
+  - flutter-add-integration-test
+  - flutter-add-widget-test
+  - flutter-apply-architecture-best-practices
+  - flutter-build-responsive-layout
+  - flutter-code-generation
+  - flutter-environments-security
+  - flutter-golden-tests
+  - flutter-networking-dio
+  - flutter-observability
+  - flutter-release
+  - flutter-setup-declarative-routing
+  - flutter-setup-localization
+  - flutter-state-riverpod
+  - flutter-use-http-package
+  - local-first-data
+  - mobile-cicd
+  - mobile-ux
+  - store-publishing
+  - supabase-flutter

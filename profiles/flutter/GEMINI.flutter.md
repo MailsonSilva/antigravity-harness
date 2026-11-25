@@ -8,19 +8,21 @@ Adote estrutura modular estrita por feature:
 ```text
 lib/
 ├── core/                  # Serviços globais, DB local, tema e utilitários
+│   ├── config/            # AppEnv (--dart-define-from-file)
 │   ├── database/          # SQLite (migrations, helpers, DAOs)
-│   ├── network/           # Clientes HTTP / Supabase SDK
+│   ├── network/           # Clientes Dio / HTTP / Supabase SDK
+│   ├── observability/     # CrashReporter (Sentry/Crashlytics) e handlers globais
 │   └── theme/             # Design Tokens, tipografia e estilos
 ├── features/
 │   └── [feature_name]/
-│       ├── data/          # Models, DTOs, DataSources e Repositórios concretos
+│       ├── data/          # Models, DTOs (.freezed/.g), DataSources e Repositórios concretos
 │       ├── domain/        # Entidades puras e Interfaces de repositório
-│       └── presentation/  # Telas, Widgets e State Notifiers
+│       └── presentation/  # Telas, Widgets e AsyncNotifiers
 └── main.dart
 ```
 
 ### Regras de Dependência
-- **Domain**: Dart puro, sem imports de Flutter, widgets ou pacotes externos de UI.
+- **Domain**: Dart puro, sem imports de Flutter, widgets ou pacotes externos de UI/rede/banco.
 - **Presentation**: Depende exclusivamente do Domain e de seus próprios Notifiers/Controllers. Nunca chama SQLite ou APIs diretamente do Widget.
 - **Data**: Implementa as interfaces do Domain, tratando mapeamentos, erros e cache local.
 
@@ -50,16 +52,24 @@ Todo ecrã ou componente que consome dados assíncronos deve tratar explicitamen
 
 ---
 
-## 5. Loop Obrigatório de Verificação (Flutter Gate)
-Antes de finalizar qualquer tarefa ou PR:
+## 5. Gatilhos de Skills por Etapa do Ciclo
+- **Camadas & Fluxo**: `clean-architecture` (fronteiras/Result) + `flutter-apply-architecture-best-practices` (Services/Notifiers).
+- **Codegen**: `flutter-code-generation` sempre que usar `freezed`, `json_serializable` ou `@riverpod` (`build_runner`).
+- **Rede**: `flutter-networking-dio` como padrão de produção (interceptors/refresh/retry); `flutter-use-http-package` só para chamadas simples/pontuais.
+- **Ambientes & Secrets**: `flutter-environments-security` para flavors (`dev`, `staging`, `prod`), `--dart-define-from-file` e `.gitignore`.
+- **Qualidade & Regressão Visual**: `flutter-add-widget-test`, `flutter-golden-tests` (contra `_references/screens/`) e `flutter-add-integration-test` (Patrol).
+- **Observabilidade Pós-Deploy**: `flutter-observability` (`FlutterError.onError`, `PlatformDispatcher.instance.onError`, Sentry/Crashlytics e retroalimentação para `PROJECT_BRAIN.md` / `HARNESS_FEEDBACK.md`).
+
+---
+
+## 6. Loop Obrigatório de Verificação (Flutter Gate)
+Antes de finalizar qualquer tarefa ou PR, execute o gate unificado (ou os comandos abaixo):
 ```powershell
-# 1. Formatação de código
-dart format .
-
-# 2. Análise estática obrigatória (deve retornar 0 avisos)
-flutter analyze
-
-# 3. Execução de testes automatizados
-flutter test
+# Windows (PowerShell)
+.\.agents\scripts\verify.ps1
 ```
-Proibido concluir tarefas se `flutter analyze` reportar avisos ou se qualquer teste falhar.
+```bash
+# Linux / macOS / CI
+./.agents/scripts/verify.sh
+```
+Equivalente manual: `dart format .`, `dart analyze` (0 avisos) e `flutter test -j 1` (100% verde). Proibido concluir tarefas se a análise estática reportar avisos ou se qualquer teste falhar.

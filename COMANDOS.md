@@ -30,6 +30,17 @@ Preserva `_specs/`, `.agents/PROJECT_BRAIN.md`, `.agents/HARNESS_FEEDBACK.md` e 
 /caminho/para/antigravity-harness/init.sh flutter .
 ```
 
+### Quality Gate Unificado (`verify.ps1` / `verify.sh`)
+Todo projeto instalado recebe `.agents/scripts/verify.ps1` (Windows) e `.agents/scripts/verify.sh` (Linux/macOS/CI), executando `dart analyze` e `flutter test -j 1`:
+```powershell
+# Windows
+.\.agents\scripts\verify.ps1
+```
+```bash
+# Linux / macOS / GitHub Actions
+./.agents/scripts/verify.sh
+```
+
 ### Flags úteis
 - **Ativar MCPs opcionais** (`supabase_mcp`, `google_stitch`, `patrol_mcp`, `graft_ast`, `ai_memory`):
   - PowerShell: `-WithOptionalMcps` | Bash: `--with-optional-mcps`

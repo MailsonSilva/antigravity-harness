@@ -221,6 +221,15 @@ fi
 if [ -f "$HARNESS_ROOT/COMANDOS.md" ]; then
     cp "$HARNESS_ROOT/COMANDOS.md" "$AGENTS_DIR/COMANDOS.md"
 fi
+if [ -d "$HARNESS_ROOT/.agents/scripts" ]; then
+    mkdir -p "$AGENTS_DIR/scripts"
+    for script_name in verify.ps1 verify.sh; do
+        if [ -f "$HARNESS_ROOT/.agents/scripts/$script_name" ]; then
+            cp "$HARNESS_ROOT/.agents/scripts/$script_name" "$AGENTS_DIR/scripts/$script_name"
+        fi
+    done
+    [ -f "$AGENTS_DIR/scripts/verify.sh" ] && chmod +x "$AGENTS_DIR/scripts/verify.sh"
+fi
 if [ -f "$CORE_DIR/templates/board.json" ] && [ ! -f "$SPECS_DIR/board.json" ]; then
     cp "$CORE_DIR/templates/board.json" "$SPECS_DIR/board.json"
 fi

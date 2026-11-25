@@ -35,16 +35,22 @@ Ao delegar via `invoke_subagent`, use **sempre** um `TypeName` nativo (`"self"` 
 | Protótipo visual, tokens, UX mobile | `self` | `Flutter UI/UX Designer` | `mobile-ux` |
 | Breakpoints e telas grandes | `self` | `Flutter Responsive Builder` | `flutter-build-responsive-layout`, `mobile-ux` |
 | Inventário de strings / i18n | `self` | `Flutter Localization Engineer` | `flutter-setup-localization` |
-| Estruturar feature (camadas, pastas) | `self` | `Flutter Clean Arch Builder` | `flutter-apply-architecture-best-practices`, `clean-architecture` |
+| Estruturar camadas / pureza de domínio | `self` | `Flutter Clean Arch Architect` | `clean-architecture` |
+| Implementar feature (Services/Notifiers) | `self` | `Flutter Feature Builder` | `flutter-apply-architecture-best-practices`, `flutter-state-riverpod` |
+| Modelos/DTOs/Providers gerados (build_runner) | `self` | `Flutter Codegen Engineer` | `flutter-code-generation`, `flutter-apply-architecture-best-practices` |
 | Estado com Riverpod / 4 estados | `self` | `Flutter Riverpod Engineer` | `flutter-state-riverpod`, `mobile-ux` |
 | Navegação, rotas, deep links | `self` | `Flutter Routing Engineer` | `flutter-setup-declarative-routing` |
-| REST/HTTP em services | `self` | `Flutter Network Engineer` | `flutter-use-http-package`, `local-first-data` |
+| Ambientes, flavors e segurança | `self` | `Flutter Security & Env Engineer` | `flutter-environments-security` |
+| APIs REST de produção (Dio/refresh/retry) | `self` | `Flutter Network Engineer` | `flutter-networking-dio`, `local-first-data` |
+| Chamadas HTTP simples/pontuais | `self` | `Flutter Network Engineer` | `flutter-use-http-package` |
 | Supabase (auth, RLS, storage) | `self` | `Supabase Flutter Engineer` | `supabase-flutter`, `local-first-data` |
 | Banco local, sync offline | `self` | `Offline-First Data Engineer` | `local-first-data`, `supabase-flutter` |
 | Refatorar if-else/JSON/sealed | `self` | `Dart Pattern Matching Engineer` | `dart-use-pattern-matching`, `clean-architecture` |
 | Testes RED (unit/widget) | `self` | `Flutter TDD Tester` | `clean-architecture`, `flutter-add-widget-test` |
+| Testes visuais / Golden Tests | `self` | `Flutter Golden Test Engineer` | `flutter-golden-tests`, `flutter-add-widget-test` |
 | Teste E2E em device | `self` | `Flutter Integration Tester` | `flutter-add-integration-test`, `code-quality-tests` |
 | QA, lint, cobertura, autorreparo | `self` | `Flutter QA & Coverage Validator` | `code-quality-tests`, `dart-collect-coverage` |
+| Observabilidade, crashes e pós-deploy | `self` | `Flutter Observability Engineer` | `flutter-observability`, `harness-evolver` |
 | Release, CI/CD e publicação | `self` | `Flutter Release Engineer` | `flutter-release`, `mobile-cicd`, `store-publishing` |
 | Commit semântico | `self` | `Git Release Committer` | (nenhuma — usa `git diff` e pt-BR) |
 

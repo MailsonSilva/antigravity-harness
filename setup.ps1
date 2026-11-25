@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Antigravity Harness Setup & Update (Windows / PowerShell 5.1+)
 # Configura ou atualiza o ambiente Antigravity (v4 Modular) no projeto-alvo.
 # Uso:
@@ -330,6 +330,20 @@ try {
         $ComandosDest = Join-Path $AgentsDir "COMANDOS.md"
         Copy-Item -Path $ComandosSource -Destination $ComandosDest -Force
         $ManagedFiles += @{ path = ".agents/COMANDOS.md"; sha256 = (Get-FileSha256 $ComandosDest) }
+    }
+
+    $ScriptsSourceDir = Join-Path $HarnessRoot ".agents\scripts"
+    if (Test-Path $ScriptsSourceDir) {
+        $ScriptsDestDir = Join-Path $AgentsDir "scripts"
+        New-Item -ItemType Directory -Path $ScriptsDestDir -Force | Out-Null
+        foreach ($scriptName in @("verify.ps1", "verify.sh")) {
+            $scriptSrc = Join-Path $ScriptsSourceDir $scriptName
+            if (Test-Path $scriptSrc) {
+                $scriptDest = Join-Path $ScriptsDestDir $scriptName
+                Copy-Item -Path $scriptSrc -Destination $scriptDest -Force
+                $ManagedFiles += @{ path = ".agents/scripts/$scriptName"; sha256 = (Get-FileSha256 $scriptDest) }
+            }
+        }
     }
 
     $BoardTemplate = Join-Path $CoreDir "templates\board.json"
