@@ -1,142 +1,86 @@
-# Guia de Alterações — Harness Universal (v2)
+# Guia de Alterações — Antigravity Harness (v4 Modular)
 
-> Documento de referência da modernização do harness para o padrão **provider-agnostic**,
-> baseado nos 8 componentes canônicos do Google Research Harness² e na política de
-> herança de modelos (`inherit`). Este arquivo é versionado e serve como fonte de verdade
-> para instaladores, atualizadores e agentes.
+> Documento de referência da arquitetura **v4 Modular**, orientada a SDD (`_specs/SPEC.md`), TDD (`RED → GREEN`), memória curada File-First (`.agents/PROJECT_BRAIN.md`), auto-evolução (`.agents/HARNESS_FEEDBACK.md`) e isolamento estrito de perfis (`core/` + `profiles/<stack>/`).
 
 ---
 
 ## 1. Objetivo
 
-Eliminar qualquer acoplamento a fornecedor de IA (modelos fixos, IDs de vendor ou
-nomenclatura proprietária) mantendo um único scaffold reutilizável em Claude Code,
-Codex, Antigravity, Cursor e CLIs equivalentes. O harness **não escolhe modelo**:
-ele herda o modelo já autenticado no ambiente e permite sobrescrita explícita por perfil.
+Fornecer uma **Fonte Única de Verdade (SSOT)** modular e agnóstica de modelo que:
+- Elimina duplicação entre repositório-fonte e projetos consumidores via `setup.ps1` (Windows) e `init.sh` (Linux/macOS/WSL).
+- Evita inchaço de contexto (*Progressive Disclosure*): consolida regras globais + stack em um único `GEMINI.md` na raiz e carrega no máximo 2 skills sob demanda via `antigravity-skill-orchestrator`.
+- Garante atualizações seguras e idempotentes controladas pelo manifesto `.agents/.harness-manifest.json`.
 
 ---
 
-## 2. Os 8 Componentes Canônicos
+## 2. Componentes Canônicos v4
 
-| # | Componente | Arquivo(s) de referência | Responsabilidade |
+| # | Componente | Caminho no Repositório-Fonte | Papel no Projeto Consumidor |
 |---|---|---|---|
-| 1 | **System Prompts** | `.agents/rules/global.md` | Idioma (pt-BR), spec-driven, TDD, handoffs, commits convencionais e segurança. |
-| 2 | **Guardrails** | `.agents/rules/mobile.md`, `.agents/rules/web.md` | Padrões técnicos por plataforma: arquitetura em camadas, 4 estados de UI, performance, a11y, SEO e gates de qualidade. |
-| 3 | **Memory** | `.agents/PROJECT_BRAIN.md`, `.agents/memory/context.db` | Memória persistente do projeto (aprendizados e histórico de evolução) e banco local de tickets do `ai-memory`. |
-| 4 | **Tool Guidance** | `.agents/mcp.json` | Declaração dos servidores MCP (`google-stitch`, `graft-ast`, `ai-memory`) e instruções de uso. |
-| 5 | **Subagents** | `.agents/harness.yaml#subagents` | Elenco de papéis, perfil de modelo abstrato, regras, skills e ferramentas permitidas. |
-| 6 | **Skills** | `.agents/skills/**/SKILL.md` | Capacidades reutilizáveis com gatilho, fluxo de trabalho e checklist. |
-| 7 | **Scripts** | `install.ps1`, `install.sh`, `update.ps1`, `update.sh` | Instalação e sincronização idempotentes, com preservação de dados locais. |
-| 8 | **Plugins** | `.agents/mcp.json` | Extensões e integrações externas carregadas via MCP. |
+| 1 | **Diretrizes Base & Stack** | `core/GEMINI.base.md` + `profiles/<stack>/GEMINI.<stack>.md` | Concatenados em `GEMINI.md` na raiz do projeto (com detecção de `-AppDir`). |
+| 2 | **Manifesto de Perfil** | `profiles/<stack>/profile.yaml` | Declara `aliases`, `gemini_file`, `skills` e `mcps` (`default` vs `optional`). |
+| 3 | **Workflows SDD/TDD** | `core/workflows/{plan,orchestrate}.md` | Copiados para `.agents/workflows/` (Micro-Spec → Ondas `RED → GREEN → Gate`). |
+| 4 | **Skills Modulares** | `core/skills/` (4) + `profiles/<stack>/skills/` (23 Flutter / 3 Web) | Copiadas para `.agents/skills/` e roteadas pelo `antigravity-skill-orchestrator`. |
+| 5 | **Memória & Feedback** | `core/templates/{PROJECT_BRAIN,HARNESS_FEEDBACK}.md` | Inicializados em `.agents/` e **preservados** em updates. |
+| 6 | **Kanban & Spec Viewer** | `harness-studio.html` + `core/templates/board.json` | Studio zero-build conectado a `_specs/board.json` (trava otimista `lastModified`) e `_specs/SPEC.md` (leitura). |
+| 7 | **Quality Gates** | `.agents/scripts/{verify.ps1,verify.sh}` | Executam `dart analyze` e `flutter test -j 1` (Windows, Linux/macOS e CI). |
+| 8 | **Instaladores Unificados** | `setup.ps1` (UTF-8 BOM) e `init.sh` | Suportam execução local ou remota (`git clone --depth 1`), `-InitApp` e `-WithOptionalMcps`. |
 
-### 2.1 Mapa de diretórios
-
+### 2.1 Estrutura Gerada no Projeto Consumidor
 ```text
-.agents/
-├── harness.yaml              # componentes 5 e 6 (referências) + perfis de modelo
-├── mcp.json                  # componentes 4 e 8
-├── PROJECT_BRAIN.md          # componente 3 (memória consolidada)
-├── memory/                   # componente 3 (banco local, não versionado)
-├── rules/
-│   ├── global.md             # componente 1
-│   ├── mobile.md             # componente 2
-│   └── web.md                # componente 2
-├── skills/                   # componente 6
-└── workflows/
-    └── dev-cycle.yaml        # orquestração ponta a ponta
+projeto-alvo/
+├── GEMINI.md                         # Diretrizes unificadas (Core + Perfil + Workspace)
+├── harness-studio.html               # Kanban visual e leitor de SPEC.md
+├── _specs/
+│   ├── board.json                    # Estado das tarefas (schemaVersion: 1, lastModified)
+│   └── SPEC.md                       # Micro-Spec ativa da feature
+└── .agents/
+    ├── .harness-manifest.json        # Controle de arquivos/skills gerenciados (SHA-256)
+    ├── PROJECT_BRAIN.md              # Memória curada por blocos fixos (~60 linhas)
+    ├── HARNESS_FEEDBACK.md           # Sugestões para promoção ao antigravity-harness
+    ├── COMANDOS.md                   # Cola operacional de início/fim de sessão e prompts
+    ├── mcp.json                      # MCPs default (e optional sob -WithOptionalMcps)
+    ├── scripts/{verify.ps1,verify.sh}
+    ├── workflows/{plan,orchestrate}.md
+    └── skills/                       # Skills do core + perfil + skills customizadas locais
 ```
 
 ---
 
-## 3. Política de Herança de Modelos (`inherit`)
+## 3. Contrato dos Scripts (`setup.ps1` e `init.sh`)
 
-### 3.1 Padrão
+### 3.1 Flags Suportadas
+- **`-Profile` / `<perfil>`**: resolvido dinamicamente via `profiles/*/profile.yaml` (`flutter`/`mobile`, `web-sites`/`web`).
+- **`-InitApp` / `--init-app`**: para Flutter, executa `flutter create` (se `pubspec.yaml` ausente e `flutter` no `PATH`) e cria `lib/core/{database,errors,network,theme}`, `lib/features`, `test/{core,features}`, `integration_test` e `_references/{brand,screens}`.
+- **`-WithOptionalMcps` / `--with-optional-mcps`**: habilita MCPs opcionais (`supabase_mcp`, `google_stitch`, `patrol_mcp`, `graft_ast`, `ai_memory`); por padrão instala apenas `mcps.default` (`dart_mcp` no Flutter).
+- **`-AppDir` / `--app-dir`**: define o pacote Dart/Flutter em monorepos (autodetecta `apps/mobile/pubspec.yaml` quando presente).
 
-```yaml
-model_profiles:
-  reasoning: "${AI_MODEL_REASONING:-inherit}"
-  coding: "${AI_MODEL_CODING:-inherit}"
-  multimodal_design: "${AI_MODEL_DESIGN:-inherit}"
-  fast_ops: "${AI_MODEL_FAST:-inherit}"
-```
+### 3.2 Regras de Atualização e Preservação
+Antes de sobrescrever arquivos gerenciados, um backup é criado em `%TEMP%/harness-backup-*` (ou `/tmp/harness-backup-*`). Nenhuma mutação automática é feita em `.gitignore` ou no índice Git (`git rm --cached`).
 
-- `inherit` significa **usar o modelo atualmente logado** na CLI/IDE, sem nenhuma
-  suposição de fornecedor, versão ou nome comercial.
-- Nenhum arquivo do harness pode conter identificador de modelo fixo (ex.: `gemini-*`,
-  `gpt-*`, `claude-*`).
-- Nenhuma variável é obrigatória: o pipeline nunca aborta por perfil não configurado.
+| Artefato | Comportamento no Update |
+|---|---|
+| `GEMINI.md`, `.agents/workflows/*`, `.agents/scripts/*`, `.agents/mcp.json`, `.agents/COMANDOS.md`, `harness-studio.html` | **Atualizados** (com backup prévio) e registrados em `managedFiles`. |
+| `.agents/skills/*` listadas em `managedSkills` | **Atualizadas**; skills removidas do perfil upstream são limpas apenas se constavam no manifesto anterior. |
+| Skills customizadas do projeto (fora de `managedSkills`) | **Preservadas** integralmente. |
+| `.agents/PROJECT_BRAIN.md`, `.agents/HARNESS_FEEDBACK.md`, `_specs/*`, `_references/*` | **Preservados** integralmente (criados apenas se ausentes). |
 
-### 3.2 Sobrescrita opcional por perfil
+---
 
-| Perfil | Variável | Uso típico |
+## 4. Critérios de Aceitação v4
+
+- [x] `setup.ps1` compatível com PowerShell 5.1 (salvo em UTF-8 **com BOM**, JSONs gravados em UTF-8 **sem BOM**).
+- [x] `bash -n init.sh` e `bash -n .agents/scripts/verify.sh` retornando código `0`.
+- [x] Instalação limpa com `-Profile flutter` materializando as **27 skills** (4 `core` + 23 `flutter`), `verify.ps1`, `verify.sh` e `COMANDOS.md`.
+- [x] Atualização preservando `PROJECT_BRAIN.md`, `HARNESS_FEEDBACK.md`, `_specs/board.json`, `_specs/SPEC.md` e skills customizadas.
+- [x] Todas as `SKILL.md` seguindo o template canônico de `core/skills/skill-creator/SKILL.md`.
+
+---
+
+## 5. Histórico
+
+| Data | Versão | Alteração |
 |---|---|---|
-| `reasoning` | `AI_MODEL_REASONING` | PRD, arquitetura, decisões e autoevolução do harness. |
-| `coding` | `AI_MODEL_CODING` | TDD, builders e refatoração. |
-| `multimodal_design` | `AI_MODEL_DESIGN` | Extração de Design DNA e prototipagem visual. |
-| `fast_ops` | `AI_MODEL_FAST` | Commits semânticos e comandos rápidos. |
-
-PowerShell:
-
-```powershell
-$env:AI_MODEL_REASONING = "seu-modelo-forte"
-$env:AI_MODEL_CODING    = "seu-modelo-rapido"
-```
-
-Bash:
-
-```bash
-export AI_MODEL_REASONING="seu-modelo-forte" AI_MODEL_CODING="seu-modelo-rapido"
-```
-
-### 3.3 Regras de consistência
-
-1. Todo subagente declara `profile` (nunca `model`) e o perfil precisa existir em
-   `model_profiles`.
-2. Workflows não exigem variáveis de modelo; apenas exibem o perfil resolvido.
-3. Instaladores e atualizadores não podem reintroduzir nomes de modelo ou agentes
-   removidos do elenco.
-
----
-
-## 4. Contrato dos Scripts
-
-### 4.1 `install.ps1` / `install.sh`
-
-- Criam a estrutura canônica e gravam **exatamente** os arquivos versionados em `.agents/`.
-- Preservam `.agents/PROJECT_BRAIN.md` caso já exista (nunca sobrescrevem memória).
-- São compatíveis com PowerShell 5.1 (sem `&&`, arquivo salvo em UTF-8 **com BOM**).
-
-### 4.2 `update.ps1` / `update.sh`
-
-Sincronizam com o upstream via clone raso em diretório temporário:
-
-| Categoria | Comportamento |
-|---|---|
-| `.agents/PROJECT_BRAIN.md` | **Preservado** integralmente. |
-| `.agents/skills/**` | **Preservado**; apenas skills novas do upstream são adicionadas. |
-| `.agents/memory/**` | **Preservado** integralmente (nunca copiado nem apagado). |
-| `.agents/harness.yaml`, `mcp.json`, `rules/**`, `workflows/**` | Atualizados (backup prévio). |
-| `_specs/prd.md`, `features/`, `tasks/T*.md`, `apps/`, `_references/` | Preservados. |
-
-- O repositório aceita `owner/repo`, URL completa ou caminho local (`-Repo` / `REPO`).
-- Falha de clone aborta sem alterar o projeto (o `try/finally` limpa o temporário).
-
----
-
-## 5. Critérios de Aceitação
-
-- [ ] `harness.yaml` declara os 8 componentes em `scaffolding`.
-- [ ] Todos os perfis usam `:-inherit`.
-- [ ] Nenhuma ocorrência de modelo fixo ou `release_manager` em scripts geradores.
-- [ ] `install.ps1` parseia sem erros no PowerShell 5.1 e possui BOM.
-- [ ] `bash -n install.sh` e `bash -n update.sh` retornam código 0.
-- [ ] Instalação limpa gera harness idêntico ao do repositório.
-- [ ] Atualização preserva `PROJECT_BRAIN.md`, skills existentes e `memory/`.
-
----
-
-## 6. Histórico
-
-| Data | Alteração |
-|---|---|
-| 2026-10-30 | Harness v2 agnóstico: 8 componentes, perfis `inherit`, instaladores alinhados, atualizadores com sincronização real e correção de compatibilidade com PowerShell 5.1. |
+| 2026-10-30 | v2 | Padronização agnóstica inicial (`inherit`, 8 componentes). |
+| 2026-11-24 | v4.0 | Consolidação `core/` + `profiles/`, unificação `setup.ps1`/`init.sh` com manifesto, `harness-studio.html` em `_specs/board.json`, fluxo SDD/TDD (`RED → GREEN`), `PROJECT_BRAIN.md`, `HARNESS_FEEDBACK.md` e `COMANDOS.md`. |
+| 2026-11-25 | v4.1 | Perfil Flutter expandido para 23 skills (arquitetura consolidada, `flutter-environments-security`, `flutter-golden-tests`, `flutter-code-generation`, `flutter-networking-dio`, `flutter-observability`) e paridade Linux/CI com `.agents/scripts/verify.sh`. |
