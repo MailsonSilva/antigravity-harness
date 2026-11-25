@@ -6,15 +6,19 @@
 - **Stack:** [Flutter / Web / Backend]
 - **Domínio:** [Resumo em 1 linha]
 
-## 2. Invariantes Arquiteturais Ativas
+## 2. Design System (Fonte Única de Verdade Visual)
+- **Especificação Visual:** `_references/brand/DESIGN_SYSTEM.md` (cores semânticas Light/Dark, tipografia, espaçamentos, raios e padrões de componentes).
+- **Regra:** Toda tela/widget em `lib/features/` consome exclusivamente `Theme.of(context)` e `ThemeExtension` (`context.tokens`).
+
+## 3. Invariantes Arquiteturais Ativas
 - [Ex.: Camada `domain/` pura, sem imports externos.]
 - [Ex.: Toda tela implementa Loading, Empty, Error e Success.]
 
-## 3. Padrões Depreciados / Não Usar
+## 4. Padrões Depreciados / Não Usar
 - [Ex.: Não usar `setState` para estado de feature; usar Riverpod.]
 
-## 4. Contratos de Dados & Persistência
+## 5. Contratos de Dados & Persistência
 - [Ex.: Queries com `WHERE LIKE` ou `JOIN` exigem índice composto.]
 
-## 5. Último Handoff & Decisões Recentes (Máx. 5 itens)
+## 6. Último Handoff & Decisões Recentes (Máx. 5 itens)
 - **[YYYY-MM-DD]:** Projeto inicializado com Antigravity Harness v4.

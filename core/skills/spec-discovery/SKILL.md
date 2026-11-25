@@ -10,11 +10,15 @@ category: Arquitetura & Produto
 - Cada especificação deve cobrir **uma fatia vertical** (legível em ~2 minutos) e ser salva em `_specs/SPEC.md`.
 - Evite PRDs monolíticos: se houver mais de 5–7 tarefas atômicas, divida em incrementos menores.
 
-## 2. Entrevista Cirúrgica Pré-Spec
-Antes de fechar `_specs/SPEC.md`, formule até **3 a 5 perguntas diretas** apenas para eliminar lacunas reais que não devem ser chutadas:
-- Transições de estado e comportamento offline/erro.
-- Contratos de dados, nulabilidade e regras de negócio/cálculo.
-- Limites de escopo (o que **não** deve ser alterado nesta entrega).
+## 2. Entrevista Cirúrgica & Design System Pré-Spec
+Antes de fechar `_specs/SPEC.md` ou planejar telas:
+1. **Verificação Visual Obrigatória (`_references/brand/DESIGN_SYSTEM.md`)**:
+   - Confira se `_references/brand/DESIGN_SYSTEM.md` já está preenchido para o projeto.
+   - Se ainda estiver no estado de template (`[Nome do App]`), extraia paleta, tipografia e estilos das referências em `_references/screens/` ou faça perguntas rápidas ao usuário para defini-lo antes de iniciar a UI.
+2. Formule até **3 a 5 perguntas diretas** apenas para eliminar lacunas reais que não devem ser chutadas:
+   - Transições de estado e comportamento offline/erro.
+   - Contratos de dados, nulabilidade e regras de negócio/cálculo.
+   - Limites de escopo (o que **não** deve ser alterado nesta entrega).
 
 ## 3. Estrutura Obrigatória de `_specs/SPEC.md`
 1. **Contexto e Problema Real**: O que está quebrado, lento ou faltando.

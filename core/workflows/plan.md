@@ -15,12 +15,13 @@ Mapear integralmente os requisitos de negócio, contratos de dados, dependência
 
 ### Passo 1: Inspeção Prévia do Contexto
 - Ler `.agents/PROJECT_BRAIN.md` (se existir) para respeitar invariantes ativas e padrões depreciados.
+- Verificar `_references/brand/DESIGN_SYSTEM.md` (se a feature envolver UI): confirmar se já está preenchido; se ainda estiver como template, extrair tokens das telas em `_references/screens/` ou preparar perguntas no Passo 2 antes de planejar componentes visuais.
 - Ler arquivos de configuração do projeto (`pubspec.yaml` ou `package.json`).
 - Inspecionar a estrutura existente de diretórios e contratos já estabelecidos.
 - Identificar dependências de persistência (ex: SQLite local, Supabase, API REST).
 
 ### Passo 2: Entrevista e Alinhamento Técnico (Cirúrgico)
-- Formular no máximo **3 a 5 perguntas diretas** sobre lacunas reais (transições de estado, falhas offline/rede, contratos de erro e limites de escopo).
+- Formular no máximo **3 a 5 perguntas diretas** sobre lacunas reais (incluindo definição de paleta/tipografia em `_references/brand/DESIGN_SYSTEM.md` caso ainda seja template, transições de estado, falhas offline/rede, contratos de erro e limites de escopo).
 - Propor escolhas padrão para UX, modelos de erro e offline-first caso o usuário não especifique.
 
 ### Passo 3: Geração da `_specs/SPEC.md` (Micro-Spec)

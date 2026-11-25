@@ -32,7 +32,8 @@ Ao delegar via `invoke_subagent`, use **sempre** um `TypeName` nativo (`"self"` 
 | Tarefa | `TypeName` | `Role` Sugerido | Skills (ordem de prioridade) |
 |---|---|---|---|
 | Descobrir escopo, PRD, regras de negócio | `research` | `Product Discovery Analyst` | `spec-discovery` |
-| Protótipo visual, tokens, UX mobile | `self` | `Flutter UI/UX Designer` | `mobile-ux` |
+| Design System, tokens e theming | `self` | `Flutter Theme Architect` | `flutter-design-system`, `mobile-ux` |
+| Protótipo visual, 4 estados, ergonomia UX | `self` | `Flutter UI/UX Designer` | `mobile-ux`, `flutter-design-system` |
 | Breakpoints e telas grandes | `self` | `Flutter Responsive Builder` | `flutter-build-responsive-layout`, `mobile-ux` |
 | Inventário de strings / i18n | `self` | `Flutter Localization Engineer` | `flutter-setup-localization` |
 | Estruturar camadas / pureza de domínio | `self` | `Flutter Clean Arch Architect` | `clean-architecture` |

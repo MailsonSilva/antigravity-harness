@@ -239,6 +239,10 @@ fi
 if [ -f "$CORE_DIR/templates/HARNESS_FEEDBACK.md" ] && [ ! -f "$AGENTS_DIR/HARNESS_FEEDBACK.md" ]; then
     cp "$CORE_DIR/templates/HARNESS_FEEDBACK.md" "$AGENTS_DIR/HARNESS_FEEDBACK.md"
 fi
+mkdir -p "$TARGET_DIR/_references/brand" "$TARGET_DIR/_references/screens"
+if [ -f "$CORE_DIR/templates/DESIGN_SYSTEM.md" ] && [ ! -f "$TARGET_DIR/_references/brand/DESIGN_SYSTEM.md" ]; then
+    cp "$CORE_DIR/templates/DESIGN_SYSTEM.md" "$TARGET_DIR/_references/brand/DESIGN_SYSTEM.md"
+fi
 
 # Scaffolding inicial do app Flutter (--init-app)
 if [ "$INIT_APP" = "true" ] && [ "$PROFILE_NAME" = "flutter" ]; then

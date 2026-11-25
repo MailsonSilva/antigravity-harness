@@ -15,7 +15,8 @@
 - Instaladores por heredoc (`install.ps1`, `install.sh`), `update.ps1`/`update.sh`, `.agents/harness.yaml`, `.agents/rules/` e `_specs/task-board.md` (substituídos pela v4 Modular + `_specs/board.json`).
 - Alteração automática de `.gitignore` ou execução de `git rm --cached` nos scripts de setup.
 
-## 4. Contratos de Dados & Persistência
+## 4. Contratos de Dados, Visual & Persistência
+- **Design System (SSOT Visual):** `_references/brand/DESIGN_SYSTEM.md` (cores semânticas, tipografia, espaçamentos e bordas; validado automaticamente por `verify.ps1` / `verify.sh` em `lib/features/`).
 - **Perfis:** `profiles/<stack>/profile.yaml` (sem `if` hardcoded nos instaladores).
 - **Kanban Studio:** `_specs/board.json` (`schemaVersion: 1`, `lastModified` com trava otimista).
 - **MCP Padrão Flutter:** `dart_mcp`; pesados (`supabase_mcp`, `google_stitch`, `patrol_mcp`, `graft_ast`, `ai_memory`) apenas via `-WithOptionalMcps`.

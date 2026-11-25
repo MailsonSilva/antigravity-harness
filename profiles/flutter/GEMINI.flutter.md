@@ -45,15 +45,17 @@ Todo ecrã ou componente que consome dados assíncronos deve tratar explicitamen
 
 ---
 
-## 4. Ergonomia e UI Mobile
+## 4. Ergonomia, Design System e UI Mobile (Regra Inegociável)
+- **Fonte Única Visual:** É **obrigatório** ler `_references/brand/DESIGN_SYSTEM.md` antes de criar ou editar qualquer widget ou tela.
+- **Proibição Estrita de Valores Hardcoded em `lib/features/`:** É **estritamente proibido** usar cores literais (`Color(0x...)`, `Colors.blue`, etc., exceto `Colors.transparent`), `TextStyle` com `fontSize`/`fontFamily` hardcoded ou números mágicos de espaçamento/borda diretamente em `lib/features/`. Tudo deve vir de `Theme.of(context)` (`colorScheme`, `textTheme`) ou `ThemeExtension` (`context.tokens` em `lib/core/theme/`).
 - **Área Mínima de Toque**: Todo elemento interativo deve ter no mínimo **48x48 dp**.
 - **Performance**: Use construtores `const` sempre que o widget não contiver estado mutável.
-- **Design Tokens**: Cores, espaçamentos e fontes devem ser consumidos de `core/theme/` (proibido valores mágicos de cores na UI).
 
 ---
 
 ## 5. Gatilhos de Skills por Etapa do Ciclo
 - **Camadas & Fluxo**: `clean-architecture` (fronteiras/Result) + `flutter-apply-architecture-best-practices` (Services/Notifiers).
+- **Design System & UX**: `flutter-design-system` (`lib/core/theme/` e `ThemeExtension`) + `mobile-ux` (4 estados e ergonomia 48dp).
 - **Codegen**: `flutter-code-generation` sempre que usar `freezed`, `json_serializable` ou `@riverpod` (`build_runner`).
 - **Rede**: `flutter-networking-dio` como padrão de produção (interceptors/refresh/retry); `flutter-use-http-package` só para chamadas simples/pontuais.
 - **Ambientes & Secrets**: `flutter-environments-security` para flavors (`dev`, `staging`, `prod`), `--dart-define-from-file` e `.gitignore`.

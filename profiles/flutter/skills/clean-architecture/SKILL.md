@@ -1,4 +1,4 @@
-﻿---
+---
 name: clean-architecture
 description: Estrutura de camadas Clean Architecture (Presentation, Domain, Data), inversão de dependência, pureza de domínio e tratamento funcional de erros com sealed classes em Flutter. NÃO use para convenções passo a passo de implementação Dart, Riverpod ou build_runner.
 category: Arquitetura & Domínio

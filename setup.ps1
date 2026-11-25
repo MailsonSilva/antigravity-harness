@@ -364,6 +364,15 @@ try {
         Copy-Item -Path $FeedbackTemplate -Destination $TargetFeedback -Force
     }
 
+    $RefBrandDir = Join-Path $TargetDir "_references\brand"
+    $RefScreensDir = Join-Path $TargetDir "_references\screens"
+    New-Item -ItemType Directory -Path $RefBrandDir, $RefScreensDir -Force | Out-Null
+    $DesignTemplate = Join-Path $CoreDir "templates\DESIGN_SYSTEM.md"
+    $TargetDesignSystem = Join-Path $RefBrandDir "DESIGN_SYSTEM.md"
+    if ((Test-Path $DesignTemplate) -and -not (Test-Path $TargetDesignSystem)) {
+        Copy-Item -Path $DesignTemplate -Destination $TargetDesignSystem -Force
+    }
+
     # 8.1 Scaffolding inicial do app Flutter (-InitApp)
     if ($InitApp -and $ProfileName -eq "flutter") {
         $TargetAppPath = if ([string]::IsNullOrWhiteSpace($AppDir)) { $TargetDir } else { Join-Path $TargetDir $AppDir }
