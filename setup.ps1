@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Antigravity Harness Setup & Update (Windows / PowerShell 5.1+)
 # Configura ou atualiza o ambiente Antigravity (v4 Modular) no projeto-alvo.
 # Uso:

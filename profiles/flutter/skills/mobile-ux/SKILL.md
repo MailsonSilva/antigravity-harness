@@ -1,4 +1,4 @@
-﻿---
+---
 name: mobile-ux
 description: Usabilidade mobile, os 4 estados obrigatórios de tela (Loading, Empty, Error, Success), ergonomia de toque (48dp) e micro-interações em Flutter. NÃO use para arquitetura de tokens ou ThemeData/ThemeExtension (use flutter-design-system).
 category: UI/UX & Frontend
